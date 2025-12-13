@@ -191,7 +191,24 @@ Install: `pre-commit install`
 
 ## Step 4: Record the Learning
 
-Add to agent memory or documentation:
+### Agent Memory (Optional Enhancement)
+
+If agent memory MCP server is available, record the defeat for future sessions:
+
+```python
+add_recent_learning("Defeated [pattern-name]: [key insight about the fix]")
+```
+
+**Example:**
+```python
+add_recent_learning("Silent fallback pattern defeated - always raise ValueError for missing required fields instead of returning None")
+```
+
+**Note:** This step is optional. If the MCP server is not running, the pattern defeat test itself serves as the primary learning mechanism through pre-commit enforcement.
+
+### Documentation
+
+Add pattern defeat to documentation:
 
 ```markdown
 ## [Pattern Name] Incident ([Date])
