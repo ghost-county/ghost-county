@@ -63,8 +63,8 @@ section() {
 show_banner() {
     echo -e "${MAGENTA}"
     cat << "EOF"
-                                    .     .
-                                 .  |\-^-/|  .
+                                   .     .
+                                .  |\-^-/|   .
                                /| } O.=" O { |\
                               /╱ \-_ _ _-/    \\
                  ██╗  ██╗ █████╗ ██╗   ██╗███╗   ██╗████████╗
@@ -239,7 +239,7 @@ RUNNING_FROM_REMOTE=false
 
 # GitHub repo URL for remote installation
 readonly GITHUB_REPO_URL="https://github.com/ghost-county/ghost-county.git"
-readonly GITHUB_REPO_BRANCH="master"
+readonly GITHUB_REPO_BRANCH="main"
 
 # ============================================================================
 # HELP TEXT
