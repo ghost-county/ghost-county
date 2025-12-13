@@ -281,3 +281,57 @@ nats-data/
 !.haunt/tests/
 !.haunt/scripts/
 !.haunt/README.md
+
+# ============================================================================
+# Haunt - Project-Local Directories
+# ============================================================================
+
+# .claude/ - Project-local Claude Code configuration
+.claude/
+
+# .haunt/ - Project SDLC artifacts (ephemeral working files)
+.haunt/plans/
+.haunt/progress/
+.haunt/completed/
+.haunt/docs/
+
+# Preserve SDLC tests and scripts (optionally shareable)
+!.haunt/tests/
+!.haunt/scripts/
+!.haunt/README.md
+
+# ============================================================================
+# Haunt - Project-Local Directories
+# ============================================================================
+
+# .claude/ - Project-local Claude Code configuration
+.claude/
+
+# .haunt/ - Project SDLC artifacts (ephemeral working files)
+.haunt/plans/
+.haunt/progress/
+.haunt/completed/
+.haunt/docs/
+
+# Preserve SDLC tests and scripts (optionally shareable)
+!.haunt/tests/
+!.haunt/scripts/
+!.haunt/README.md
+
+# ============================================================================
+# Haunt - Project-Local Directories
+# ============================================================================
+
+# .claude/ - Project-local Claude Code configuration
+.claude/
+
+# .haunt/ - Project SDLC artifacts (ephemeral working files)
+.haunt/plans/
+.haunt/progress/
+.haunt/completed/
+.haunt/docs/
+
+# Preserve SDLC tests and scripts (optionally shareable)
+!.haunt/tests/
+!.haunt/scripts/
+!.haunt/README.md
