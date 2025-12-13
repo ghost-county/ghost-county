@@ -89,19 +89,57 @@ Claude Code's Agent SDK provides automatic context management. Understanding the
 
 ## Agent Memory Best Practices
 
-### When to Use `recall_context()`
+### When to Recall Context
 
-**Use for:**
-- Multi-session features (>1 day of work)
-- Complex architectural decisions requiring historical rationale
-- Features with cross-agent coordination history
-- Work resuming after >24 hour gap
+Use `recall_context("[agent-type]")` when:
 
-**Skip for:**
-- Single-session tasks
-- Simple bug fixes
-- Well-documented requirements in roadmap
-- Fresh features with no prior context
+**Multi-session work:**
+- Resuming M-sized requirements that span multiple sessions
+- Continuing features started in previous sessions (>24 hour gap)
+- Work with complex implementation history requiring prior context
+
+**Complex debugging:**
+- Debugging issues that span multiple investigation sessions
+- Troubleshooting problems requiring knowledge of previous failed attempts
+- Root cause analysis that builds on prior research findings
+
+**Cross-agent handoffs:**
+- Receiving work from another agent type (e.g., Dev receives from Research)
+- Coordinating features requiring multiple agent specializations
+- Understanding context from previous agent's decisions or discoveries
+
+**Example workflow:**
+```bash
+# At session startup, after verifying assignment
+recall_context("dev-backend")
+
+# Review recalled context for:
+# - Previous implementation decisions
+# - Known blockers or gotchas
+# - Partial work from last session
+# - Cross-references to related requirements
+
+# Proceed with work using historical context
+```
+
+### When to Skip Memory
+
+Do NOT use `recall_context()` when:
+
+**Simple, self-contained work:**
+- S-sized tasks completable in single session
+- Straightforward bug fixes with clear root cause
+- New features with no dependency on prior sessions
+
+**Clear requirements:**
+- All context needed is documented in roadmap
+- Acceptance criteria and tasks are self-explanatory
+- No ambiguity about implementation approach
+
+**Fresh starts:**
+- Starting new feature with no prior attempts
+- Clean-slate work with no historical context
+- Requirements explicitly state "ignore previous approaches"
 
 ### Storage Pattern
 
