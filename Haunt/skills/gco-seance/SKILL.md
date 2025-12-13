@@ -13,57 +13,130 @@ The Seance is Ghost County's primary workflow orchestration layer - a ritual tha
 - **Existing Projects:** Incremental workflow for single enhancement/bug/issue
 - **Trigger Phrases:** "start a seance", "hold a seance", "time for a seance", "let's seance"
 
-## Context Detection
+## Three Operating Modes
 
-The Seance workflow adapts based on project state:
+The Seance workflow has three context-aware modes:
 
-### New Project (No `.haunt/` Directory)
+### Mode 1: With Prompt (Immediate Workflow)
 
-**Full Workflow:**
-1. Vision & Goals discussion
-2. Requirements development (14-dimension rubric)
-3. Strategic analysis (JTBD, Kano, RICE, etc.)
-4. Roadmap creation (batching, sizing, dependencies)
-5. Prompt to summon spirits for implementation
+**Triggered by:** `/seance <user prompt>`
+
+**Flow:**
+1. Detect if `.haunt/` exists (determines full vs incremental)
+2. Execute idea-to-roadmap workflow with user's prompt
+3. Prompt to summon spirits after planning
+
+**For New Projects:**
+- Full workflow: Vision → Requirements → Analysis → Roadmap
+- Creates `.haunt/plans/requirements-document.md`, `requirements-analysis.md`, `roadmap.md`
+
+**For Existing Projects:**
+- Incremental workflow: Brief analysis → Add to roadmap
+- Updates `.haunt/plans/roadmap.md` with new items
+
+### Mode 2: No Arguments + Existing Project (Choice Prompt)
+
+**Triggered by:** `/seance` in repository with `.haunt/` directory
+
+**Flow:**
+1. Detect `.haunt/` exists
+2. Present choice prompt:
+
+```
+🕯️ The spirits stir. What brings you to the veil?
+
+[A] Add something new — I have an idea, feature, or bug to add
+[B] Summon the spirits — The roadmap is ready. Let's work.
+
+Your choice?
+```
+
+3. **If Choice A:**
+   - Ask: "What would you like to add?"
+   - Wait for user input
+   - Execute incremental idea-to-roadmap workflow
+   - Add to existing roadmap
+   - Prompt to summon spirits
+
+4. **If Choice B:**
+   - Read `.haunt/plans/roadmap.md`
+   - Find all ⚪ Not Started items
+   - Display items grouped by batch/phase
+   - Ask: "Which requirements should the spirits work on? (e.g., REQ-042, REQ-043) or 'all' for the next batch"
+   - Spawn agents for selected items
+
+**Output (Choice A):**
+- Updated `.haunt/plans/roadmap.md` with new items
+
+**Output (Choice B):**
+- Spawned agents working on selected requirements
+
+### Mode 3: No Arguments + New Project (New Project Prompt)
+
+**Triggered by:** `/seance` in repository without `.haunt/` directory
+
+**Flow:**
+1. Detect `.haunt/` does NOT exist
+2. Present new project prompt:
+
+```
+🕯️ A fresh haunting ground. What would you like to build?
+```
+
+3. Wait for user input
+4. Execute full idea-to-roadmap workflow
+5. Prompt to summon spirits after planning
 
 **Output:**
 - `.haunt/plans/requirements-document.md`
 - `.haunt/plans/requirements-analysis.md`
 - `.haunt/plans/roadmap.md`
 
-### Existing Project (Has `.haunt/` Directory)
-
-**Incremental Workflow:**
-1. Focus on single enhancement/bug/issue
-2. Run abbreviated idea-to-roadmap for that item
-3. Add to existing roadmap (continue REQ numbering)
-4. Prompt to summon spirits for implementation
-
-**Output:**
-- Updated `.haunt/plans/roadmap.md` with new items
-
 ## Workflow Steps
 
-### Step 1: Detect Context
+### Step 1: Detect Mode and Context
 
-```bash
-# Check if .haunt/ exists
-if [ -d ".haunt/" ]; then
-  MODE="incremental"
-else
-  MODE="full"
-fi
+```python
+import os
+
+has_args = bool(arguments.strip())
+has_haunt = os.path.exists(".haunt/")
+
+if has_args:
+    mode = 1  # Immediate workflow with prompt
+    workflow_type = "full" if not has_haunt else "incremental"
+elif has_haunt:
+    mode = 2  # Choice prompt (add new vs work roadmap)
+else:
+    mode = 3  # New project prompt
 ```
 
 **Communicate mode to user:**
-- Full: "🕯️ No .haunt/ detected. Beginning full séance ritual..."
-- Incremental: "🕯️ Existing project detected. Beginning incremental séance..."
 
-### Step 2: Invoke Project Manager
+**Mode 1 (With Prompt):**
+- New Project: "🕯️ No .haunt/ detected. Beginning full séance ritual..."
+- Existing Project: "🕯️ Existing project detected. Beginning incremental séance..."
 
-The Seance skill loads the `gco-project-manager` agent with appropriate context and user request.
+**Mode 2 (Choice Prompt):**
+```
+🕯️ The spirits stir. What brings you to the veil?
 
-**For Full Mode:**
+[A] Add something new — I have an idea, feature, or bug to add
+[B] Summon the spirits — The roadmap is ready. Let's work.
+
+Your choice?
+```
+
+**Mode 3 (New Project Prompt):**
+```
+🕯️ A fresh haunting ground. What would you like to build?
+```
+
+### Step 2: Execute Mode-Specific Flow
+
+**Mode 1 (With Prompt):** Invoke Project Manager immediately
+
+**For Full Workflow (New Project):**
 ```
 Spawn gco-project-manager with:
 - User's original prompt/idea
@@ -71,12 +144,60 @@ Spawn gco-project-manager with:
 - Run-through or review mode (ask user preference)
 ```
 
-**For Incremental Mode:**
+**For Incremental Workflow (Existing Project):**
 ```
 Spawn gco-project-manager with:
 - User's feature/bug/enhancement request
 - Instruction: "Existing project - add to roadmap"
 - Context: Existing roadmap path (.haunt/plans/roadmap.md)
+```
+
+**Mode 2 (Choice Prompt):** Handle user choice
+
+**Choice A (Add Something New):**
+1. Ask: "What would you like to add?"
+2. Wait for user response
+3. Spawn gco-project-manager with incremental workflow:
+```
+Spawn gco-project-manager with:
+- User's new feature/bug/enhancement
+- Instruction: "Existing project - add to roadmap"
+- Context: Existing roadmap path (.haunt/plans/roadmap.md)
+```
+
+**Choice B (Summon the Spirits):**
+1. Read `.haunt/plans/roadmap.md`
+2. Parse and extract all ⚪ Not Started requirements
+3. Group by batch/phase for display
+4. Present to user:
+```
+📋 Current roadmap shows these unstarted items:
+
+Batch 3: Authentication
+- ⚪ REQ-042: Implement JWT token generation
+- ⚪ REQ-043: Add login endpoint
+- ⚪ REQ-044: Add logout endpoint
+
+Batch 4: User Management
+- ⚪ REQ-045: Create user profile API
+- ⚪ REQ-046: Add avatar upload
+
+Which requirements should the spirits work on?
+- Enter specific REQ numbers (e.g., "REQ-042, REQ-043")
+- Or "all" for the next batch
+- Or "batch 3" for all items in Batch 3
+```
+5. Parse user selection
+6. Spawn appropriate agents for selected items (skip Step 3 & 4 summoning prompt)
+
+**Mode 3 (New Project Prompt):**
+1. Wait for user input to "What would you like to build?"
+2. Spawn gco-project-manager with full workflow:
+```
+Spawn gco-project-manager with:
+- User's project idea
+- Instruction: "New project - execute full idea-to-roadmap workflow"
+- Run-through or review mode (ask user preference)
 ```
 
 ### Step 3: Planning Phase
@@ -162,12 +283,12 @@ Then spawn appropriate gco-* agents based on roadmap assignments:
 Confirm roadmap location:
 > "Your roadmap is ready at `.haunt/plans/roadmap.md`. You can summon spirits later with `/summon <agent>` or begin implementation yourself."
 
-## Example Flow
+## Example Flows
 
-### New Project Example
+### Mode 1 Example: With Prompt (New Project)
 
 ```
-User: "Let's hold a seance to build a task management app"
+User: "/seance Build a task management app"
 
 Agent:
 🕯️ No .haunt/ detected. Beginning full séance ritual...
@@ -199,7 +320,7 @@ Summoning gco-dev-backend for REQ-002...
 Summoning gco-dev-backend for REQ-003...
 ```
 
-### Existing Project Example
+### Mode 1 Example: With Prompt (Existing Project)
 
 ```
 User: "/seance Add OAuth login support"
@@ -225,7 +346,147 @@ Your roadmap is ready at `.haunt/plans/roadmap.md`.
 You can summon spirits later with `/summon gco-dev-backend REQ-087`
 ```
 
+### Mode 2 Example: Choice Prompt - Add New
+
+```
+User: "/seance"
+
+Agent:
+🕯️ The spirits stir. What brings you to the veil?
+
+[A] Add something new — I have an idea, feature, or bug to add
+[B] Summon the spirits — The roadmap is ready. Let's work.
+
+Your choice?
+
+User: "A"
+
+Agent:
+What would you like to add?
+
+User: "Add rate limiting to the API"
+
+Agent:
+🕯️ Existing project detected. Beginning incremental séance...
+
+[PM creates requirements for rate limiting]
+[PM adds REQ-092 through REQ-094 to roadmap]
+
+✅ Added 3 new requirements in Batch 9: Rate Limiting
+
+[Random selection]
+"Shall we invoke the spirits for our dark intent?"
+
+[User: "yes"]
+
+[Random response]
+"👻 The spirits rise..."
+
+Summoning gco-dev-backend for REQ-092...
+Summoning gco-dev-backend for REQ-093...
+Summoning gco-dev-infrastructure for REQ-094...
+```
+
+### Mode 2 Example: Choice Prompt - Work Roadmap
+
+```
+User: "/seance"
+
+Agent:
+🕯️ The spirits stir. What brings you to the veil?
+
+[A] Add something new — I have an idea, feature, or bug to add
+[B] Summon the spirits — The roadmap is ready. Let's work.
+
+Your choice?
+
+User: "B"
+
+Agent:
+📋 Current roadmap shows these unstarted items:
+
+Batch 3: Authentication
+- ⚪ REQ-042: Implement JWT token generation
+- ⚪ REQ-043: Add login endpoint
+- ⚪ REQ-044: Add logout endpoint
+
+Batch 4: User Management
+- ⚪ REQ-045: Create user profile API
+- ⚪ REQ-046: Add avatar upload
+
+Which requirements should the spirits work on?
+- Enter specific REQ numbers (e.g., "REQ-042, REQ-043")
+- Or "all" for the next batch
+- Or "batch 3" for all items in Batch 3
+
+User: "batch 3"
+
+Agent:
+[Random response]
+"👁️ They hear your call."
+
+Summoning gco-dev-backend for REQ-042...
+Summoning gco-dev-backend for REQ-043...
+Summoning gco-dev-backend for REQ-044...
+```
+
+### Mode 3 Example: New Project Prompt
+
+```
+User: "/seance"
+
+Agent:
+🕯️ A fresh haunting ground. What would you like to build?
+
+User: "A personal finance tracker"
+
+Agent:
+🕯️ No .haunt/ detected. Beginning full séance ritual...
+
+[Full workflow proceeds as in Mode 1...]
+```
+
 ## Implementation Notes
+
+### Themed Prompts for Mode Transitions
+
+Use these atmospheric prompts to enhance each mode:
+
+**Mode 1 Detection (New Project):**
+- "🕯️ No .haunt/ detected. Beginning full séance ritual..."
+- "🕯️ A virgin repository. Let us prepare the full ritual..."
+- "🕯️ Fresh ground for a haunting. The full séance begins..."
+
+**Mode 1 Detection (Existing Project):**
+- "🕯️ Existing project detected. Beginning incremental séance..."
+- "🕯️ The spirits recognize this place. An incremental summoning..."
+- "🕯️ A familiar haunting. Beginning targeted ritual..."
+
+**Mode 2 Initial Prompt:**
+- "🕯️ The spirits stir. What brings you to the veil?"
+- "🕯️ The séance chamber awaits. What is your intent?"
+- "🕯️ The candles flicker. Speak your purpose."
+
+**Mode 2 Choice A Follow-up:**
+- "What would you like to add?"
+- "Tell me your vision. What shall we manifest?"
+- "Speak it into being. What do you wish to create?"
+
+**Mode 2 Choice B - Roadmap Display Header:**
+- "📋 Current roadmap shows these unstarted items:"
+- "📜 The grimoire reveals these pending rituals:"
+- "📋 The spirits await these tasks:"
+
+**Mode 2 Choice B - Agent Spawn Responses:**
+Use the existing 75/25 random selection from summoning prompts:
+- "👁️ They hear your call."
+- "🌙 The veil parts..."
+- "💀 So be it. The summoning begins."
+
+**Mode 3 Initial Prompt:**
+- "🕯️ A fresh haunting ground. What would you like to build?"
+- "🕯️ Untouched soil. What shall we raise from nothing?"
+- "🕯️ A blank slate awaits. What is your vision?"
 
 ### Theming Philosophy
 
@@ -233,6 +494,7 @@ You can summon spirits later with `/summon gco-dev-backend REQ-087`
 - Theming enhances, doesn't obscure
 - Core workflow stays clear and functional
 - Random selection adds variety without being overwhelming
+- Mode transitions should feel natural, not jarring
 
 ### Integration with PM Agent
 
@@ -263,14 +525,38 @@ The Seance skill is a **thin orchestration layer** that:
 
 Before completing the Seance:
 
-- [ ] Context detected correctly (new vs existing)
-- [ ] PM invoked with appropriate mode
+**Mode Detection:**
+- [ ] Mode detected correctly (1, 2, or 3)
+- [ ] `.haunt/` directory check performed
+- [ ] Arguments presence checked
+- [ ] Appropriate themed prompt displayed for mode
+
+**Mode 1 (With Prompt):**
+- [ ] PM invoked with user's prompt
+- [ ] Full vs incremental workflow determined correctly
 - [ ] Planning workflow completed successfully
 - [ ] Summoning prompt presented (random selection)
 - [ ] User decision respected (yes/no)
 - [ ] If yes: Appropriate agents spawned with assignments
 - [ ] If no: Roadmap location confirmed
+
+**Mode 2 (Choice Prompt):**
+- [ ] Choice prompt presented correctly
+- [ ] User choice [A] or [B] captured
+- [ ] If A: Follow-up question asked, PM invoked for incremental workflow
+- [ ] If B: Roadmap parsed, ⚪ items displayed grouped by batch
+- [ ] If B: User selection parsed correctly (specific REQs, "all", or "batch N")
+- [ ] If B: Appropriate agents spawned (skip summoning prompt)
+
+**Mode 3 (New Project Prompt):**
+- [ ] New project prompt presented
+- [ ] User input captured for "What would you like to build?"
+- [ ] PM invoked with full workflow
+
+**All Modes:**
 - [ ] All output stays in `.haunt/plans/`
+- [ ] Themed prompts enhance without obscuring workflow
+- [ ] Error handling for invalid user input
 
 ## Skill References
 
