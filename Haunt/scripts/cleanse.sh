@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 #
-# exorcism.sh - Haunt Uninstall Script
+# cleanse.sh - Haunt Uninstall Script
 #
 # Removes Ghost County (Haunt) framework from your system.
-# Supports partial (global only) or full (global + project) exorcism.
+# Supports partial (global only) or full (global + project) cleansing.
 #
-# Usage: bash Haunt/scripts/exorcism.sh [options]
+# Usage: bash Haunt/scripts/cleanse.sh [options]
 #
 # Options:
 #   --partial       Remove ~/.claude/gco-* artifacts only (default)
@@ -92,12 +92,12 @@ FORCE=false
 
 show_help() {
     cat << EOF
-${BOLD}${MAGENTA}Exorcism - Haunt Uninstall Script${NC}
+${BOLD}${MAGENTA}Cleanse - Haunt Uninstall Script${NC}
 
-Cast out the Haunt framework from your system.
+Cleanse the Haunt framework from your system.
 
 ${BOLD}Usage:${NC}
-  bash exorcism.sh [options]
+  bash cleanse.sh [options]
 
 ${BOLD}Options:${NC}
   --partial       Remove ~/.claude/gco-* artifacts only (default)
@@ -107,14 +107,14 @@ ${BOLD}Options:${NC}
   --help          Show this help message
 
 ${BOLD}Examples:${NC}
-  # Interactive partial exorcism with backup
-  bash exorcism.sh --partial --backup
+  # Interactive partial cleanse with backup
+  bash cleanse.sh --partial --backup
 
-  # Full exorcism (removes everything)
-  bash exorcism.sh --full --backup
+  # Full cleanse (removes everything)
+  bash cleanse.sh --full --backup
 
-  # Force exorcism without prompts (use carefully!)
-  bash exorcism.sh --full --force
+  # Force cleanse without prompts (use carefully!)
+  bash cleanse.sh --full --force
 
 ${BOLD}Safety Features:${NC}
   - Checks for uncommitted work in .haunt/
@@ -194,7 +194,7 @@ check_uncommitted_work() {
 
     if [[ "$has_warnings" == "true" ]]; then
         echo ""
-        echo -e "${YELLOW}🔮 Recommendation: Finish or commit your work before exorcising.${NC}"
+        echo -e "${YELLOW}🔮 Recommendation: Finish or commit your work before cleansing.${NC}"
         echo ""
         return 1
     fi
@@ -233,7 +233,7 @@ count_dirs() {
 # ============================================================================
 
 preview_deletion() {
-    section "Preview: What Will Be Banished"
+    section "Preview: What Will Be Cleansed"
 
     local total_files=0
     local total_dirs=0
@@ -502,23 +502,23 @@ final_confirmation() {
         echo "A backup will be created before deletion."
     fi
     echo ""
-    echo -e "${YELLOW}Type 'EXORCISE' to proceed (or anything else to abort): ${NC}"
+    echo -e "${YELLOW}Type 'CLEANSE' to proceed (or anything else to abort): ${NC}"
     read -r response
 
-    if [[ "$response" == "EXORCISE" ]]; then
+    if [[ "$response" == "CLEANSE" ]]; then
         return 0
     else
-        info "Exorcism aborted by user"
+        info "Cleanse aborted by user"
         exit 0
     fi
 }
 
 # ============================================================================
-# MAIN EXORCISM LOGIC
+# MAIN CLEANSE LOGIC
 # ============================================================================
 
-perform_exorcism() {
-    section "Beginning the Exorcism Ritual"
+perform_cleanse() {
+    section "Beginning the Cleansing Ritual"
 
     local failed=false
 
@@ -528,7 +528,7 @@ perform_exorcism() {
             if confirm_action "Backup failed. Continue without backup? (yes/no): "; then
                 warning "Continuing without backup"
             else
-                error "Exorcism aborted"
+                error "Cleanse aborted"
                 exit 1
             fi
         fi
@@ -536,7 +536,7 @@ perform_exorcism() {
 
     # Remove global artifacts
     echo ""
-    info "Banishing global spirits from ~/.claude/..."
+    info "Cleansing global spirits from ~/.claude/..."
     echo ""
 
     remove_gco_files "$GLOBAL_AGENTS_DIR" "gco-*.md" "agents" || failed=true
@@ -547,18 +547,18 @@ perform_exorcism() {
     # Remove project artifacts if full mode
     if [[ "$MODE" == "full" ]]; then
         echo ""
-        info "Banishing project artifacts (.haunt/)..."
+        info "Cleansing project artifacts (.haunt/)..."
         echo ""
         remove_project_artifacts || failed=true
     fi
 
     echo ""
     if [[ "$failed" == "true" ]]; then
-        warning "Exorcism completed with some failures"
-        warning "Some spirits may linger..."
+        warning "Cleanse completed with some failures"
+        warning "Some remnants may linger..."
         return 1
     else
-        success "The exorcism is complete. Ghost County has been banished."
+        success "The cleansing is complete. Ghost County has been purified."
         if [[ "$CREATE_BACKUP" == "true" && -f "$BACKUP_FILE" ]]; then
             info "Backup saved to: ${BACKUP_FILE}"
         fi
@@ -575,7 +575,7 @@ main() {
     parse_arguments "$@"
 
     # Show banner
-    section "Exorcism - Haunt Uninstall"
+    section "Cleanse - Haunt Uninstall"
 
     echo -e "${MAGENTA}"
     cat << "EOF"
@@ -588,7 +588,7 @@ EOF
 
     # Capitalize first letter of mode (bash 3.2 compatible)
     local mode_display="$(echo "${MODE:0:1}" | tr '[:lower:]' '[:upper:]')${MODE:1}"
-    echo -e "${BOLD}Mode:${NC} ${mode_display} Exorcism"
+    echo -e "${BOLD}Mode:${NC} ${mode_display} Cleanse"
     if [[ "$MODE" == "full" ]]; then
         echo -e "${RED}⚠️  Full mode will remove BOTH ~/.claude/gco-* AND .haunt/${NC}"
     fi
@@ -598,7 +598,7 @@ EOF
     section "Checking for Restless Spirits"
     if ! check_uncommitted_work; then
         if ! confirm_action "Continue anyway? (yes/no): "; then
-            info "Exorcism aborted - tend to your spirits first"
+            info "Cleanse aborted - tend to your spirits first"
             exit 0
         fi
     else
@@ -611,13 +611,13 @@ EOF
     # Final confirmation
     final_confirmation
 
-    # Perform the exorcism
-    perform_exorcism
+    # Perform the cleanse
+    perform_cleanse
 
     echo ""
-    section "The Veil Has Closed"
+    section "The Veil Has Been Purified"
     echo ""
-    echo "Your repository walks in daylight once more."
+    echo "Your repository walks in clarity once more."
     echo ""
     if [[ "$CREATE_BACKUP" == "true" && -f "$BACKUP_FILE" ]]; then
         echo "To restore from backup:"

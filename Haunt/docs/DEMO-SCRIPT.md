@@ -76,7 +76,7 @@
 ### Key Talking Points
 
 - **Single summon:** `/summon Dev-Frontend REQ-042` for targeted work
-- **Parallel summon:** `/summon-all` to spawn multiple agents at once
+- **Parallel summon:** `/summon all` to spawn multiple agents at once
 - **Independence:** Each agent works autonomously, no manual coordination needed
 - **Efficiency:** What would take 2 days sequentially → done in parallel
 
@@ -84,7 +84,7 @@
 
 1. Show single `/summon` command
 2. Highlight assignment clarity: agent knows exactly what to do
-3. Show `/summon-all` for parallel execution
+3. Show `/summon all` for parallel execution
 4. Emphasize "3 agents working simultaneously"
 
 ### Expected Questions
@@ -105,16 +105,16 @@
 
 ### Key Talking Points
 
-- **Pattern detection:** `/curse scan` finds anti-patterns automatically
-- **Test-based enforcement:** Each defeated curse = permanent test
+- **Pattern detection:** `/seer` finds anti-patterns automatically
+- **Test-based enforcement:** Each exorcised pattern = permanent test
 - **Examples:** Silent fallbacks, magic numbers, god functions
-- **Cultural fit:** Playful "curse" metaphor makes code review fun
+- **Cultural fit:** "Seer" divines patterns, "exorcism" defeats them
 
 ### Demo Flow
 
-1. Show `/curse scan` output with detected issues
-2. Highlight severity: some curses defeated (tests exist), others active
-3. Show `/curse defeat` creating a test
+1. Show `/seer` output with detected issues
+2. Highlight severity: some patterns warded (tests exist), others active
+3. Show `/exorcism` creating a defeat test
 4. Explain: test runs on every commit, preventing regression
 
 ### Expected Questions

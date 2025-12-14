@@ -1,273 +1,249 @@
-# Exorcism (Uninstall Haunt)
+# Exorcism (Pattern Defeat Test Generation)
 
-Cast out the Haunt framework from your system. Choose between partial exorcism (global artifacts only) or full exorcism (global + project artifacts).
+Exorcise anti-patterns from your codebase by generating defeat tests - "protective wards" that prevent cursed patterns from returning.
 
-## Usage
+## Pattern Exorcism: $ARGUMENTS
 
-```
-/exorcism                  # Interactive mode with safety prompts
-/exorcism --partial        # Remove ~/.claude artifacts only
-/exorcism --full           # Remove ~/.claude AND .haunt artifacts
-/exorcism --backup         # Create backup before deletion
-/exorcism --force          # Skip confirmation prompts (dangerous!)
-```
+### Usage
 
-## Safety Features
+| Command | Description |
+|---------|-------------|
+| `/exorcism <pattern-name>` | Generate defeat test for a specific pattern |
+| `/exorcism <pattern-name> --install` | Generate test AND install pre-commit hooks |
+| `/exorcism --list` | Show all detected patterns that can be exorcised |
 
-Before performing any exorcism, the ritual will:
+### Available Patterns
 
-1. **Display what will be removed** - Show all files/directories to be deleted
-2. **Check for uncommitted work** - Warn if `.haunt/plans/roadmap.md` has changes or in-progress items
-3. **Offer backup** - Create `~/haunt-backup-YYYY-MM-DD-HHMMSS.tar.gz` before deletion
-4. **Require confirmation** - Explicit "yes" required to proceed (unless --force)
+Common patterns you can exorcise:
+- `silent-fallback` - Silent dictionary.get() with defaults
+- `empty-catch` - Empty exception handlers
+- `god-function` - Functions over 100 lines
+- `magic-numbers` - Hardcoded numeric values
+- `single-letter-vars` - Unclear variable names
+- `deep-nesting` - Excessive indentation (4+ levels)
+- `commented-code` - Commented-out code blocks
+- `catch-all-exception` - Catching Exception without re-raising
 
-## Exorcism Modes
+### Execution
 
-### Partial Exorcism (Default Safe Mode)
+#### Basic Exorcism (`/exorcism <pattern-name>`)
 
-Removes **global** Ghost County artifacts from `~/.claude/`:
-
-```
-~/.claude/agents/gco-*.md
-~/.claude/rules/gco-*.md
-~/.claude/skills/gco-*/
-~/.claude/commands/gco-*.md
-```
-
-**Preserves:**
-- Project-specific `.haunt/` directory (roadmap, progress, completed work)
-- `Haunt/` source directory (your cloned repo)
-- Non-GCO agents/rules/skills/commands (if any exist)
-
-**Use when:** You want to remove the framework but keep your project planning artifacts.
-
-### Full Exorcism (Complete Removal)
-
-Removes **both** global `~/.claude/` AND project `.haunt/` artifacts:
-
-```
-~/.claude/agents/gco-*.md
-~/.claude/rules/gco-*.md
-~/.claude/skills/gco-*/
-~/.claude/commands/gco-*.md
-.haunt/                    # ⚠️ ALL planning, progress, completed work
-```
-
-**Preserves:**
-- `Haunt/` source directory (your cloned repo)
-- Non-GCO agents/rules/skills/commands
-
-**Use when:** Starting fresh or completely removing Ghost County from this project.
-
-⚠️ **WARNING:** Full exorcism deletes your roadmap, progress reports, and archived work. Backup first!
-
-## Interactive Workflow
-
-When you invoke `/exorcism` without arguments, you'll be guided through:
-
-### Step 1: Uncommitted Work Check
-
-```
-👻 Checking for restless spirits...
-
-⚠️ WARNING: Uncommitted work detected in .haunt/plans/roadmap.md
-⚠️ WARNING: 3 requirements marked 🟡 In Progress:
-   - REQ-123: Feature implementation
-   - REQ-125: Bug fix
-   - REQ-127: Documentation update
-
-🔮 Recommendation: Finish or commit your work before exorcising.
-
-Continue anyway? (yes/no): _
-```
-
-### Step 2: Choose Exorcism Mode
-
-```
-👻 How deep shall the exorcism go?
-
-[1] Partial Exorcism - Remove ~/.claude/gco-* artifacts only
-    Preserves: .haunt/ directory with your roadmap and progress
-
-[2] Full Exorcism - Remove ~/.claude/gco-* AND .haunt/ directory
-    ⚠️ Destroys: All planning, progress, and archived work
-
-Choice (1/2): _
-```
-
-### Step 3: Preview Deletion
-
-```
-👻 The following will be banished:
-
-Global Artifacts (~/.claude/):
-  Agents (5):
-    - gco-dev-backend.md
-    - gco-dev-frontend.md
-    - gco-dev-infrastructure.md
-    - gco-research-analyst.md
-    - gco-project-manager.md
-
-  Rules (8):
-    - gco-session-startup.md
-    - gco-commit-conventions.md
-    - gco-file-conventions.md
-    - gco-roadmap-format.md
-    - gco-status-updates.md
-    - gco-assignment-lookup.md
-    - gco-completion-checklist.md
-    - gco-framework-changes.md
-
-  Skills (17):
-    - gco-session-startup/
-    - gco-commit-conventions/
-    - gco-roadmap-workflow/
-    - gco-tdd-workflow/
-    - gco-code-patterns/
-    - gco-feature-contracts/
-    - gco-context7-usage/
-    - gco-pattern-defeat/
-    - gco-seance/
-    - gco-coven-mode/
-    - gco-witching-hour/
-    - gco-issue-to-roadmap/
-    - gco-file-permissions/
-    - gco-nats-connectivity/
-    - gco-agent-memory-persistence/
-    - gco-pattern-detection/
-    - gco-memory-consolidation/
-
-  Commands (18):
-    - gco-summon.md
-    - gco-ritual.md
-    - gco-summon-all.md
-    - gco-haunt.md
-    - gco-exorcism.md
-    - haunt.md
-    - haunt-update.md
-    - ritual.md
-    - seance.md
-    - haunting.md
-    - hauntings.md
-    - spirits.md
-    - summon.md
-    - divine.md
-    - banish.md
-    - coven.md
-    - curse.md
-    - exorcise.md
-    - apparition.md
-    - witching-hour.md
-
-[Full mode only]
-Project Artifacts (.haunt/):
-  - .haunt/plans/roadmap.md
-  - .haunt/plans/*.md
-  - .haunt/completed/
-  - .haunt/progress/
-  - .haunt/tests/
-  - .haunt/docs/
-```
-
-### Step 4: Backup Offer
-
-```
-🔮 Create backup before exorcism?
-
-A backup will be saved to:
-  ~/haunt-backup-2025-12-13-143022.tar.gz
-
-This includes all files that will be deleted.
-
-Create backup? (yes/no): _
-```
-
-### Step 5: Final Confirmation
-
-```
-⚠️ FINAL WARNING ⚠️
-
-This will permanently delete the files listed above.
-This action CANNOT be undone (unless you created a backup).
-
-Type 'EXORCISE' to proceed: _
-```
-
-### Step 6: Execution
-
-```
-👻 Beginning the exorcism ritual...
-
-🔮 Creating backup: ~/haunt-backup-2025-12-13-143022.tar.gz
-✓ Backup created (2.4 MB)
-
-🌫️ Banishing global agents (5 files)...
-✓ Removed ~/.claude/agents/gco-dev-backend.md
-✓ Removed ~/.claude/agents/gco-dev-frontend.md
-✓ Removed ~/.claude/agents/gco-dev-infrastructure.md
-✓ Removed ~/.claude/agents/gco-research-analyst.md
-✓ Removed ~/.claude/agents/gco-project-manager.md
-
-🌫️ Banishing global rules (8 files)...
-✓ Removed ~/.claude/rules/gco-*.md (8 files)
-
-🌫️ Banishing global skills (17 directories)...
-✓ Removed ~/.claude/skills/gco-*/ (17 directories)
-
-🌫️ Banishing global commands (20 files)...
-✓ Removed ~/.claude/commands/*.md (20 files)
-
-[Full mode only]
-🌫️ Banishing project artifacts (.haunt/)...
-✓ Removed .haunt/ directory
-
-👻 The exorcism is complete. Ghost County has been banished.
-
-Backup saved to: ~/haunt-backup-2025-12-13-143022.tar.gz
-```
-
-## Implementation via Script
-
-The actual deletion logic is implemented in `Haunt/scripts/exorcism.sh`:
+Generate a defeat test for a specific pattern:
 
 ```bash
-bash Haunt/scripts/exorcism.sh [--partial|--full] [--backup] [--force]
+cd /Users/heckatron/github_repos/Claude
+python3 Haunt/scripts/rituals/pattern-detector/generate_tests.py \
+  --pattern-name "$ARGUMENTS" \
+  --output-dir .haunt/tests/patterns/
 ```
 
-## Restore from Backup
+This will:
+1. Generate defeat test file: `.haunt/tests/patterns/test_<pattern>.py`
+2. Validate test syntax
+3. Show test location
 
-If you created a backup and want to restore:
+#### Full Exorcism (`/exorcism <pattern-name> --install`)
+
+Generate defeat test AND update pre-commit hooks:
 
 ```bash
-# Extract to see contents
-tar -tzf ~/haunt-backup-2025-12-13-143022.tar.gz
+cd /Users/heckatron/github_repos/Claude
 
-# Restore (be careful - this will overwrite!)
-cd ~
-tar -xzf ~/haunt-backup-2025-12-13-143022.tar.gz
+# Generate defeat test
+python3 Haunt/scripts/rituals/pattern-detector/generate_tests.py \
+  --pattern-name "$PATTERN_NAME" \
+  --output-dir .haunt/tests/patterns/
+
+# Update pre-commit hooks to run defeat tests
+python3 Haunt/scripts/rituals/pattern-detector/update_precommit.py --install
 ```
 
-## Error Handling
+This will:
+1. Generate defeat test
+2. Add pattern defeat tests to `.pre-commit-config.yaml`
+3. Install pre-commit hooks
+4. Create protective ward against pattern recurrence
 
-- **Script not found**: If `exorcism.sh` doesn't exist, provide manual removal instructions
-- **Permission denied**: Suggest using `chmod +x` or running with `bash`
-- **Backup failed**: Offer to continue without backup or abort
-- **Partial deletion failure**: Report what succeeded and what failed
+#### List Mode (`/exorcism --list`)
 
-## Ghost County Flavor
+Show all patterns available for exorcism:
 
-When reporting success:
-- "The spirits have departed. Ghost County is no more."
-- "The exorcism is complete. The veil has closed."
-- "Your repository walks in daylight once more."
+```bash
+# If patterns JSON exists, read it
+if [ -f ".haunt/progress/patterns-analysis.json" ]; then
+  python3 -c "
+import json
+with open('.haunt/progress/patterns-analysis.json') as f:
+    data = json.load(f)
+    print('🕯️ PATTERNS READY FOR EXORCISM 🕯️\n')
+    for i, pattern in enumerate(data.get('patterns', []), 1):
+        print(f'{i}. {pattern[\"name\"]}')
+        print(f'   Severity: {pattern.get(\"impact\", \"unknown\")}')
+        print(f'   Frequency: {pattern.get(\"frequency\", \"unknown\")}')
+        print()
+"
+else
+  echo "No patterns detected yet. Run /seer first to detect patterns."
+fi
+```
 
-When reporting errors:
-- "The spirits resist! Permission denied: [file]"
-- "The ritual falters - backup creation failed."
-- "Some spirits linger... [list of files that couldn't be removed]"
+### Output Format
 
-## See Also
+Present results in a ritual narrative:
 
-- `/haunt-update` - Update Haunt to latest version without full reinstall
-- `/banish` - Archive completed work (different from exorcism)
-- `setup-haunt.sh` - Reinstall Haunt after exorcism
+#### Success (Basic)
+```
+🕯️ EXORCISM RITUAL COMPLETE 🕯️
+
+Pattern Exorcised: {pattern-name}
+
+Protective Ward Created:
+- .haunt/tests/patterns/test_{pattern_name}.py
+
+The anti-pattern has been warded. Run these tests to verify:
+  pytest .haunt/tests/patterns/test_{pattern_name}.py -v
+
+Next Steps:
+- Run defeat test: pytest .haunt/tests/patterns/ -v
+- Install pre-commit protection: /exorcism {pattern-name} --install
+- Or install manually: pre-commit install
+```
+
+#### Success (Full with --install)
+```
+🕯️ EXORCISM RITUAL COMPLETE 🕯️
+
+Pattern Exorcised: {pattern-name}
+
+Protective Wards Created:
+- Defeat test: .haunt/tests/patterns/test_{pattern_name}.py
+- Pre-commit hook: .pre-commit-config.yaml (updated)
+
+Protection Activated:
+✓ Pre-commit hooks installed
+✓ Pattern will be detected before each commit
+
+The anti-pattern has been exorcised. Your repository is now protected.
+
+Verify protection:
+  pre-commit run --all-files
+```
+
+#### Failure
+```
+⚠️ EXORCISM FAILED ⚠️
+
+Pattern: {pattern-name}
+Error: {error-message}
+
+Troubleshooting:
+- Run /seer first to detect patterns
+- Check pattern name spelling
+- Verify pattern-detector scripts are available
+- See: Haunt/scripts/rituals/pattern-detector/CLI-USAGE.md
+```
+
+#### List Mode Output
+```
+🕯️ PATTERNS READY FOR EXORCISM 🕯️
+
+1. silent-fallback
+   Severity: high
+   Frequency: weekly
+   Description: Silent dictionary.get() with defaults
+
+2. empty-catch
+   Severity: medium
+   Frequency: monthly
+   Description: Empty exception handlers
+
+...
+
+To exorcise a pattern:
+  /exorcism <pattern-name>
+
+To protect against recurrence:
+  /exorcism <pattern-name> --install
+```
+
+### Quick Actions
+
+After exorcising a pattern:
+
+- **Run defeat test**: `pytest .haunt/tests/patterns/test_{pattern}.py -v`
+- **Run all wards**: `pytest .haunt/tests/patterns/ -v`
+- **Install protection**: `/exorcism {pattern} --install`
+- **Verify hooks**: `pre-commit run --all-files`
+
+### Notes
+
+- Exorcism generates Python defeat tests using AST analysis
+- Tests are standalone and can be run individually
+- Pre-commit hook runs ALL defeat tests before each commit
+- Tests are "protective wards" - they prevent patterns from returning
+- Failed defeat test means pattern was detected again (curse returned)
+- Pattern must be detected by `/seer` before it can be exorcised
+
+### Integration with Pattern Detection
+
+Typical workflow:
+1. `/seer` - Detect anti-patterns (divine curses)
+2. Review `.haunt/progress/weekly-refactor-*.md` (understand curses)
+3. `/exorcism <pattern>` - Generate defeat test (create ward)
+4. `/exorcism <pattern> --install` - Activate protection (install ward)
+5. `pytest .haunt/tests/patterns/ -v` - Verify all wards hold
+
+### Advanced Usage
+
+#### Custom Pattern Definitions
+
+If the pattern isn't in the standard list, you can still exorcise it by providing a pattern definition:
+
+```bash
+# Create pattern definition JSON
+cat > /tmp/custom-pattern.json <<EOF
+{
+  "patterns": [
+    {
+      "name": "custom-antipattern",
+      "description": "Custom anti-pattern description",
+      "evidence": ["Example code"],
+      "frequency": "weekly",
+      "impact": "high",
+      "root_cause": "Root cause analysis"
+    }
+  ]
+}
+EOF
+
+# Generate test from custom pattern
+python3 Haunt/scripts/rituals/pattern-detector/generate_tests.py \
+  --input /tmp/custom-pattern.json \
+  --output-dir .haunt/tests/patterns/
+```
+
+#### Re-generating Tests
+
+Defeat tests can be regenerated if the pattern definition changes:
+
+```bash
+# Tests are idempotent - running again overwrites
+/exorcism {pattern-name}
+```
+
+### Troubleshooting
+
+**Error: "Pattern not found"**
+- Run `/seer` first to detect patterns
+- Check `.haunt/progress/patterns-analysis.json` exists
+- Verify pattern name matches detected pattern
+
+**Error: "Test generation failed"**
+- Check Python is available: `python3 --version`
+- Verify pattern-detector scripts exist
+- See detailed logs in script output
+
+**Error: "Pre-commit install failed"**
+- Install pre-commit: `pip install pre-commit`
+- Verify git repository: `git status`
+- Check `.pre-commit-config.yaml` is valid YAML
