@@ -44,9 +44,11 @@ tools: Glob, Grep, Read, Edit, Write, Bash, TodoWrite, mcp__context7__*, mcp__ag
 | Agent File | Subagent Type(s) | Notes |
 |------------|------------------|-------|
 | gco-dev.md | Dev-Backend, Dev-Frontend, Dev-Infrastructure | Single polyglot agent handles all 3 modes |
-| gco-research.md | Research-Analyst, Research-Critic | Single agent handles both modes |
+| gco-research.md | Research-Analyst, Research-Critic | Single agent handles both modes, has Write access |
+| gco-research-analyst.md | Research-Analyst | Read-only variant, no Write/Edit/Bash |
+| gco-code-reviewer.md | (uses main context) | Typically not spawned as subagent, has Edit/Write |
+| gco-code-reviewer-readonly.md | (uses main context) | Read-only variant, no Edit/Write/Bash/TodoWrite |
 | gco-project-manager.md | Project-Manager-Agent | |
-| gco-code-reviewer.md | (uses main context) | Typically not spawned as subagent |
 | gco-release-manager.md | (uses main context) | Typically not spawned as subagent |
 
 **Note:** The `gco-dev.md` agent is a single polyglot that adapts based on file paths and task context. The Task tool's subagent_type determines tool access, while the agent determines its working mode internally.
@@ -71,19 +73,87 @@ tools: Glob, Grep, Read, Edit, Write, Bash, TodoWrite, mcp__context7__*, mcp__ag
 - **mcp__agent_memory__*** - Agent memory persistence
 - **mcp__agent_chat__*** - Inter-agent communication
 
+## Tool Restriction Patterns
+
+### Why Restrict Tools?
+
+Tool restrictions prevent accidental modifications and enforce separation of concerns. Inspired by Claude Code's built-in agents (Explore is read-only, Plan is plan mode), Haunt provides restricted variants for safety-critical tasks.
+
+### Read-Only Variants
+
+**Pattern:** Remove Write, Edit, Bash, and TodoWrite tools while keeping read-only analysis tools.
+
+**When to use:**
+- Reviewing untrusted or third-party code
+- Investigating production systems
+- Reconnaissance before making changes
+- Research where modification risk must be zero
+
+**Examples:**
+- `gco-research-analyst.md` - Read-only research (no Write tool)
+- `gco-code-reviewer-readonly.md` - Code review without modification capability
+
+**Benefits:**
+- Zero accidental modification risk
+- Clear separation of analysis from implementation
+- Safe operation in shared/sensitive contexts
+- Enforces "reviewer doesn't fix code" discipline
+
+### Tool Access Philosophy
+
+Each agent's tool access should be documented in the agent's header with:
+
+```yaml
+---
+name: agent-name
+tools: [list of tools]
+# Tool Access Philosophy: [Why these tools and not others]
+# Tool permissions enforced by Task tool subagent_type
+---
+```
+
+**Philosophy statement should explain:**
+1. Why this set of tools (not more, not less)
+2. What the agent can and cannot do
+3. When to use this agent vs an alternative variant
+4. Specific safety or design rationale
+
+### Creating Restricted Variants
+
+To create a read-only variant of an existing agent:
+
+1. **Copy base agent** - Start with full-access version
+2. **Remove write tools** - Strip Write, Edit, Bash, TodoWrite
+3. **Add philosophy** - Document why read-only is beneficial
+4. **Update output format** - Change from file-writing to chat reporting
+5. **Document use cases** - Explain when to use this vs full-access variant
+
+**Example transformation:**
+
+```yaml
+# Before (full access)
+tools: Glob, Grep, Read, Write, Edit, Bash, mcp__*
+
+# After (read-only)
+tools: Glob, Grep, Read, WebSearch, WebFetch, mcp__context7__*, mcp__agent_memory__*
+# Tool Access Philosophy: Read-only enforcement prevents accidental modifications during research.
+```
+
 ## Best Practices
 
 ### For Agent Designers
 
 1. **Match YAML to Subagent** - Keep the `tools` field in agent YAML aligned with what the Task tool subagent_type actually provides
 2. **Principle of Least Privilege** - Only request tools the agent actually needs
-3. **Document Rationale** - Add comments explaining why specific tools are needed
+3. **Document Rationale** - Add Tool Access Philosophy comment explaining tool choices
+4. **Consider Variants** - Create read-only variants for safety-critical use cases
 
 ### For Framework Users
 
 1. **Use Correct Subagent Type** - When spawning agents, use the appropriate subagent_type for the task
 2. **Don't Assume Tools** - Don't expect agents to have tools not in their subagent type
 3. **Check Permissions First** - If an agent fails, verify the subagent_type has the required tools
+4. **Choose Appropriate Variant** - Use read-only variants when modification risk must be zero
 
 ## Troubleshooting
 
