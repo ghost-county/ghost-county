@@ -231,36 +231,38 @@ fi
 
 **What it checks:**
 - Commands directory exists: `~/.claude/commands/`
-- Expected GCO commands are present
+- Expected Haunt commands are present
 - Commands are properly formatted
 
 **Expected Commands:**
-- `gco-seance.md`
-- `gco-summon.md`
-- `gco-haunt.md`
-- `gco-haunting.md`
-- `gco-seer.md`
-- `gco-exorcism.md`
-- `gco-banish.md`
-- `gco-ritual.md`
-- `gco-cleanse.md`
-- `gco-apparition.md`
-- `gco-haunt-update.md`
-- `gco-witching-hour.md`
-- `gco-coven.md`
-- `gco-checkup.md` (this command!)
+- `seance.md`
+- `summon.md`
+- `haunt.md`
+- `haunting.md`
+- `seer.md`
+- `exorcism.md`
+- `banish.md`
+- `ritual.md`
+- `cleanse.md`
+- `apparition.md`
+- `haunt-update.md`
+- `witching-hour.md`
+- `coven.md`
+- `checkup.md` (this command!)
+- `qa.md`
+- `decompose.md`
 
 **Verification:**
 ```bash
 COMMANDS_DIR="$HOME/.claude/commands"
 
 if [ -d "$COMMANDS_DIR" ]; then
-    FOUND_COMMANDS=$(ls "$COMMANDS_DIR"/gco-*.md 2>/dev/null | wc -l)
+    FOUND_COMMANDS=$(ls "$COMMANDS_DIR"/*.md 2>/dev/null | wc -l)
 
-    if [ "$FOUND_COMMANDS" -ge 13 ]; then
+    if [ "$FOUND_COMMANDS" -ge 16 ]; then
         echo "✅ Commands: $FOUND_COMMANDS slash commands available"
     else
-        echo "⚠️ Commands: $FOUND_COMMANDS slash commands found (expected at least 13)"
+        echo "⚠️ Commands: $FOUND_COMMANDS slash commands found (expected at least 16)"
     fi
 else
     echo "❌ Commands: Directory not found"

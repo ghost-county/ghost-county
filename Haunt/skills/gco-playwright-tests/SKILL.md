@@ -433,6 +433,6 @@ test('should show user profile after login', async ({ page }) => {
 ## See Also
 
 - `Haunt/docs/BROWSER-MCP-SETUP.md` - Browser MCP installation guide
-- `Haunt/commands/gco-qa.md` - Test scenario generation from requirements
+- `Haunt/commands/qa.md` - Test scenario generation from requirements
 - `Haunt/skills/gco-tdd-workflow/SKILL.md` - General TDD guidance
 - [Playwright Documentation](https://playwright.dev/docs/intro)

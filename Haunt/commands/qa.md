@@ -500,7 +500,7 @@ Examples:
 When generating test scenarios from requirement tasks:
 
 1. **Positive Path**: Each task becomes a test scenario
-   - Task: "Create Haunt/commands/gco-qa.md"
+   - Task: "Create Haunt/commands/qa.md"
    - Scenario: "should create command file with correct format"
 
 2. **Edge Cases**: Identify boundary conditions

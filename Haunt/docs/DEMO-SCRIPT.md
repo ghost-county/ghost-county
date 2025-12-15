@@ -180,7 +180,7 @@
 ### Expected Questions
 
 **Q:** "Can I customize rituals?"
-**A:** "Yes. Edit the ritual skill (Haunt/skills/gco-ritual/SKILL.md) to add/remove checks."
+**A:** "Yes. Edit the ritual command (Haunt/commands/ritual.md) to add/remove checks."
 
 **Q:** "Do rituals run automatically?"
 **A:** "Not yet. Currently manual invocation, but could be hooked into CI or cron jobs."
