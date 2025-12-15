@@ -75,7 +75,7 @@ show_banner() {
                  ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝   ╚═╝
                         ┌─────────────────────────────┐
                         │   G H O S T   C O U N T Y   │
-                        │   Summoning Your Dev Team   │
+                        │     Summon Your Dev Team    │
                         └─────────────────────────────┘
 EOF
     echo -e "${NC}"
