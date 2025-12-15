@@ -6,14 +6,28 @@ Call forth Ghost County agents to handle tasks. Summon a single spirit for speci
 
 ### Single Spirit Summoning
 
-**Format:** `/summon <agent-type> <task-description>`
+**Format:** `/summon <agent-type> [--mode=<level>] <task-description>`
 
 **Examples:**
 - `/summon dev Fix the authentication bug`
 - `/summon research Investigate React 19 server components`
+- `/summon research --mode=quick "Find authentication patterns"`
+- `/summon research --mode=thorough "Analyze all error handling"`
 - `/summon code-reviewer Review PR #42`
 - `/summon release-manager Prepare v1.2.0 release`
 - `/summon project-manager Update roadmap priorities`
+
+**Mode Parameter (Research Agent Only):**
+
+The `--mode` parameter controls investigation thoroughness for research agents:
+
+| Mode | Time | Scope | When to Use |
+|------|------|-------|-------------|
+| `quick` | <1 min | 5 files max | Time-sensitive, simple lookups |
+| `standard` | 2-5 min | Up to 20 files | Most research tasks (default) |
+| `thorough` | 10-30 min | All relevant files | Critical decisions, audits |
+
+If `--mode` is not specified, research agents default to **standard** mode.
 
 ### Full Coven Summoning
 
@@ -67,18 +81,20 @@ Parse the first argument to determine which spirit to summon:
 ## Single Spirit Summoning Logic
 
 1. **Parse agent type** from first argument (case-insensitive)
-2. **Extract task** from remaining arguments
-3. **Map to gco-* agent** using table above
-4. **Spawn the spirit** using Task tool with:
+2. **Extract mode parameter** if present (format: `--mode=quick|standard|thorough`)
+3. **Extract task** from remaining arguments
+4. **Map to gco-* agent** using table above
+5. **Spawn the spirit** using Task tool with:
    - `subagent_type`: Mapped agent character sheet (e.g., `gco-dev-backend`)
-   - `instructions`: Task description with Ghost County context
+   - `instructions`: Task description with Ghost County context and mode (if applicable)
 
-### Example Invocation
+### Example Invocation: Basic
 
 If user types: `/summon dev Fix the authentication redirect loop`
 
 **Parsing:**
 - Agent type: `dev` → Maps to `gco-dev-backend`
+- Mode: None
 - Task: `Fix the authentication redirect loop`
 
 **Spawn:**
@@ -86,6 +102,58 @@ If user types: `/summon dev Fix the authentication redirect loop`
 Task tool with:
 - subagent_type: "gco-dev-backend"
 - instructions: "You are a Dev-Backend agent in Ghost County. Fix the authentication redirect loop."
+```
+
+### Example Invocation: With Mode Parameter
+
+If user types: `/summon research --mode=quick "Find authentication patterns"`
+
+**Parsing:**
+- Agent type: `research` → Maps to `gco-research`
+- Mode: `quick`
+- Task: `Find authentication patterns`
+
+**Spawn:**
+```
+Task tool with:
+- subagent_type: "gco-research"
+- instructions: "You are a Research agent in Ghost County. Use QUICK investigation mode. Find authentication patterns."
+```
+
+### Mode Parameter Processing
+
+**Detection:**
+- Look for `--mode=<value>` anywhere in arguments
+- Valid values: `quick`, `standard`, `thorough`
+- Case-insensitive matching
+- Remove from task description after parsing
+
+**Injection:**
+- If mode specified: Add "Use [MODE] investigation mode." to instructions
+- If no mode: Research agents default to standard mode (no explicit instruction needed)
+- Non-research agents: Ignore mode parameter (no effect)
+
+**Example parsing logic:**
+```python
+import re
+
+def parse_summon_args(args_string):
+    # Extract mode parameter
+    mode_match = re.search(r'--mode=(quick|standard|thorough)', args_string, re.IGNORECASE)
+    mode = mode_match.group(1).lower() if mode_match else None
+
+    # Remove mode parameter from task description
+    task = re.sub(r'--mode=(quick|standard|thorough)\s*', '', args_string, flags=re.IGNORECASE)
+
+    # Remove quotes if present
+    task = task.strip().strip('"').strip("'")
+
+    return mode, task
+
+# Example usage
+mode, task = parse_summon_args('--mode=quick "Find authentication patterns"')
+# mode = 'quick'
+# task = 'Find authentication patterns'
 ```
 
 ## Full Coven Summoning Logic (`/summon all`)
@@ -302,10 +370,25 @@ Example: /summon dev Fix the login bug
 ```
 🌫️ The summoning requires a task...
 
-Usage: /summon <agent-type> <task-description>
+Usage: /summon <agent-type> [--mode=<level>] <task-description>
 Example: /summon dev Fix the authentication bug
+Example: /summon research --mode=quick "Find auth patterns"
 
 Or: /summon all (to work all unblocked roadmap items)
+```
+
+### Invalid Mode Parameter
+```
+🌫️ Invalid investigation mode: <mode>
+
+Valid modes for research agents:
+- quick: Fast triage (<1 min, 5 files max)
+- standard: Balanced investigation (2-5 min, default)
+- thorough: Deep analysis (10-30 min, comprehensive)
+
+Example: /summon research --mode=quick "Find authentication patterns"
+
+Note: --mode parameter only applies to research agents.
 ```
 
 ## Requirements for Successful Execution
