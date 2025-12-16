@@ -24,6 +24,48 @@ git log --oneline -5
 - Identify any patterns or ongoing work streams
 - Understand the project's current development state
 
+## 2.5. Check Roadmap File Size
+
+**CRITICAL:** Monitor roadmap file size to prevent performance degradation.
+
+```bash
+wc -l .haunt/plans/roadmap.md
+```
+
+**What to check:**
+- Count of lines in `.haunt/plans/roadmap.md` (must be shown)
+- **Normal (0-500 lines):** Continue normally, no action needed
+- **Warning (501-750 lines):** Display warning - archiving should be done soon
+- **Critical (751+ lines):** STOP work and require archiving before proceeding
+
+**Actions:**
+
+**If 0-500 lines:**
+```
+✓ Roadmap size normal (XXX lines). Continue.
+```
+
+**If 501-750 lines:**
+```
+⚠ WARNING: Roadmap is XXX lines (limit: 500)
+Consider archiving completed items to .haunt/completed/roadmap-archive.md
+See gco-roadmap-format.md for archiving guidelines.
+Continue with caution.
+```
+
+**If 751+ lines:**
+```
+🛑 CRITICAL: Roadmap is XXX lines (hard limit: 750)
+Cannot proceed with work. Roadmap MUST be archived below 500 lines.
+
+Action Required:
+1. Stop current work
+2. Archive ALL completed (🟢) requirements to .haunt/completed/roadmap-archive.md
+3. Verify roadmap is under 500 lines
+4. See gco-roadmap-format.md for archiving guidelines
+5. Restart session once roadmap is healthy
+```
+
 ## 3. Verify Tests Pass
 
 **CRITICAL:** If tests are broken, FIX THEM FIRST before starting new work.
@@ -70,6 +112,7 @@ Session startup is complete when all of the following are true:
 - Working directory verified (step 1)
 - Git status checked and understood (step 1)
 - Recent changes reviewed (step 2)
+- Roadmap file size checked and within acceptable limits (step 2.5)
 - Tests passing OR broken tests identified for immediate fix (step 3)
 - Current assignment identified from one of:
   - Direct user assignment, OR
