@@ -136,24 +136,7 @@ uv --version
 - Simplifies MCP server installation
 - Required for `uvx` commands in documentation
 
-#### 6. NATS JetStream (for agent coordination)
-**Purpose:** Message queue for multi-agent coordination
-
-```bash
-# Install on macOS
-brew install nats-server
-
-# Install on Ubuntu/Debian
-# See: https://docs.nats.io/running-a-nats-service/introduction/installation
-
-# Start NATS server
-nats-server -js
-
-# Verify
-nats-server --version
-```
-
-#### 7. Playwright (for E2E testing)
+#### 6. Playwright (for E2E testing)
 **Purpose:** Browser automation for end-to-end tests
 
 ```bash

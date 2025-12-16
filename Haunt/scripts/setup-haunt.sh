@@ -230,7 +230,6 @@ VERBOSE=false
 SKIP_PREREQS=false
 NO_BACKUP=false
 NO_MCP=false
-WITH_NATS=false
 WITH_RITUALS=true  # Enabled by default
 NO_RITUALS=false
 WITH_PATTERN_DETECTION=true  # Enabled by default
@@ -259,7 +258,7 @@ ${BOLD}DESCRIPTION:${NC}
 
     • Spirit agents to ~/.claude/agents/
     • Haunt methodology skills from Haunt/skills/
-    • Verifies spiritual infrastructure (NATS, MCP servers)
+    • Verifies spiritual infrastructure (MCP servers)
     • Manifests required directory structure
     • Ensures idempotent execution (safe to run multiple times)
 
@@ -283,7 +282,6 @@ ${BOLD}OPTIONS:${NC}
     ${BOLD}--skip-prereqs${NC}      Skip prerequisite divination
     ${BOLD}--no-backup${NC}         Skip backup of existing spirits
     ${BOLD}--no-mcp${NC}            Skip MCP server channeling
-    ${BOLD}--with-nats${NC}         Bind NATS JetStream for multi-agent séances (optional)
     ${BOLD}--no-rituals${NC}        Skip binding of ritual scripts (morning-review, evening-handoff, weekly-refactor)
     ${BOLD}--no-pattern-detection${NC}  Skip conjuring of pattern detection tools (hunt-patterns, weekly-refactor)
     ${BOLD}--cleanup${NC}           Delete cloned repo after setup (for remote installation)
@@ -334,9 +332,6 @@ ${BOLD}EXAMPLES:${NC}
 
     # Update agents without backup
     bash scripts/setup-haunt.sh --agents-only --no-backup
-
-    # Setup with NATS JetStream (if available)
-    bash scripts/setup-haunt.sh --with-nats
 
 ${BOLD}EXIT CODES:${NC}
     0    Success
@@ -416,10 +411,6 @@ parse_arguments() {
                 ;;
             --no-mcp)
                 NO_MCP=true
-                shift
-                ;;
-            --with-nats)
-                WITH_NATS=true
                 shift
                 ;;
             --no-rituals)
@@ -2297,240 +2288,6 @@ TEMPLATE_EOF
 }
 
 # ============================================================================
-# PHASE 5a: NATS JETSTREAM CONFIGURATION (OPTIONAL)
-# ============================================================================
-
-configure_nats() {
-    section "Phase 5a: Binding NATS JetStream (Optional)"
-
-    # Check if NATS setup was requested
-    if [[ "$WITH_NATS" == false ]]; then
-        info "NATS configuration skipped (use --with-nats to enable)"
-        info "NATS is optional infrastructure for multi-agent coordination"
-        return 0
-    fi
-
-    info "Configuring NATS JetStream for multi-agent coordination..."
-    echo ""
-
-    # -------------------------------------------------------------------------
-    # Check if nats-server is installed
-    # -------------------------------------------------------------------------
-    if ! command -v nats-server &> /dev/null; then
-        warning "NATS server not installed"
-        info "NATS is optional infrastructure - setup will continue without it"
-        echo ""
-        info "To install NATS:"
-        info "  macOS:         brew install nats-server"
-        info "  Linux:         curl -sf https://binaries.nats.dev/nats-io/nats-server/v2@latest | sh"
-        info "  Documentation: https://docs.nats.io/running-a-nats-service/introduction/installation"
-        echo ""
-        return 0
-    fi
-
-    local nats_version=$(nats-server --version | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1 2>/dev/null || echo "installed")
-    success "NATS server found: ${nats_version}"
-
-    # -------------------------------------------------------------------------
-    # Check if nats CLI is installed
-    # -------------------------------------------------------------------------
-    if ! command -v nats &> /dev/null; then
-        warning "NATS CLI not installed"
-        info "NATS CLI is required to configure streams"
-        echo ""
-        info "To install NATS CLI:"
-        info "  macOS:         brew install nats-io/nats-tools/nats"
-        info "  Linux:         curl -sf https://binaries.nats.dev/nats-io/natscli/nats@latest | sh"
-        info "  Documentation: https://docs.nats.io/using-nats/nats-tools/nats_cli"
-        echo ""
-        return 0
-    fi
-
-    local nats_cli_version=$(nats --version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 2>/dev/null || echo "installed")
-    success "NATS CLI found: ${nats_cli_version}"
-
-    # -------------------------------------------------------------------------
-    # Check if NATS server is running
-    # -------------------------------------------------------------------------
-    echo ""
-    info "Checking NATS server status..."
-
-    if nats server ping > /dev/null 2>&1; then
-        success "NATS server is running"
-    else
-        warning "NATS server is not running"
-        echo ""
-        info "To start NATS server:"
-        info "  1. Start in foreground:  nats-server -js"
-        info "  2. Start in background:  nats-server -js -D"
-        info "  3. Using config file:    nats-server -c /path/to/nats.conf"
-        echo ""
-        info "Skipping stream creation (server not running)"
-        return 0
-    fi
-
-    # -------------------------------------------------------------------------
-    # Create JetStream streams
-    # -------------------------------------------------------------------------
-    echo ""
-    info "Manifesting NATS JetStream streams..."
-
-    local streams_created=0
-    local streams_existing=0
-    local streams_failed=0
-
-    # Stream 1: REQUIREMENTS
-    echo ""
-    info "Manifesting REQUIREMENTS stream..."
-    if [[ "$DRY_RUN" == false ]]; then
-        if nats stream add REQUIREMENTS \
-            --subjects "work.requirements.*" \
-            --storage file \
-            --replicas 1 \
-            --retention limits \
-            --max-msgs 10000 \
-            --max-age 30d \
-            --discard old \
-            --max-msg-size 1MB \
-            --dupe-window 2m \
-            --defaults 2>/dev/null; then
-            success "REQUIREMENTS stream created"
-            ((streams_created++))
-        else
-            # Check if stream already exists
-            if nats stream info REQUIREMENTS > /dev/null 2>&1; then
-                info "REQUIREMENTS stream already exists"
-                ((streams_existing++))
-            else
-                error "Failed to create REQUIREMENTS stream"
-                ((streams_failed++))
-            fi
-        fi
-    else
-        info "[DRY RUN] Would create REQUIREMENTS stream"
-    fi
-
-    # Stream 2: WORK
-    echo ""
-    info "Manifesting WORK stream..."
-    if [[ "$DRY_RUN" == false ]]; then
-        if nats stream add WORK \
-            --subjects "work.assigned.*,work.progress.*,work.complete.*" \
-            --storage file \
-            --replicas 1 \
-            --retention limits \
-            --max-msgs 50000 \
-            --max-age 7d \
-            --discard old \
-            --max-msg-size 1MB \
-            --dupe-window 2m \
-            --defaults 2>/dev/null; then
-            success "WORK stream created"
-            ((streams_created++))
-        else
-            if nats stream info WORK > /dev/null 2>&1; then
-                info "WORK stream already exists"
-                ((streams_existing++))
-            else
-                error "Failed to create WORK stream"
-                ((streams_failed++))
-            fi
-        fi
-    else
-        info "[DRY RUN] Would create WORK stream"
-    fi
-
-    # Stream 3: INTEGRATION
-    echo ""
-    info "Manifesting INTEGRATION stream..."
-    if [[ "$DRY_RUN" == false ]]; then
-        if nats stream add INTEGRATION \
-            --subjects "work.integration.*" \
-            --storage file \
-            --replicas 1 \
-            --retention limits \
-            --max-msgs 10000 \
-            --max-age 7d \
-            --discard old \
-            --max-msg-size 1MB \
-            --dupe-window 2m \
-            --defaults 2>/dev/null; then
-            success "INTEGRATION stream created"
-            ((streams_created++))
-        else
-            if nats stream info INTEGRATION > /dev/null 2>&1; then
-                info "INTEGRATION stream already exists"
-                ((streams_existing++))
-            else
-                error "Failed to create INTEGRATION stream"
-                ((streams_failed++))
-            fi
-        fi
-    else
-        info "[DRY RUN] Would create INTEGRATION stream"
-    fi
-
-    # Stream 4: RELEASES
-    echo ""
-    info "Manifesting RELEASES stream..."
-    if [[ "$DRY_RUN" == false ]]; then
-        if nats stream add RELEASES \
-            --subjects "work.releases.*" \
-            --storage file \
-            --replicas 1 \
-            --retention limits \
-            --max-msgs 5000 \
-            --max-age 30d \
-            --discard old \
-            --max-msg-size 1MB \
-            --dupe-window 2m \
-            --defaults 2>/dev/null; then
-            success "RELEASES stream created"
-            ((streams_created++))
-        else
-            if nats stream info RELEASES > /dev/null 2>&1; then
-                info "RELEASES stream already exists"
-                ((streams_existing++))
-            else
-                error "Failed to create RELEASES stream"
-                ((streams_failed++))
-            fi
-        fi
-    else
-        info "[DRY RUN] Would create RELEASES stream"
-    fi
-
-    # -------------------------------------------------------------------------
-    # Verify streams
-    # -------------------------------------------------------------------------
-    echo ""
-    if [[ "$DRY_RUN" == false ]]; then
-        info "Verifying NATS streams..."
-        if nats stream ls > /dev/null 2>&1; then
-            echo ""
-            nats stream ls
-            echo ""
-        fi
-
-        # Summary
-        info "Stream creation summary:"
-        echo "  - Created:  ${streams_created} new stream(s)"
-        echo "  - Existing: ${streams_existing} stream(s)"
-        echo "  - Failed:   ${streams_failed} stream(s)"
-        echo ""
-
-        if [[ $streams_failed -gt 0 ]]; then
-            warning "Some streams failed to create"
-            warning "Check NATS server logs for details"
-        else
-            success "All NATS streams configured successfully"
-        fi
-    else
-        info "[DRY RUN] Would verify streams with: nats stream ls"
-    fi
-}
-
-# ============================================================================
 # PHASE 5: INFRASTRUCTURE VERIFICATION
 # ============================================================================
 
@@ -3488,11 +3245,6 @@ main() {
     # Phase 5: MCP server configuration
     if [[ "$AGENTS_ONLY" == false ]]; then
         setup_mcp_servers
-    fi
-
-    # Phase 5a: NATS JetStream configuration (optional)
-    if [[ "$AGENTS_ONLY" == false ]]; then
-        configure_nats
     fi
 
     # Phase 5b: Infrastructure verification

@@ -262,17 +262,6 @@ print_section "Infrastructure Health"
 echo ""
 echo -e "${BOLD}Services:${NC}"
 
-# NATS Server
-if nats stream ls > /dev/null 2>&1; then
-    print_success "NATS Server: Running"
-    work_messages=$(nats stream info WORK --json 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['state']['messages'])" 2>/dev/null || echo "0")
-    echo "    └─ WORK queue: $work_messages messages"
-    health_score=$((health_score + 5))
-else
-    print_warning "NATS Server: Not running (optional)"
-fi
-health_max=$((health_max + 5))
-
 # Agent Memory Server
 if pgrep -f agent-memory > /dev/null; then
     print_success "Agent Memory Server: Running"

@@ -62,7 +62,7 @@ ghost-county/
 ├── Agentic_SDLC_Framework/   # v1.0 Legacy framework (monolithic agents)
 │   ├── 00-Overview.md        # Quick start guide
 │   ├── 01-Prerequisites.md   # Environment setup
-│   ├── 02-Infrastructure.md  # NATS, MCP servers, memory
+│   ├── 02-Infrastructure.md  # MCP servers, memory
 │   ├── 03-Agent-Definitions.md  # Agent character sheets
 │   ├── 04-Implementation-Phases.md
 │   ├── 05-Operations.md      # Daily/weekly rituals
@@ -165,7 +165,6 @@ Do NOT ask the user "should I log this?" - if it sounds like an issue or request
 
 ## Infrastructure Dependencies
 
-- **NATS JetStream** - Message queue for agent coordination
 - **MCP Servers** - Context7 (library docs), Agent Memory (persistence)
 - **Playwright** - E2E browser automation tests
 

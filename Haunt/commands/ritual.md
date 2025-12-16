@@ -45,7 +45,7 @@ The morning-review.sh script provides:
 - Current work focus (active and blocked items)
 - Test suite status
 - Agent memory recall (recent learnings)
-- Infrastructure health (NATS, memory server, git status)
+- Infrastructure health (memory server, git status)
 - Skill usage statistics
 - Project health score (0-100%)
 - Recommendations for the day
@@ -137,7 +137,7 @@ The ritual is complete.
 - All scripts located in `Haunt/scripts/rituals/`
 - Scripts use bash and standard Unix tools
 - Some features require Python 3 (agent memory parsing)
-- NATS and MCP servers optional but recommended
+- MCP servers optional but recommended
 
 **When to Use:**
 - **Morning ritual:** Every session startup (part of session-startup protocol)

@@ -141,7 +141,6 @@ done
 
 ### Infrastructure Check
 
-- [ ] NATS queues healthy (depth < 100)
 - [ ] Memory storage adequate (< 50MB)
 - [ ] CI/CD pipeline efficient
 - [ ] No bottlenecks identified

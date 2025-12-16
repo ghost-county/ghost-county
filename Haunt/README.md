@@ -119,8 +119,8 @@ Not recommended. Choose one architecture per project to avoid conflicting instru
 ### How do I add a new skill?
 Create `Haunt/skills/new-skill-name/SKILL.md` with YAML frontmatter (`name`, `description`) + markdown content. Reference it in agent's "Skills Used" section.
 
-### Do agents still use NATS, MCP servers, and memory?
-Yes. Infrastructure requirements unchanged. Only agent file structure refactored.
+### Do agents still use MCP servers and memory?
+Yes. Infrastructure requirements for MCP servers and agent memory are unchanged. Only agent file structure refactored.
 
 ### How does this integrate with the Anthropic Agent SDK?
 The framework uses a **selective integration** approach. SDK infrastructure (context compaction, prompt caching, tool permissions) is used automatically via Claude Code CLI. Custom methodology (roadmap workflow, pattern detection, skills) remains framework-specific. See `docs/SDK-INTEGRATION.md` for details.
