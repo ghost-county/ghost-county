@@ -23,7 +23,7 @@ See `.claude/rules/gco-status-updates.md` for update protocol.
 
 ### Current Items
 
-No active work. Rules Integration phase complete (REQ-104 through REQ-117).
+No active work. UI Testing Integration phase complete (REQ-204).
 
 See `.haunt/plans/roadmap.md` for full roadmap.
 
