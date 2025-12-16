@@ -23,7 +23,15 @@ See `.claude/rules/gco-status-updates.md` for update protocol.
 
 ### Current Items
 
-No active work. UI Testing Integration phase complete (REQ-204).
+⚪ REQ-205: GitHub Issues Integration with @haunt Marker
+   Agent: Research-Analyst → Dev-Infrastructure
+   Brief: Auto-detect GitHub issues marked @haunt and add to roadmap with approval
+   Status: Not Started
+
+⚪ REQ-206: Create /bind Command for Custom Workflow Rule Overrides
+   Agent: Dev-Infrastructure
+   Brief: Enable project-specific rule overrides via /bind command
+   Status: Not Started
 
 See `.haunt/plans/roadmap.md` for full roadmap.
 
