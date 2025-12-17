@@ -133,6 +133,7 @@ What was done:
 | `/witching-hour` | Intensive debugging workflow |
 | `/bind` | Create custom rule overrides for specific files |
 | `/haunt` | Status check and health verification |
+| `/haunt-report` | Report bugs or feature requests to Haunt maintainers |
 
 **Automatic session startup (every session, every agent):**
 ```bash
@@ -499,7 +500,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 - **Quick questions:** Check [QUICK-REFERENCE.md](QUICK-REFERENCE.md)
 - **Setup issues:** Read [SETUP-GUIDE.md](SETUP-GUIDE.md)
 - **Deep dives:** Explore [docs/WHITE-PAPER.md](docs/WHITE-PAPER.md)
-- **Bug reports:** Use `claude /haunt` then report via GitHub Issues
+- **Bug reports:** Use `claude /haunt-report` to create issues with automatic diagnostics
 
 ---
 
