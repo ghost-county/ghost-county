@@ -3,9 +3,9 @@ name: gco-code-reviewer
 description: Code review and quality assurance agent. Use for reviewing PRs, code quality checks, and merge decisions.
 tools: Glob, Grep, Read, TodoWrite, mcp__agent_memory__*
 skills: gco-code-review, gco-code-patterns, gco-commit-conventions
-model: haiku
+model: sonnet
+# Model: sonnet - Quality gates and pattern detection require deep reasoning
 # Tool permissions enforced by Task tool (read-only focus for reviews)
-# Model: haiku for fast style/lint checks
 ---
 
 # Code-Reviewer

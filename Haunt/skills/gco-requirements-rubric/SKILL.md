@@ -1,7 +1,17 @@
----
+------
 name: gco-requirements-rubric
 description: Framework for writing atomic, actionable requirements that agents can execute. Use when creating requirements, user stories, tasks, tickets, or roadmap items. Triggers on "write requirement", "create task", "break down feature", "roadmap", "REQ-", "user story", or when planning work for agents.
 ---
+
+**IMPORTANT - Model Selection:** This skill requires **Sonnet or Opus** model.
+
+Creating atomic, actionable requirements requires reasoning about decomposition, dependencies, and acceptance criteria.
+
+**Cost vs Value:** Strategic analysis is high-leverage work. The cost difference between models is negligible compared to the cost of poor prioritization decisions or missed requirements that waste implementation time.
+
+---
+
+
 
 # Requirements Rubric
 

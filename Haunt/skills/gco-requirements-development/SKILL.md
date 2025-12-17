@@ -1,7 +1,17 @@
----
+------
 name: gco-requirements-development
 description: Transform ideas, brain dumps, and rough concepts into formal, testable requirements documents. Use when starting new features, processing user requests, or formalizing project scope. Triggers on "new feature", "I want to build", "add capability", "requirements for", or when the Project Manager begins Phase 1 of the idea-to-roadmap workflow.
 ---
+
+**IMPORTANT - Model Selection:** This skill requires **Sonnet or Opus** model.
+
+Transforming ideas into formal requirements requires understanding user intent, identifying edge cases, and ensuring completeness - all requiring reasoning capability.
+
+**Cost vs Value:** Strategic analysis is high-leverage work. The cost difference between models is negligible compared to the cost of poor prioritization decisions or missed requirements that waste implementation time.
+
+---
+
+
 
 # Requirements Development
 

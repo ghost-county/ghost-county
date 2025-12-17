@@ -2,6 +2,8 @@
 name: gco-code-reviewer-readonly
 description: Read-only code review agent. Use for reviewing code changes without ability to modify files or execute commands.
 tools: Glob, Grep, Read, mcp__agent_memory__*
+model: haiku
+# Model: haiku - Read-only review, no complex reasoning needed
 skills: gco-code-review, gco-code-patterns, gco-commit-conventions
 # Tool Access Philosophy: Strict read-only enforcement prevents accidental modifications during code review.
 # Reviews should analyze and report findings, not modify code. For reviews requiring minor fixes, use gco-code-reviewer instead.

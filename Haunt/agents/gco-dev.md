@@ -3,14 +3,9 @@ name: gco-dev
 description: Development agent for backend, frontend, and infrastructure implementation. Use for writing code, tests, and features.
 tools: Glob, Grep, Read, Edit, Write, Bash, TodoWrite, mcp__context7__*, mcp__agent_memory__*, mcp__playwright__*
 skills: gco-tdd-workflow, gco-commit-conventions, gco-code-patterns, gco-session-startup, gco-playwright-tests
-model: inherit
-# Tool permissions enforced by Task tool subagent_type (Dev-Backend, Dev-Frontend, Dev-Infrastructure)
-# Model: inherit (use whatever model spawned this agent, allows task-based model selection)
-#
-# Model Selection by Task Size:
-#   XS/S tasks (1-2 hours, <4 files): haiku - fast, cost-effective for simple changes
-#   M tasks (2-4 hours, 4-8 files): sonnet - reasoning power for complex logic
-#   SPLIT tasks: decompose first, then select per-subtask
+model: sonnet
+# Tool permissions enforced by Task tool subagent_type (Dev-Backend, Dev-Frontend, Dev-Infrastructure)  
+# Model: sonnet - Implementation requires reasoning for TDD, patterns, and edge cases
 ---
 
 # Dev Agent

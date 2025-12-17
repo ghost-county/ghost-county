@@ -105,6 +105,24 @@ bash Haunt/scripts/validation/validate-agent-skills.sh
 
 ## Agent Architecture
 
+## Model Selection
+
+Agents use models specified in their character sheets:
+
+| Agent | Model | Why |
+|-------|-------|-----|
+| Project Manager | Sonnet/Opus | Strategic analysis (JTBD, Kano, RICE) - high leverage |
+| Research | Sonnet | Deep investigation and architecture recommendations |
+| Dev | Sonnet | Implementation requires reasoning (TDD, patterns, edge cases) |
+| Code Reviewer | Sonnet | Quality gates and pattern detection |
+| Release Manager | Sonnet | Risk assessment and coordination |
+
+**Rationale:** High-leverage activities (requirements, research, implementation, review) require high-capability models. The cost difference is negligible compared to the cost of poor decisions or wasted dev time.
+
+See `.claude/rules/gco-model-selection.md` for detailed guidance.
+
+
+
 Agents follow a naming convention: `[Category]-[Role]`
 
 | Type | Agents | Purpose |

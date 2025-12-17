@@ -1,7 +1,17 @@
----
+------
 name: gco-requirements-analysis
 description: Strategic analysis of requirements using business frameworks (JTBD, Kano, Porter, VRIO, SWOT, RICE). Use after requirements-development to prioritize and assess strategic impact. Triggers on "analyze requirements", "prioritize features", "strategic analysis", or when the Project Manager begins Phase 2 of the idea-to-roadmap workflow.
 ---
+
+**IMPORTANT - Model Selection:** This skill requires **Sonnet or Opus** model.
+
+Strategic analysis frameworks (JTBD, Kano, RICE, SWOT, VRIO) require deep reasoning to identify implications, balance competing priorities, and make nuanced judgments.
+
+**Cost vs Value:** Strategic analysis is high-leverage work. The cost difference between models is negligible compared to the cost of poor prioritization decisions or missed requirements that waste implementation time.
+
+---
+
+
 
 # Requirements Analysis
 

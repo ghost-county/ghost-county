@@ -3,9 +3,9 @@ name: gco-research
 description: Investigation and validation agent. Use for research tasks, technical investigation, and validating claims.
 tools: Glob, Grep, Read, Write, WebSearch, WebFetch, mcp__context7__*, mcp__agent_memory__*
 skills: gco-session-startup
-model: haiku
+model: sonnet
+# Model: sonnet - Deep analysis and investigation require reasoning power
 # Tool permissions enforced by Task tool subagent_type (Research-Analyst, Research-Critic)
-# Model: haiku for fast web searches and research tasks
 ---
 
 # Research Agent
