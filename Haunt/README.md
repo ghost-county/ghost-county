@@ -1,169 +1,389 @@
-# Haunt v2.0 - Lightweight Agent Architecture
+# Haunt
 
-> Lightweight agent definitions (30-50 lines) + reusable Skills library
+> Transform AI language models into coordinated development teams with persistent memory, structured workflows, and enforced quality standards.
 
----
-
-## What's Different from Agentic_SDLC_Framework/
-
-**Old (v1.0)**: Monolithic agent files with duplicated content across agents (~200+ lines each)
-**New (v2.0)**: Lightweight agent character sheets that reference shared Skills (~30-50 lines each)
-
-### Key Changes
-- **Agent files**: Character sheets only (identity, values, responsibilities, skills referenced)
-- **Skills library**: Reusable SKILL.md files in `Haunt/skills/` directory with YAML frontmatter
-- **Reduced duplication**: Common workflows (session-startup, commit-conventions, tdd-workflow) now shared
-- **Easier maintenance**: Update a skill once, all agents benefit immediately
-- **Faster onboarding**: Agents load 85% smaller files, reference skills on-demand
+[![Version](https://img.shields.io/badge/version-2.0-blue.svg)](https://github.com/yourusername/haunt)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 ---
 
-## New in v2.0
+## What Is Haunt?
 
-### Agent Definitions (30-50 lines each)
-- **gco-dev.md** - Polyglot developer (backend, frontend, infrastructure modes)
-- **gco-project-manager.md** - Coordinator for roadmap, dispatch, archiving
-- **gco-research.md** - Investigator for technical research and validation
-- **gco-code-reviewer.md** - Quality enforcer for merge requests
-- **gco-release-manager.md** - Release coordinator for deployment orchestration
+**Haunt** is a lightweight framework that gives AI agents **persistent memory**, **specialized roles**, and **enforced best practices**—transforming one-off code generation into coordinated team development.
 
-### Skills Library (15+ reusable Haunt skills)
-Skills use YAML frontmatter with `name` and `description`, followed by markdown content.
+While traditional AI coding assistants forget everything between sessions, Haunt creates AI teammates that:
+- ✅ **Remember your project conventions** across sessions
+- ✅ **Coordinate parallel workstreams** without conflicts
+- ✅ **Enforce quality standards** automatically
+- ✅ **Track progress** through structured roadmaps
+- ✅ **Maintain context** about architectural decisions
 
-**Haunt Methodology Skills** (in `Haunt/skills/`):
-- `session-startup` - Session initialization checklist (pwd, git status, tests, assignments)
-- `commit-conventions` - Commit message format and branch naming standards
-- `feature-contracts` - Understanding immutable acceptance criteria
-- `tdd-workflow` - Red-Green-Refactor cycle and testing guidance
-- `roadmap-workflow` - Roadmap format, batch organization, archiving procedures
-- `requirements-rubric` - Framework for writing atomic, actionable requirements
-- `code-review` - Structured code review checklist with anti-pattern detection
-- `code-patterns` - Anti-pattern detection and error handling conventions
-
-**Domain-Specific Skills** (in `Skills/`):
-- Various specialized skills like xlsx-editor, pitch-deck-builder, etc. (not part of Haunt framework)
-
-Browse Haunt skills: `Haunt/skills/*/SKILL.md`
-
-### Rules Library (Invariant Enforcement)
-Rules are markdown files in `.claude/rules/` that auto-load and enforce protocols:
-
-- `session-startup.md` - 5-step startup checklist (environment, tests, git, changes, assignment)
-- `file-conventions.md` - Haunt artifact locations (plans, completed, tests, docs)
-- `commit-conventions.md` - Commit format: `[REQ-XXX] Action: Description`
-- `status-updates.md` - Worker vs PM responsibilities for roadmap updates
-- `assignment-lookup.md` - 4-step assignment sequence (Direct → Active Work → Roadmap → Ask PM)
-- `completion-checklist.md` - 5-point verification before marking work done
-- `roadmap-format.md` - Path-targeted rule for roadmap file structure
-
-Rules vs Skills vs Agents (GCO framework layers):
-| Layer | Purpose | Loading | Size |
-|-------|---------|---------|------|
-| **Rules** | "You MUST always do this" | Auto-load | 50-100 lines |
-| **Agents** | "This is WHO you are" | On spawn | 30-50 lines |
-| **Skills** | "Here's HOW to do this" | On-demand | 100-500 lines |
-| **CLAUDE.md** | "This is WHAT and WHY" | Always | <500 tokens |
-
-Browse rules: `Haunt/rules/*.md`
-
-### Benefits
-- Faster agent initialization (smaller files to load)
-- Single source of truth for workflows (update once, all agents benefit)
-- Easier experimentation (swap skills without rewriting agents)
-- Better version control (track skill changes independently)
+**The difference:** You're not just getting code suggestions—you're building with a team that has institutional knowledge.
 
 ---
 
-## Agent Definitions
+## The Problem
 
-| Agent | Purpose |
-|-------|---------|
-| gco-dev.md | Polyglot developer (backend/frontend/infrastructure modes) |
-| gco-project-manager.md | Roadmap coordinator, dispatch, archiving |
-| gco-research.md | Technical research and validation |
-| gco-code-reviewer.md | Code quality enforcement for PRs |
-| gco-release-manager.md | Deployment orchestration and release management |
+Building software with AI assistants today means:
+
+- 🔴 **Context loss** - Every conversation starts fresh, forgetting previous decisions
+- 🔴 **Inconsistent quality** - Different prompts produce wildly different code quality
+- 🔴 **No coordination** - Multiple AI agents can't work together effectively
+- 🔴 **Manual tracking** - You're the project manager, tracker, and QA in addition to writing prompts
+
+**Haunt solves this** by providing external memory (Rules, Skills, Roadmap), specialized agent roles, and automated quality enforcement.
 
 ---
 
-## How to Use
+## Key Features
 
-### Option 1: Copy agents to .claude/agents/ (Recommended)
-```bash
-# Global agents (available in all projects)
-cp Haunt/agents/*.md ~/.claude/agents/
+### 🧠 External Memory System
+LLMs are stateless, but Haunt provides **5 layers of persistent memory**:
 
-# Project-specific agents (override global)
-cp Haunt/agents/*.md ./.claude/agents/
+| Layer | Purpose | Example |
+|-------|---------|---------|
+| **Rules** | Auto-loaded invariants | "Always verify tests pass before starting work" |
+| **Agents** | Character sheets | "I am a Dev agent who follows TDD" |
+| **Skills** | On-demand workflows | "How to write a commit message" |
+| **CLAUDE.md** | Project context | "This is a REST API using FastAPI" |
+| **Roadmap** | Working memory | "REQ-042: Implement JWT auth (In Progress)" |
+
+**Result:** Agents remember your standards, patterns, and decisions across sessions.
+
+### 👥 Specialized Agent Teams
+
+Instead of one "do everything" assistant, Haunt provides **5 specialized agents**:
+
+| Agent | Role | Capabilities |
+|-------|------|--------------|
+| **Project Manager** | Coordinator | Requirements analysis (JTBD, Kano, RICE), roadmap planning, batch coordination |
+| **Dev** | Implementation | Backend/Frontend/Infrastructure modes, TDD workflow, automatic commit generation |
+| **Research** | Investigation | Technical research, library evaluation, documentation validation |
+| **Code Reviewer** | Quality Gate | Pattern detection, PR review, merge coordination |
+| **Release Manager** | Deployment | Release coordination, changelog generation, deployment orchestration |
+
+**Coordination:** Agents communicate through the **roadmap** (status updates, blockers, dependencies)—no direct agent-to-agent communication needed.
+
+### 📋 Roadmap-Driven Development
+
+**Single source of truth:** `.haunt/plans/roadmap.md`
+
+```markdown
+## Batch 1: Foundation (parallel execution)
+
+### 🟡 REQ-001: Database schema for tasks
+**Agent:** Dev-Backend | **Effort:** S (1-2hr) | **Status:** In Progress
+- [x] Create User model
+- [x] Create Task model
+- [ ] Write migration
+
+### ⚪ REQ-002: React app structure
+**Agent:** Dev-Frontend | **Effort:** S (1-2hr) | **Status:** Not Started
+**Blocked by:** None
+
+## Batch 2: Features (sequential, after Batch 1)
+
+### ⚪ REQ-003: Task CRUD API
+**Agent:** Dev-Backend | **Effort:** M (2-4hr)
+**Blocked by:** REQ-001
 ```
 
-### Option 2: Reference agents directly
-Point Claude Code to `Haunt/agents/` when starting a session.
+**Features:**
+- Visual status tracking (⚪ Not Started, 🟡 In Progress, 🟢 Complete, 🔴 Blocked)
+- Dependency chains prevent premature work
+- Batch organization enables parallel execution
+- Effort sizing (XS: <1hr, S: 1-2hr, M: 2-4hr, SPLIT: decompose immediately)
+- Automatic archival when complete
 
-### Skills Usage
-Agents reference skills by name (e.g., "session-startup"). Haunt methodology skills are located in `Haunt/skills/` directory. Claude Code automatically finds and uses skills when agents invoke them.
+### ⚡ Quality Enforcement
+
+**No shortcuts allowed.** Before marking work complete, agents verify:
+
+1. ✅ All task checkboxes marked `[x]`
+2. ✅ Completion criteria met
+3. ✅ **Tests passing** (pytest/npm test)
+4. ✅ Files modified as specified
+5. ✅ Documentation updated
+
+**Standardized commits:**
+```
+[REQ-042] Add: JWT authentication endpoints
+
+What was done:
+- Created POST /auth/login endpoint with JWT generation
+- Added token refresh endpoint
+- Implemented rate limiting (10 req/min)
+
+🤖 Generated with Claude Code
+```
+
+**Pattern detection:** TDD for agent behavior—when agents make mistakes, defeat tests prevent recurrence.
+
+### 🔄 Automated Workflows
+
+**19 slash commands** for common tasks:
+
+| Command | Purpose |
+|---------|---------|
+| `/seance` | Full workflow orchestration (idea → requirements → roadmap → implementation) |
+| `/coven` | Summon parallel agent team for complex features |
+| `/decompose` | Break down large requirements into smaller pieces |
+| `/qa` | Generate test scenarios from requirements |
+| `/ritual` | Run weekly refactor session |
+| `/witching-hour` | Intensive debugging workflow |
+| `/bind` | Create custom rule overrides for specific files |
+| `/haunt` | Status check and health verification |
+
+**Automatic session startup (every session, every agent):**
+```bash
+1. Verify environment: pwd && git status
+2. Check recent changes: git log --oneline -5
+3. Verify tests pass: pytest tests/ -x -q
+4. Find assignment: Active Work → Roadmap → Ask PM
+```
+
+### 🎯 Strategic Planning
+
+Project Manager agent performs **strategic analysis** on all requirements:
+
+- **Jobs-To-Be-Done (JTBD):** Understand user motivations
+- **Kano Model:** Categorize features (Basic, Performance, Delight)
+- **RICE Scoring:** Reach × Impact × Confidence / Effort prioritization
+- **SWOT Analysis:** Strengths, Weaknesses, Opportunities, Threats
+- **VRIO Framework:** Value, Rarity, Imitability, Organization
+
+**Result:** Work on high-impact features first, with clear business justification.
 
 ---
 
-## FAQ
+## Quick Start
 
-### Why v2.0 instead of patching v1.0?
-Architectural change (monolithic to lightweight) required clean break. Old framework remains available for rollback.
-
-### Are all skills referenced by agents?
-No. Agents reference core Haunt methodology skills from `Haunt/skills/` (session-startup, commit-conventions, tdd-workflow, etc). Other domain-specific skills in `/Skills/` (xlsx-editor, pitch-deck-builder) are invoked only when needed and are not part of the Haunt framework.
-
-### Can I use both v1.0 and v2.0 agents?
-Not recommended. Choose one architecture per project to avoid conflicting instructions.
-
-### How do I add a new skill?
-Create `Haunt/skills/new-skill-name/SKILL.md` with YAML frontmatter (`name`, `description`) + markdown content. Reference it in agent's "Skills Used" section.
-
-### Do agents still use MCP servers and memory?
-Yes. Infrastructure requirements for MCP servers and agent memory are unchanged. Only agent file structure refactored.
-
-### How does this integrate with the Anthropic Agent SDK?
-The framework uses a **selective integration** approach. SDK infrastructure (context compaction, prompt caching, tool permissions) is used automatically via Claude Code CLI. Custom methodology (roadmap workflow, pattern detection, skills) remains framework-specific. See `docs/SDK-INTEGRATION.md` for details.
-
-### What if a skill is missing?
-Agent will continue without error. Add missing skill to `Haunt/skills/` directory and reference it in agent file.
-
-### How do I customize an agent for my project?
-Copy agent to `./.claude/agents/` (project-specific) and modify. Project agents override global agents.
-
-### What's the migration path from v1.0 to v2.0?
-1. Backup old agents (`~/.claude/agents/*.md` → `~/.claude/agents.backup/`)
-2. Copy new agents (`Haunt/agents/*.md` → `~/.claude/agents/`)
-3. Test with one project before rolling out globally
-4. Keep old framework for 30 days in case rollback needed
-
-### Can I mix old and new agents?
-Not recommended. Monolithic agents (v1.0) contain duplicated content that conflicts with skill references (v2.0).
-
-### How do I know which version I'm using?
-Check agent file size: v1.0 agents are 150-300 lines, v2.0 agents are 30-50 lines.
-
----
-
-## Rollback Procedure
-
-If v2.0 doesn't work for your use case, rollback to v1.0:
+### Installation (3 commands)
 
 ```bash
-# 1. Remove v2.0 agents
-rm ~/.claude/agents/gco-dev.md
-rm ~/.claude/agents/gco-project-manager.md
-rm ~/.claude/agents/gco-research.md
-rm ~/.claude/agents/gco-code-reviewer.md
-rm ~/.claude/agents/gco-release-manager.md
+# 1. Clone repository
+git clone https://github.com/yourusername/haunt.git
+cd haunt
 
-# 2. Use old framework
-# Follow instructions in Agentic_SDLC_Framework/00-Overview.md
-bash Agentic_SDLC_Framework/scripts/setup-all.sh --agents
+# 2. Run setup
+bash Haunt/scripts/setup-haunt.sh
 
-# 3. Delete Haunt/ directory (optional)
-# Only if you want to fully revert
-rm -rf Haunt/
+# 3. Verify installation
+bash Haunt/scripts/setup-haunt.sh --verify
+```
+
+**What setup does:**
+- Copies agent character sheets to `~/.claude/agents/`
+- Installs rules to `~/.claude/rules/` (auto-loaded every session)
+- Deploys skills to `~/.claude/skills/` (on-demand)
+- Creates project structure (`.haunt/plans/`, `.haunt/completed/`, etc.)
+
+### Your First Project
+
+**Step 1: Start with Project Manager**
+```bash
+claude -a gco-project-manager
+```
+
+```
+You: "I want to build a REST API for managing book reviews.
+     Users can register, log in, post reviews, and rate books."
+```
+
+PM will:
+1. Confirm understanding
+2. Generate formal requirements document
+3. Perform strategic analysis (JTBD, Kano, RICE)
+4. Create roadmap with sized requirements
+5. Assign agents to requirements
+
+**Step 2: Implement with Dev Agent**
+```bash
+claude -a gco-dev
+```
+
+Agent automatically:
+- Runs session startup (verify tests, check git, find assignment)
+- Implements feature following TDD workflow
+- Updates roadmap status (⚪ → 🟡 → 🟢)
+- Creates commit: `[REQ-001] Add: User registration endpoint`
+
+**Step 3: Review with Code Reviewer**
+```bash
+claude -a gco-code-reviewer
+```
+
+Reviewer verifies:
+- Tests passing
+- No anti-patterns detected
+- Commit messages follow convention
+- Implementation matches completion criteria
+
+**Step 4: Track Progress**
+
+Check `.haunt/plans/roadmap.md`:
+```markdown
+**Active Work:**
+- 🟢 REQ-001: User registration endpoint (Complete)
+- 🟡 REQ-002: Login with JWT (In Progress)
+- ⚪ REQ-003: Book review CRUD (Not Started)
+```
+
+---
+
+## Architecture Overview
+
+### The Four-Layer System
+
+```
+┌──────────────────────────────────────────────┐
+│ AGENTS (WHO you are)                         │ ← 30-50 lines each
+│   Character sheets, tool permissions         │   Loaded on spawn
+├──────────────────────────────────────────────┤
+│ RULES (You MUST do this)                     │ ← 50-100 lines each
+│   Invariant enforcement, auto-loaded         │   Always enforced
+├──────────────────────────────────────────────┤
+│ SKILLS (HOW to do this)                      │ ← 100-500 lines each
+│   Reusable workflows, on-demand              │   Loaded when invoked
+├──────────────────────────────────────────────┤
+│ COMMANDS (Shortcuts)                         │ ← User-invoked
+│   Common task automation                     │   19 total
+└──────────────────────────────────────────────┘
+```
+
+### Why This Layering Matters
+
+**Agents are lightweight** (30-50 lines) because they **reference** skills rather than duplicating workflows.
+
+**Rules are always on** because they enforce invariants that must **never** be violated.
+
+**Skills are on-demand** because they're detailed guidance only needed in specific contexts.
+
+**Commands are shortcuts** for tasks users would otherwise type manually.
+
+### v2.0 vs v1.0
+
+| Aspect | v1.0 (Monolithic) | v2.0 (Lightweight) |
+|--------|-------------------|-------------------|
+| Agent file size | 200+ lines | 30-50 lines |
+| Workflow duplication | Duplicated in every agent | Shared via skills |
+| Maintenance | Update 5 agents for one change | Update 1 skill |
+| Loading speed | Slower (large files) | 85% faster |
+| Customization | Edit entire agent | Swap skills |
+
+---
+
+## What Makes Haunt Unique
+
+### 1. External Memory for Stateless LLMs
+Rules, skills, and roadmap provide **persistent institutional knowledge** that survives across sessions.
+
+### 2. Roadmap as Communication Layer
+Agents coordinate through **status updates** in the roadmap—no direct agent-to-agent communication needed.
+
+### 3. One-Feature-Per-Session Rule
+Everything sized to complete in **one sitting** (max 4 hours)—prevents context sprawl and ensures atomic commits.
+
+### 4. TDD for Agent Behavior
+**Pattern detection tests** ensure agents learn from mistakes:
+- Pattern Found → Test Written → Agent Trained → Pattern Defeated
+
+### 5. Human-in-the-Loop Autonomy
+Agents handle **implementation details** (code, tests, commits), humans approve **architecture and releases**.
+
+### 6. Selective SDK Integration
+Uses SDK infrastructure (prompt caching, tool permissions) without replacing custom methodology.
+
+---
+
+## Real-World Workflows
+
+### Parallel Development (Coven Mode)
+```
+User: "Add dark mode to the app"
+
+Project Manager:
+  ├─> REQ-001: Dark mode toggle component (Dev-Frontend)
+  ├─> REQ-002: Theme state management (Dev-Frontend)
+  ├─> REQ-003: API for user theme preference (Dev-Backend)
+  └─> REQ-004: Update CSS variables (Dev-Frontend)
+
+All agents work simultaneously, PM tracks completion
+```
+
+### Weekly Refactor Ritual
+```bash
+claude -a gco-project-manager
+> /ritual weekly-refactor
+
+Agent runs:
+1. Code quality scan (pattern detection)
+2. Test coverage analysis
+3. Technical debt review
+4. Agent prompt optimization
+5. Documentation updates
+```
+
+### Intensive Debugging (Witching Hour)
+```bash
+claude -a gco-dev
+> /witching-hour
+
+Agent workflow:
+1. Enable verbose logging
+2. Reproduce issue systematically
+3. Correlate patterns across errors
+4. Write failing test that captures bug
+5. Fix and verify
+6. Create defeat test to prevent recurrence
+```
+
+---
+
+## File Organization
+
+### Project Structure
+```
+.haunt/
+├── plans/
+│   └── roadmap.md                # Single source of truth
+├── completed/                    # Archived requirements
+├── progress/                     # Session notes
+├── tests/
+│   ├── patterns/                 # Pattern defeat tests
+│   ├── behavior/                 # Agent behavior tests
+│   └── e2e/                      # End-to-end tests
+└── docs/
+    ├── research/                 # Investigation findings
+    └── validation/               # Review reports
+```
+
+### Framework Structure
+```
+Haunt/
+├── agents/                       # Character sheets (source)
+│   ├── gco-dev.md
+│   ├── gco-project-manager.md
+│   ├── gco-research.md
+│   ├── gco-code-reviewer.md
+│   └── gco-release-manager.md
+├── rules/                        # Invariant enforcement (source)
+│   ├── gco-session-startup.md
+│   ├── gco-commit-conventions.md
+│   ├── gco-completion-checklist.md
+│   └── ...
+├── skills/                       # Reusable workflows (source)
+│   ├── gco-tdd-workflow/
+│   ├── gco-roadmap-planning/
+│   ├── gco-requirements-analysis/
+│   └── ...
+├── commands/                     # Slash commands
+│   ├── seance.md
+│   ├── coven.md
+│   └── ...
+└── scripts/
+    ├── setup-haunt.sh            # One-command install
+    └── validation/               # Verification scripts
 ```
 
 ---
@@ -172,22 +392,122 @@ rm -rf Haunt/
 
 | Document | Purpose |
 |----------|---------|
-| `README.md` | This file - architecture overview |
-| `SETUP-GUIDE.md` | Complete setup instructions |
-| `QUICK-REFERENCE.md` | Quick reference card |
-| `docs/SDK-INTEGRATION.md` | How SDK features integrate with framework |
-| `docs/TOOL-PERMISSIONS.md` | Agent tool access reference |
-| `docs/SKILLS-REFERENCE.md` | Complete catalog of all available skills |
-| `docs/WHITE-PAPER.md` | Framework design philosophy |
-| `docs/PATTERN-DETECTION.md` | Pattern detection methodology |
-| `docs/HAUNT-DIRECTORY-SPEC.md` | Directory structure specification |
-| `.claude/rules/` | Invariant enforcement protocols (auto-enforced) |
+| **README.md** | This file - overview and quick start |
+| **[SETUP-GUIDE.md](SETUP-GUIDE.md)** | Complete installation instructions |
+| **[QUICK-REFERENCE.md](QUICK-REFERENCE.md)** | Cheat sheet for commands, agents, skills |
+| **[docs/WHITE-PAPER.md](docs/WHITE-PAPER.md)** | Framework design philosophy |
+| **[docs/SDK-INTEGRATION.md](docs/SDK-INTEGRATION.md)** | How SDK features integrate |
+| **[docs/TOOL-PERMISSIONS.md](docs/TOOL-PERMISSIONS.md)** | Agent tool access reference |
+| **[docs/SKILLS-REFERENCE.md](docs/SKILLS-REFERENCE.md)** | Complete skills catalog |
+| **[docs/PATTERN-DETECTION.md](docs/PATTERN-DETECTION.md)** | Pattern detection methodology |
+| **[docs/HAUNT-DIRECTORY-SPEC.md](docs/HAUNT-DIRECTORY-SPEC.md)** | Directory structure specification |
 
-## Next Steps
+---
 
-1. Review agent definitions in `Haunt/agents/`
-2. Browse skills library in `Haunt/skills/*/SKILL.md`
-3. Read `docs/SDK-INTEGRATION.md` to understand how SDK features work
-4. Copy agents to `~/.claude/agents/` or `./.claude/agents/`
-5. Start a session and verify agents reference skills correctly
-6. Provide feedback on v2.0 architecture
+## Integration & Compatibility
+
+### Works With
+- ✅ **Claude Code CLI** (primary interface)
+- ✅ **Anthropic Claude API** (via SDK integration)
+- ✅ **MCP Servers** (Context7, Playwright, Agent Memory)
+- ✅ **GitHub Actions** (pattern tests in CI/CD)
+- ✅ **VS Code / Cursor** (via Claude Code)
+
+### Hybrid Agent Patterns
+Haunt agents work seamlessly with Claude Code's built-in agents:
+
+- **Explore → gco-dev**: Research existing code, then implement changes
+- **Plan → gco-project-manager**: Strategic planning, then formal roadmapping
+- **general-purpose → gco-code-reviewer**: Implement, then review (prevents self-review bias)
+
+See [docs/INTEGRATION-PATTERNS.md](docs/INTEGRATION-PATTERNS.md) for detailed examples.
+
+---
+
+## FAQ
+
+### Do I need to install MCP servers?
+**Optional.** Haunt works without MCP, but Context7 (docs lookup) and Playwright (E2E tests) enhance capabilities.
+
+### Can I use Haunt with existing projects?
+**Yes.** Run `bash Haunt/scripts/setup-haunt.sh --project-only` in any project to add Haunt workflows.
+
+### How do I customize an agent for my project?
+Copy to `./.claude/agents/` (project-specific) and modify. Project agents override global agents.
+
+### What if I want to remove Haunt?
+```bash
+claude /exorcism  # Removes all Haunt artifacts from current project
+```
+
+### Can I use both v1.0 and v2.0?
+**Not recommended.** Choose one architecture per project to avoid conflicting instructions.
+
+### How much does this cost?
+Haunt is **MIT licensed** and free. You pay only for Claude API usage (same as any Claude Code usage).
+
+### Does this work with other LLMs?
+Currently designed for **Claude** via Claude Code CLI. SDK-based features require Anthropic Claude API.
+
+---
+
+## Roadmap
+
+**Current (v2.0):** Lightweight architecture with skills library
+
+**Upcoming:**
+- GitHub Issues integration (auto-convert issues to roadmap items)
+- Custom bindings for project-specific rule overrides
+- Browser-based agent dashboard for roadmap visualization
+- Enhanced pattern detection with ML-based code smell identification
+- Community skills marketplace
+
+See [.haunt/plans/roadmap.md](.haunt/plans/roadmap.md) for detailed feature tracking.
+
+---
+
+## Contributing
+
+We welcome contributions! Here's how:
+
+1. **Report bugs/patterns:** Use `/issue-to-roadmap` to log issues
+2. **Submit skills:** Create `Haunt/skills/your-skill/SKILL.md` with YAML frontmatter
+3. **Improve agents:** Suggest character sheet refinements
+4. **Share workflows:** Document your team's Haunt usage patterns
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+---
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+---
+
+## Credits
+
+**Created by:** Mike Heckathorn
+**Framework:** Haunt (Ghost County project)
+**Powered by:** Claude (Anthropic)
+**Inspired by:** Years of trying to make AI agents remember what they learned yesterday
+
+---
+
+## Getting Help
+
+- **Quick questions:** Check [QUICK-REFERENCE.md](QUICK-REFERENCE.md)
+- **Setup issues:** Read [SETUP-GUIDE.md](SETUP-GUIDE.md)
+- **Deep dives:** Explore [docs/WHITE-PAPER.md](docs/WHITE-PAPER.md)
+- **Bug reports:** Use `claude /haunt` then report via GitHub Issues
+
+---
+
+**Ready to build with AI teammates who actually remember your project?**
+
+```bash
+bash Haunt/scripts/setup-haunt.sh
+claude -a gco-project-manager
+```
+
+Let's haunt some code. 👻
