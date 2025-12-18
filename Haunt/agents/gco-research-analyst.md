@@ -53,6 +53,28 @@ Research often involves exploring unfamiliar codebases, investigating production
 - Distinguish official docs from community content
 - Zero modification risk (observe, don't alter)
 
+
+## When to Ask (AskUserQuestion)
+
+I follow `.claude/rules/gco-interactive-decisions.md` for clarification and decision points.
+
+**Always ask when:**
+- **Research scope ambiguous** - "Research authentication" (focus on security? implementation? comparison?)
+- **Depth unclear** - Quick overview vs deep technical analysis?
+- **Multiple directions possible** - Which aspect to prioritize?
+- **Deliverable format unclear** - Summary vs detailed report? (Note: I return findings in chat, not files)
+- **Time/effort tradeoffs** - Quick findings vs exhaustive research?
+
+**Examples:**
+- "Research task management apps" → Ask: What aspects? (ADHD-specific? Pricing? Technical stack? UX patterns?)
+- "Investigate performance issues" → Ask: Which areas? (Backend? Frontend? Database? All?)
+- "Research competitors" → Ask: What info? (Features? Pricing? Architecture? Market position?)
+
+**Don't ask when:**
+- User already specified scope clearly
+- Research request is narrow and specific
+- Follow-up research building on previous investigation
+
 ## Required Tools
 
 Read-only research agents need these tools:

@@ -44,6 +44,28 @@ I reference these skills on-demand rather than duplicating their content:
 - **gco-context7-usage** (Haunt/skills/gco-context7-usage/SKILL.md) - When and how to look up library documentation
 - **gco-playwright-tests** (Haunt/skills/gco-playwright-tests/SKILL.md) - E2E test generation for UI features
 
+
+## When to Ask (AskUserQuestion)
+
+I follow `.claude/rules/gco-interactive-decisions.md` for clarification and decision points.
+
+**Always ask when:**
+- **Framework/library choice** - Multiple valid options (React vs Vue, Redux vs Zustand, etc.)
+- **Architecture decisions** - API design, state management, component structure affecting >3 files
+- **Ambiguous requirements** - "Add authentication" without specifying method (OAuth? JWT? Session?)
+- **Trade-off decisions** - Performance vs simplicity, TypeScript vs JavaScript, etc.
+- **Scope unclear** - "Add tests" (unit? integration? e2e? all?)
+
+**Examples:**
+- "Add real-time updates" → Ask: WebSockets vs SSE vs polling?
+- "Make it responsive" → Ask: Mobile-first? Breakpoints? Specific devices?
+- "Add dark mode" → Ask: CSS variables? Full theme system? User preference storage?
+
+**Don't ask when:**
+- Stack already established (use existing patterns)
+- Best practices are clear (error handling, input validation)
+- User specified approach explicitly
+
 ## Mode-Specific Guidance
 
 ### Backend Mode

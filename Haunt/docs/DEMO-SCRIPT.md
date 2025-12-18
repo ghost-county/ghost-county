@@ -67,6 +67,71 @@
 
 ---
 
+## Section 2.5: Interactive Decision Making (1-2 minutes)
+
+### What to Say
+
+> "What makes Haunt smart is that agents don't guess - they ask. When there's ambiguity or multiple valid approaches, agents surface the decision to you instead of making assumptions."
+
+### Key Talking Points
+
+- **No assumptions:** Agents ask when requirements are ambiguous
+- **Architecture choices:** Framework selection, database choice, API design patterns
+- **User stays in control:** Quick questions prevent hours of wasted work
+- **Smart defaults:** Agents still work autonomously when path is clear
+
+### Demo Flow
+
+1. Show séance with ambiguous request
+2. Agent asks clarifying question with multiple options
+3. User selects approach
+4. Agent proceeds confidently with chosen direction
+5. Highlight time saved by asking upfront
+
+### Example Script
+
+**Scenario:** User says "Add authentication"
+
+```
+$ /seance "Add authentication"
+
+🔮 Channeling the spirits...
+
+⚠️  CLARITY NEEDED: Multiple ways to implement authentication
+
+How should we implement authentication?
+[1] NextAuth.js (Recommended)
+    ↳ Full-featured auth library with OAuth, email, credentials
+[2] Clerk
+    ↳ Managed service. Beautiful UI, adds external dependency
+[3] Supabase Auth
+    ↳ If using Supabase, integrated solution with RLS
+[4] Custom JWT
+    ↳ Full control, more work to secure properly
+
+Your choice: [1]
+
+✓ Proceeding with NextAuth.js approach
+✓ Creating requirements:
+  - REQ-047: Install NextAuth.js and configure providers
+  - REQ-048: Create authentication API routes
+  - REQ-049: Add session handling middleware
+  - REQ-050: Build login/logout UI components
+```
+
+### Expected Questions
+
+**Q:** "Does it ask questions for every little thing?"
+**A:** "No. Agents only ask when there are genuinely multiple valid approaches or when requirements are ambiguous. They don't ask about obvious best practices or established patterns."
+
+**Q:** "Can I skip the questions and just tell it what to do?"
+**A:** "Yes. If you're specific upfront ('Add NextAuth.js authentication'), agents proceed without asking. Questions only appear when clarity is needed."
+
+**Q:** "What if I pick the wrong option?"
+**A:** "No problem. You can edit the roadmap before summoning agents, or agents can refactor later. The questions prevent waste, not lock you in forever."
+
+---
+
 ## Section 3: Summoning Spirits (1-2 minutes)
 
 ### What to Say
@@ -213,12 +278,13 @@
 | Section | Quick (5 min) | Detailed (10 min) |
 |---------|---------------|-------------------|
 | 1. Introduction | 0:00-0:30 | 0:00-0:30 |
-| 2. Séance | 0:30-1:30 | 0:30-2:00 |
-| 3. Summoning | 1:30-2:30 | 2:00-4:00 |
-| 4. Curse | 2:30-3:30 | 4:00-6:00 |
-| 5. Status | 3:30-4:00 | 6:00-8:00 |
-| 6. Rituals | 4:00-4:30 | 8:00-9:00 |
-| 7. Wrap-up | 4:30-5:00 | 9:00-10:00 |
+| 2. Séance | 0:30-1:30 | 0:30-2:30 |
+| 2.5. Interactive Decisions | 1:30-2:30 | 2:30-4:00 |
+| 3. Summoning | 2:30-3:30 | 4:00-5:30 |
+| 4. Curse | 3:30-4:00 | 5:30-7:00 |
+| 5. Status | 4:00-4:30 | 7:00-8:30 |
+| 6. Rituals | 4:30-5:00 | 8:30-9:30 |
+| 7. Wrap-up | SKIP or 5:00-5:30 | 9:30-10:00 |
 
 **Time-saving tips:**
 - **Short on time?** Skip Section 6 (Rituals) or combine with Section 5

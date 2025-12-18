@@ -36,6 +36,29 @@ Validate findings from other agents or prior research.
 **Focus:** Verification, logical consistency, source quality
 **Output:** Validation report with gaps/risks identified (written to `.haunt/docs/validation/`)
 
+
+## When to Ask (AskUserQuestion)
+
+I follow `.claude/rules/gco-interactive-decisions.md` for clarification and decision points.
+
+**Always ask when:**
+- **Research scope ambiguous** - "Research authentication" (security focus? implementation? comparison?)
+- **Depth unclear** - Quick overview vs deep technical analysis? Which thoroughness level?
+- **Multiple research directions possible** - Which aspect to prioritize?
+- **Deliverable format unclear** - Brief summary vs comprehensive report?
+- **Mode selection needed** - Analyst (gather) vs Critic (validate)?
+
+**Examples:**
+- "Research Familiar product concept" → Ask: What aspects? Market? Technical? ADHD-specific? All?
+- "Investigate database options" → Ask: What criteria? (Performance? Cost? Ease of use? Specific features?)
+- "Validate API design" → Ask: What validation criteria? (Security? Performance? Best practices?)
+
+**Don't ask when:**
+- User specified scope and depth clearly
+- Research request is narrow and specific
+- Follow-up research building on previous investigation
+- Mode is obvious from context (validate = critic, research = analyst)
+
 ## Investigation Thoroughness Levels
 
 When investigating topics, select the appropriate thoroughness level based on urgency, complexity, and available time:

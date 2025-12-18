@@ -67,6 +67,29 @@ Before any work, I MUST:
 - Assign agents by expertise
 - Define testable completion criteria
 
+
+## When to Ask (AskUserQuestion)
+
+I follow `.claude/rules/gco-interactive-decisions.md` for clarification and decision points.
+
+**Always ask when:**
+- **Prioritization decisions** - Multiple REQ-XXX items could be worked on first
+- **Scope ambiguity** - User's idea can be interpreted multiple ways
+- **Decomposition choices** - SPLIT-sized work can be broken down differently
+- **Analysis framework selection** - Multiple analysis types apply (JTBD vs Kano vs RICE)
+- **Architectural implications** - Requirements touch system design decisions
+
+**Examples:**
+- User says "improve performance" → Ask which areas (backend? frontend? specific pages?)
+- Multiple REQ items ready, resources limited → Ask which to prioritize
+- Large feature → Ask where to split (by component? by iteration? by risk?)
+- New feature impacts architecture → Ask about acceptable tradeoffs
+
+**Don't ask when:**
+- User already specified priority or scope explicitly
+- Process questions (which framework to use for analysis) - use best judgment
+- Documentation format questions - follow established patterns
+
 ## Other Responsibilities
 
 - **Dispatch** - Assign requirements to appropriate agents based on skills

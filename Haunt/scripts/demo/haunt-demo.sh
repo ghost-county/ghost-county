@@ -125,6 +125,62 @@ narrate "The séance has materialized your idea into trackable requirements!"
 pause
 
 #######################################
+#######################################
+# SECTION 2.5: INTERACTIVE DECISIONS
+#######################################
+section "2.5. INTERACTIVE DECISIONS - Agents Ask, You Decide"
+
+narrate "Agents don't guess when there's ambiguity - they ask!"
+
+echo -e "${BOLD}Scenario: Ambiguous request${NC}"
+echo "Let's try a vague idea: 'Add authentication'"
+echo ""
+simulate_command "/seance idea"
+echo ""
+echo "  🔮 Channeling the spirits..."
+echo "  🔮 What feature would you like to manifest?"
+echo ""
+echo -e "${CYAN}  > Add authentication${NC}"
+echo ""
+
+sleep 1
+
+echo -e "${YELLOW}⚠️  CLARITY NEEDED: Multiple ways to implement authentication${NC}"
+echo ""
+echo -e "${BOLD}How should we implement authentication?${NC}"
+echo ""
+echo "  [1] NextAuth.js (Recommended)"
+echo "      ↳ Full-featured auth library with OAuth, email, credentials"
+echo ""
+echo "  [2] Clerk"
+echo "      ↳ Managed service. Beautiful UI, adds external dependency"
+echo ""
+echo "  [3] Supabase Auth"
+echo "      ↳ If using Supabase, integrated solution with RLS"
+echo ""
+echo "  [4] Custom JWT"
+echo "      ↳ Full control, more work to secure properly"
+echo ""
+
+sleep 2
+
+echo -e "${CYAN}Your choice: [1]${NC}"
+echo ""
+
+sleep 1
+
+echo -e "${GREEN}✓${NC} Proceeding with NextAuth.js approach"
+echo -e "${GREEN}✓${NC} Creating requirements:"
+echo "  - REQ-047: Install NextAuth.js and configure providers"
+echo "  - REQ-048: Create authentication API routes"
+echo "  - REQ-049: Add session handling middleware"
+echo "  - REQ-050: Build login/logout UI components"
+echo ""
+
+narrate "One question saved hours of work in the wrong direction!"
+
+pause
+
 # SECTION 3: SUMMONING SPIRITS
 #######################################
 section "3. SUMMONING SPIRITS - Agent Spawning"
