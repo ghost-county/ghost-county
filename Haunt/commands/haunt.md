@@ -125,7 +125,18 @@ Parse roadmap for each batch (## Batch: *):
    - IN PROGRESS: Some items 🟡 or 🟢, no blockers
    - NOT STARTED: All items ⚪
 
-4. **Identify critical path:**
+4. **Parse effort estimation:**
+   - Extract "Effort:" field from each requirement (XS, S, M, SPLIT)
+   - Map effort to hours:
+     - XS = 0.5 hours
+     - S = 2 hours
+     - M = 6 hours
+     - SPLIT = N/A (ignore in calculations)
+   - Sum effort for ⚪ Not Started and 🟡 In Progress items only
+   - Skip 🟢 Complete items (already done)
+   - Calculate estimated completion time
+
+5. **Identify critical path:**
    - Highlight 🔴 blocked items
    - Extract "Blocked by:" field from requirement
    - Suggest unblocking actions if possible
@@ -147,10 +158,11 @@ Batch 1: Foundation
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Progress: 2/3 Complete (67%)
 Status: 🔴 BLOCKED
+Estimated Remaining: 6.0 hours (~1 day)
 
-  ✅ REQ-001: Database schema (Agent: Dev-Backend)
-  ✅ REQ-002: React app structure (Agent: Dev-Frontend)
-  🔴 REQ-003: CI/CD pipeline (Agent: Dev-Infrastructure)
+  ✅ REQ-001: Database schema (Agent: Dev-Backend) [S: 2hr]
+  ✅ REQ-002: React app structure (Agent: Dev-Frontend) [M: 6hr]
+  🔴 REQ-003: CI/CD pipeline (Agent: Dev-Infrastructure) [M: 6hr]
      ⚠️  BLOCKED BY: Infrastructure access required
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -158,10 +170,11 @@ Batch 2: Features
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Progress: 0/2 Complete (0%)
 Status: ⚪ NOT STARTED
+Estimated Remaining: 8.0 hours (~1 day)
 
-  ⚪ REQ-004: Task CRUD API (Agent: Dev-Backend)
+  ⚪ REQ-004: Task CRUD API (Agent: Dev-Backend) [M: 6hr]
      ⚠️  BLOCKED BY: REQ-001, REQ-003
-  ⚪ REQ-005: Task list UI (Agent: Dev-Frontend)
+  ⚪ REQ-005: Task list UI (Agent: Dev-Frontend) [S: 2hr]
      ⚠️  BLOCKED BY: REQ-002, REQ-004
 ```
 
@@ -187,12 +200,30 @@ Next Steps:
 4. Parse status icons: ⚪ 🟡 🟢 🔴 from `### [icon] REQ-XXX:`
 5. Extract "Blocked by:" field from requirement body
 6. Extract "Agent:" field from requirement body
+7. Extract "Effort:" field from requirement body (XS, S, M, SPLIT)
 
 **Status Icon Colors (if terminal supports):**
 - 🟢 Complete: Green text
 - 🟡 In Progress: Yellow text
 - ⚪ Not Started: White/default text
 - 🔴 Blocked: Red text
+
+**Effort Calculation:**
+1. Parse "Effort:" field from each requirement
+2. Map effort sizes to hours:
+   - XS = 0.5 hours
+   - S = 2 hours
+   - M = 6 hours
+   - SPLIT = Skip (not estimable until decomposed)
+3. Sum effort for incomplete items (⚪ and 🟡 only)
+4. Format output:
+   - Show hours with 1 decimal place: "6.0 hours"
+   - Add human-readable time estimate:
+     - <4 hours: "~[X] hours"
+     - 4-8 hours: "~1 day"
+     - 9-16 hours: "~2 days"
+     - >16 hours: "~[X] days"
+5. Display per requirement: `[Effort: Xhr]` after agent assignment
 
 **Blocker Detection:**
 1. Find all requirements with "Blocked by:" field not "None"

@@ -441,21 +441,22 @@ Extended `Haunt/commands/haunt.md` with `--batch` flag handler. Command now supp
 
 ---
 
-### ⚪ REQ-232: Add Effort Estimation to Batch Status
+### 🟢 REQ-232: Add Effort Estimation to Batch Status
 
 **Type:** Enhancement (Tooling)
 **Reported:** 2025-12-18
+**Completed:** 2025-12-18
 **Source:** BMAD research - effort estimation helps PM planning
 
 **Description:**
 Extend batch status command to calculate estimated completion time based on effort sizing (XS=0.5hr, S=2hr, M=6hr). Displays "Est. XX hours remaining" per batch.
 
 **Tasks:**
-- [ ] Parse effort field from requirements (XS, S, M)
-- [ ] Map to hours: XS=0.5, S=2, M=6 (average estimates)
-- [ ] Sum effort for incomplete items per batch
-- [ ] Display "Est. X hours remaining" in batch status output
-- [ ] Account for only ⚪ and 🟡 items (skip 🟢)
+- [x] Parse effort field from requirements (XS, S, M)
+- [x] Map to hours: XS=0.5, S=2, M=6 (average estimates)
+- [x] Sum effort for incomplete items per batch
+- [x] Display "Est. X hours remaining" in batch status output
+- [x] Account for only ⚪ and 🟡 items (skip 🟢)
 
 **Files:**
 - `Haunt/commands/haunt.md` (modify)
@@ -466,6 +467,9 @@ Extend batch status command to calculate estimated completion time based on effo
 **Agent:** Dev-Infrastructure
 **Completion:** Batch status shows estimated hours remaining per batch
 **Blocked by:** REQ-231
+
+**Implementation Notes:**
+Extended batch status command with effort estimation calculations. Added parsing for "Effort:" field (XS=0.5hr, S=2hr, M=6hr). Command now sums effort for incomplete items (⚪ and 🟡 only), displays "Estimated Remaining: X.X hours (~Y days)" per batch, and shows effort sizing per requirement in format `[Effort: Xhr]`. Updated implementation notes with effort calculation logic and human-readable time formatting rules. Deployed to `.claude/commands/haunt.md`.
 
 ---
 

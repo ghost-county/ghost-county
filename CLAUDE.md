@@ -23,17 +23,32 @@ See `.claude/rules/gco-status-updates.md` for update protocol.
 
 ### Current Items
 
-⚪ REQ-205: GitHub Issues Integration with @haunt Marker
-   Agent: Research-Analyst → Dev-Infrastructure
-   Brief: Auto-detect GitHub issues marked @haunt and add to roadmap with approval
-   Status: Not Started
+**BMAD-Inspired Enhancements (3 Phases, 13 Requirements)**
 
-⚪ REQ-206: Create /bind Command for Custom Workflow Rule Overrides
-   Agent: Dev-Infrastructure
-   Brief: Enable project-specific rule overrides via /bind command
-   Status: Not Started
+Phase 1 - Quick Wins (5 requirements, ~10 hours):
+⚪ REQ-228: Create Séance Workflow Infographic (Agent: Dev-Infrastructure, S)
+⚪ REQ-229: Create Agent Coordination Diagram (Agent: Dev-Infrastructure, S)
+⚪ REQ-230: Create Session Startup Protocol Diagram (Agent: Dev-Infrastructure, S)
+⚪ REQ-231: Implement /haunt status --batch Command (Agent: Dev-Infrastructure, M)
+⚪ REQ-232: Add Effort Estimation to Batch Status (Agent: Dev-Infrastructure, S, blocked by REQ-231)
 
-See `.haunt/plans/roadmap.md` for full roadmap.
+Phase 2 - Medium Effort (5 requirements, ~22 hours):
+⚪ REQ-225: Add /seance --quick Mode (Agent: Dev-Infrastructure, S)
+⚪ REQ-226: Add /seance --deep Mode (Agent: Dev-Infrastructure, M)
+⚪ REQ-227: Update Séance Skill with Mode Selection (Agent: Dev-Infrastructure, S, blocked by REQ-225/226)
+⚪ REQ-223: Create /story Command (Agent: Dev-Infrastructure, M)
+⚪ REQ-224: Update Dev Agent Startup to Load Story Files (Agent: Dev-Infrastructure, S, blocked by REQ-223)
+
+Phase 3 - High Impact (3 requirements, ~14 hours):
+⚪ REQ-220: Implement Batch-Specific Roadmap Sharding (Agent: Dev-Infrastructure, M)
+⚪ REQ-221: Update Session Startup to Load Active Batch Only (Agent: Dev-Infrastructure, S, blocked by REQ-220)
+⚪ REQ-222: Archive Completed Batches Automatically (Agent: Dev-Infrastructure, M, blocked by REQ-220)
+
+**Also on roadmap:**
+⚪ REQ-205: GitHub Issues Integration (Research-Analyst → Dev-Infrastructure)
+⚪ REQ-206: Create /bind Command (Dev-Infrastructure)
+
+See `.haunt/plans/roadmap.md` for full details.
 
 ## Repository Structure
 
