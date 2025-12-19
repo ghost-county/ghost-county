@@ -1054,42 +1054,79 @@ Created comprehensive lessons-learned.md database (470 lines) with 5 main sectio
 **Source:** BMAD research insights + new innovations beyond BMAD
 **Estimated Effort:** 1 M item = ~6 hours
 
-### ⚪ REQ-237: Implement Pattern Capture Automation
+### 🟢 REQ-237: Implement Pattern Capture Automation
 
 **Type:** Enhancement (Self-Improvement)
 **Reported:** 2025-12-18
+**Completed:** 2025-12-18
 **Source:** New innovation - automate pattern defeat test creation when Code Reviewer finds issues
 
 **Description:**
 When Code Reviewer identifies anti-pattern in Dev agent's work, auto-generate skeleton pattern defeat test. Creates systematic feedback loop: Mistake → Test → Prevention. Extends Haunt's existing pattern-defeat methodology with automation.
 
 **Tasks:**
-- [ ] Create `/pattern capture` command for Code Reviewer:
-  - [ ] Parse anti-pattern description from reviewer feedback
-  - [ ] Generate test filename: `test_prevent_[pattern-name].py`
-  - [ ] Create skeleton test with metadata:
-    - [ ] Pattern description (what went wrong)
-    - [ ] Defeat strategy (what should happen instead)
-    - [ ] Discovery metadata (date, REQ-XXX, agent)
-  - [ ] Save to `.haunt/tests/patterns/`
-- [ ] Add pattern capture to gco-code-reviewer agent workflow:
-  - [ ] When rejecting code with anti-pattern, offer to capture
-  - [ ] Prompt: "Should I create a pattern defeat test for this? [yes/no]"
-  - [ ] If yes, invoke `/pattern capture`
-- [ ] Update gco-pattern-detection skill with capture workflow
-- [ ] Create example pattern capture for demonstration
-- [ ] Test end-to-end: Code Review → Pattern Capture → Defeat Test
+- [x] Create `/pattern capture` command for Code Reviewer:
+  - [x] Parse anti-pattern description from reviewer feedback
+  - [x] Generate test filename: `test_prevent_[pattern-name].py`
+  - [x] Create skeleton test with metadata:
+    - [x] Pattern description (what went wrong)
+    - [x] Defeat strategy (what should happen instead)
+    - [x] Discovery metadata (date, REQ-XXX, agent)
+  - [x] Save to `.haunt/tests/patterns/`
+- [x] Add pattern capture to gco-code-reviewer agent workflow:
+  - [x] When rejecting code with anti-pattern, offer to capture
+  - [x] Prompt: "Should I create a pattern defeat test for this? [yes/no]"
+  - [x] If yes, invoke `/pattern capture`
+- [x] Update gco-pattern-defeat skill with capture workflow
+- [x] Create example pattern capture for demonstration
+- [x] Test end-to-end: Code Review → Pattern Capture → Defeat Test
 
 **Files:**
-- `Haunt/commands/pattern.md` (create - pattern capture command)
-- `Haunt/agents/gco-code-reviewer.md` (modify - add capture workflow)
-- `Haunt/skills/gco-pattern-detection/SKILL.md` (modify - document automation)
-- `.haunt/tests/patterns/test_example_captured_pattern.py` (create - demonstration)
-- Deploy via `setup-haunt.sh`
+- `Haunt/commands/pattern.md` (created - comprehensive pattern capture command with Ghost County theming)
+- `Haunt/agents/gco-code-reviewer.md` (modified - added Pattern Capture Workflow section with decision tree)
+- `Haunt/skills/gco-pattern-defeat/SKILL.md` (modified - added Pattern Capture Automation section)
+- `.haunt/tests/patterns/test_prevent_example_captured_pattern.py` (created - demonstration with metadata validation)
+- `.claude/commands/pattern.md` (deployed)
+- `.claude/agents/gco-code-reviewer.md` (deployed)
+- `.claude/skills/gco-pattern-defeat/SKILL.md` (deployed)
 
 **Effort:** M
 **Complexity:** MODERATE
 **Agent:** Dev-Infrastructure
 **Completion:** `/pattern capture` command works, Code Reviewer offers pattern capture on rejections, skeleton tests auto-generated, demonstration example exists
 **Blocked by:** None
+
+**Implementation Notes:**
+Created comprehensive `/pattern capture` command documentation (525 lines) with:
+- Full command syntax and argument specification
+- Workflow examples (Code Reviewer identifies pattern → offers capture → generates skeleton)
+- Skeleton test template with required metadata fields
+- Integration with existing weekly pattern hunt
+- Ghost County theming ("binding ward", "wandering spirit")
+- Pattern naming conventions and decision tree
+
+Updated Code Reviewer agent with Pattern Capture Workflow section (180+ lines):
+- When to offer pattern capture (decision tree with 5 conditions)
+- Offer pattern capture prompt template
+- Pattern capture execution examples
+- Common patterns to capture (High/Medium/Low priority)
+- Integration with weekly pattern hunt
+- Example interaction showing full workflow
+- Prohibitions (never auto-capture without approval)
+
+Extended pattern-defeat skill with Pattern Capture Automation section:
+- Two paths to pattern detection (manual capture vs weekly hunt)
+- Skeleton test structure documentation
+- Refinement steps (7-step checklist)
+- Integration example showing 3-week workflow
+- Verification checklist addition
+
+Created demonstration pattern test (test_prevent_example_captured_pattern.py):
+- Full skeleton structure with all metadata fields
+- TODO checklist for refinement
+- Placeholder regex pattern for customization
+- Meta-test validating skeleton structure
+- Standalone execution with helpful output
+
+All changes deployed via setup-haunt.sh. Pattern capture creates feedback loop: Code Review → Pattern Identified → Skeleton Test Generated → Dev Refines → CI/CD Enforcement → Pattern Defeated. Complements existing weekly pattern hunt with immediate reactive capture at point of discovery.
 

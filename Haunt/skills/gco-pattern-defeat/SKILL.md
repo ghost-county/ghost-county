@@ -258,6 +258,132 @@ These patterns frequently emerge from agent workflows:
 - Not archiving completed work
 - Forgetting to update Active Work section
 
+## Pattern Capture Automation (NEW)
+
+Code Reviewer can now auto-generate skeleton defeat tests during code review.
+
+### When Code Review Finds Recurring Anti-Pattern
+
+If Code Reviewer identifies a recurring anti-pattern during review, they can offer to capture it:
+
+**Code Reviewer prompt:**
+```
+This appears to be a recurring anti-pattern: "silent-fallback"
+
+Using .get() with default values on required fields hides missing data.
+
+Should I create a pattern defeat test to prevent this in the future? [yes/no]
+```
+
+**If user approves, Code Reviewer executes:**
+```
+/pattern capture "silent-fallback" "Using .get(key, default) on required fields hides missing data and causes silent failures"
+```
+
+**Result:**
+Skeleton test generated in `.haunt/tests/patterns/test_prevent_silent_fallback.py`
+
+### Automation Workflow
+
+```
+Code Review → Identifies Pattern → Offers Capture → User Approves → Skeleton Test Created
+                                                                            ↓
+                                                                    Dev Refines Test
+                                                                            ↓
+                                                                    Test Added to CI/CD
+                                                                            ↓
+                                                                    Pattern Defeated
+```
+
+### Two Paths to Pattern Detection
+
+**Path 1: Manual Capture (Code Review)**
+- **When:** During code review, at point of discovery
+- **How:** Code Reviewer offers `/pattern capture` command
+- **Output:** Single skeleton test for identified pattern
+- **Speed:** Immediate (real-time)
+- **Validation:** Human reviewer confirms it's a pattern
+
+**Path 2: Automated Hunt (Weekly Ritual)**
+- **When:** Monday morning refactor session
+- **How:** `hunt-patterns` script scans git history
+- **Output:** Batch of patterns with generated tests
+- **Speed:** Scheduled (weekly)
+- **Validation:** AI analyzes commit patterns
+
+**Best Practice:** Use both paths
+- Manual capture catches patterns during review (reactive)
+- Weekly hunt finds emerging patterns across codebase (proactive)
+
+### Skeleton Test Structure
+
+Auto-generated skeleton includes:
+
+```python
+#!/usr/bin/env python3
+"""
+Pattern Defeat Test: [Pattern Name]
+
+Pattern Name: [slug]
+Description: [what it is and why it's bad]
+Discovered: [YYYY-MM-DD]
+Requirement: [REQ-XXX or "General"]
+Agent: Code-Reviewer
+Severity: [HIGH|MEDIUM|LOW]
+
+Status: SKELETON - Needs implementation details
+
+TODO:
+1. Add specific regex pattern or AST detection logic
+2. Define file scope (*.py, *.js, specific directories)
+3. Add example violations from actual code
+4. Test the test to verify it catches the pattern
+5. Update status from SKELETON to ACTIVE
+"""
+# ... test implementation template ...
+```
+
+### Refinement Steps
+
+After skeleton is generated, Dev agent should:
+
+1. **Review detection logic** - Is regex/AST pattern accurate?
+2. **Define scope** - Which files should be scanned?
+3. **Add examples** - Include actual violations from code
+4. **Test the test** - Run `pytest .haunt/tests/patterns/test_prevent_*.py`
+5. **Adjust thresholds** - Fine-tune false positive rate
+6. **Update status** - Change from SKELETON to ACTIVE
+7. **Add to CI/CD** - Include in `.pre-commit-config.yaml`
+
+### Integration Example
+
+**Week 1: Pattern Captured**
+```
+Monday: Code review finds "silent fallback" pattern
+        Code Reviewer offers pattern capture
+        User approves
+        Skeleton test created: test_prevent_silent_fallback.py
+Tuesday: Dev refines test, adds to pre-commit
+         Test status: SKELETON → ACTIVE
+```
+
+**Week 2: Pattern Hunt Validates**
+```
+Monday: Weekly pattern hunt runs
+        Confirms "silent fallback" was recurring (3 occurrences last 7 days)
+        No new instances found (pattern defeated)
+        Test validated as effective
+```
+
+**Week 3: Continuous Prevention**
+```
+Dev commits code with .get(key, 0)
+Pre-commit hook catches pattern
+Commit rejected with helpful error
+Dev fixes code before committing
+Pattern defeated permanently
+```
+
 ## Verification Checklist
 
 After defeating a pattern:
@@ -267,3 +393,4 @@ After defeating a pattern:
 - [ ] Pattern hasn't recurred (7 days)
 - [ ] Learning recorded
 - [ ] Agent memory updated (if agent-specific pattern)
+- [ ] **NEW:** If captured via Code Review, validate with weekly hunt
