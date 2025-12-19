@@ -529,7 +529,7 @@ Also added `--deep` mode (REQ-226 content) with extended strategic analysis (SWO
 
 **Type:** Enhancement (Workflow)
 **Reported:** 2025-12-18
-**Completed:** 2025-12-18**Completed:** 2025-12-18
+**Completed:** 2025-12-18
 **Source:** BMAD research - deep analysis for high-impact features
 
 **Description:**
@@ -537,21 +537,19 @@ Add deep planning mode that includes extended strategic analysis for high-impact
 
 **Tasks:**
 - [x] Add `--deep` flag to `Haunt/commands/seance.md`
-- [x] Update `Haunt/skills/gco-seance/SKILL.md` with Mode 5 (Deep)
-- [x] Implement deep mode routing logic
-- [x] Deep mode extends Phase 2 with:
-  - Expanded SWOT matrix
-  - VRIO competitive analysis
-  - Risk assessment matrix
-  - Stakeholder impact analysis
-- [x] Create `.haunt/plans/REQ-XXX-strategic-analysis.md`
+- [x] Update `Haunt/skills/gco-seance/SKILL.md` with deep mode workflow
+- [x] Implement deep mode routing logic (planning_depth parameter)
+- [x] Deep mode extends Phase 2 with strategic frameworks
+- [x] Create strategic analysis template in requirements-analysis skill
 - [x] Document when deep mode is appropriate (M-SPLIT features)
-- [x] Deploy to `.claude/commands/seance.md`
+- [x] Deploy to `.claude/commands/seance.md` and skills
 
 **Files:**
-- `Haunt/commands/seance.md` (modify)
-- `Haunt/skills/gco-seance/SKILL.md` (modify)
-- `.claude/commands/seance.md` (deploy)
+- `Haunt/commands/seance.md` (modified - added Mode 8 and --deep flag parsing)
+- `Haunt/skills/gco-seance/SKILL.md` (already had deep mode docs)
+- `Haunt/skills/gco-requirements-analysis/SKILL.md` (modified - added strategic analysis template)
+- `.claude/commands/seance.md` (deployed)
+- `.claude/skills/gco-requirements-analysis/SKILL.md` (deployed)
 
 **Effort:** M
 **Complexity:** MODERATE
@@ -560,7 +558,12 @@ Add deep planning mode that includes extended strategic analysis for high-impact
 **Blocked by:** None
 
 **Implementation Notes:**
-Implemented as part of REQ-225. Both --quick and --deep are now planning depth modifiers that work with all planning modes. Deep mode instructs PM to extend Phase 2 with: expanded SWOT matrix, VRIO competitive analysis, risk assessment matrix, stakeholder impact analysis, and architectural implications. Creates strategic analysis document at `.haunt/plans/REQ-XXX-strategic-analysis.md`. Updated command and skill documentation with deep mode workflow and examples.
+Added `--deep` flag to seance command with parsing logic that extracts planning_depth ("quick", "standard", "deep") before mode detection. Command now supports Mode 8 (Deep Planning) showing output includes standard roadmap PLUS `.haunt/plans/REQ-XXX-strategic-analysis.md`.
+
+Created comprehensive strategic analysis template in requirements-analysis skill with sections for Executive Summary, Expanded SWOT, VRIO Competitive Analysis, Risk Assessment Matrix, Stakeholder Impact Analysis, Architectural Implications, Technology Evaluation, and Strategic Recommendation. Template suitable for M-SPLIT features requiring executive approval or significant architectural decisions.
+
+Deep mode extends standard Phase 2 without replacing it - all JTBD/Kano/RICE analysis still happens, with strategic analysis providing additional context for PM decision-making. Deployed via setup-haunt.sh.
+
 
 ---
 
