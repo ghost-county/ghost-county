@@ -1,6 +1,6 @@
 # Haunt
 
-**Haunt** is a lightweight framework that transforms AI language models into coordinated development teams through external memory patterns, structured workflows, and enforced invariants. By combining project management (roadmap-driven development), external memory (rules, skills, agents), and cognitive architecture (layered context management), Haunt enables developers to collaborate with AI agents that maintain context across sessions, follow consistent methodologies, and produce production-quality software.
+**Haunt** is a lightweight framework that transforms Claude Code's subagents into coordinated development teams through external memory patterns, structured workflows, and enforced invariants. By combining project management (roadmap-driven development), external memory (rules, skills, agents), and cognitive architecture (layered context management), Haunt enables developers to collaborate with AI agents that maintain context across sessions, follow consistent methodologies, and produce production-quality software.
 
 ## Quick Install
 
