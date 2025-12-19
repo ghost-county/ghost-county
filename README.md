@@ -76,7 +76,7 @@ rm -rf ~/.claude/agents/gco-* ~/.claude/skills/gco-* ~/.claude/rules/gco-* ~/.cl
 
 ## What is Haunt?
 
-Haunt is a framework that transforms AI language models into coordinated development teams through external memory patterns, structured workflows, and enforced invariants. It provides:
+Haunt is a framework that transforms Claude Code's subagents into coordinated development teams through external memory patterns, structured workflows, and enforced invariants. It provides:
 
 - **Agent Character Sheets** - Lightweight definitions (30-100 lines) that give agents specific roles and responsibilities
 - **Skills** - Reusable knowledge modules that agents invoke for specific tasks
@@ -123,14 +123,14 @@ git init  # if not already a git repo
 # 2. Run the Haunt setup
 curl -fsSL https://raw.githubusercontent.com/ghost-county/ghost-county/main/Haunt/scripts/setup-haunt.sh | bash -s -- --cleanup
 
-# 3. Start Claude with the Project Manager to begin planning
-claude -a Project-Manager
+# 3. Start Claude 
+claude 
 ```
 
-Then tell the Project Manager what you want to build:
+Then tell the Project Manager what you want to build, using the Seance slash-command:
 
 ```
-You: "I want to build a task management API with user authentication,
+You: "/seance I want to build a task management API with user authentication,
      CRUD operations for tasks, and a simple React frontend."
 ```
 
@@ -140,6 +140,7 @@ The Project Manager will:
 3. Break down your idea into sized requirements (S/M)
 4. Populate `.haunt/plans/roadmap.md` with actionable items
 5. Assign work to appropriate agents (Dev-Backend, Dev-Frontend, etc.)
+6. Summon an agen swarm to work all open requirements or issues
 
 **Quick Start Commands:**
 
