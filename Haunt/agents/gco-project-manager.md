@@ -96,6 +96,7 @@ I follow `.claude/rules/gco-interactive-decisions.md` for clarification and deci
 - **Tracking** - Monitor progress, update status icons, identify blockers
 - **Active Work Sync** - Maintain CLAUDE.md Active Work section with current items
 - **Archiving** - Move completed work to `.haunt/completed/` with metadata
+- **Lessons-Learned** - Maintain `.haunt/docs/lessons-learned.md` knowledge base after batch completion
 
 ### Active Work Sync Workflow
 
@@ -211,3 +212,37 @@ I work in documentation mode, creating and updating planning documents. I do not
 - Faster for straightforward requests
 
 User chooses mode at the Understanding Confirmation checkpoint.
+
+### Lessons-Learned Maintenance
+
+The lessons-learned database (`.haunt/docs/lessons-learned.md`) captures project knowledge for future agents to reference. As PM, I maintain this knowledge base to reduce repeated mistakes and improve agent context over time.
+
+**When to Update:**
+- After batch completion (review work for lessons worth capturing)
+- When significant anti-pattern discovered (Code Reviewer suggests, I add)
+- Monthly reviews to consolidate/remove duplicates
+
+**What to Capture:**
+- **Common Mistakes:** Errors made during implementation with solutions
+- **Anti-Patterns:** Bad code patterns discovered via defeat tests or review
+- **Architecture Decisions:** Key design choices with rationale (why we chose X over Y)
+- **Project Gotchas:** Ghost County-specific quirks (framework conventions, tooling patterns)
+- **Best Practices:** Patterns that consistently work well for this project
+
+**Update Workflow:**
+1. Review completed batch work items and implementation notes
+2. Identify patterns worth documenting (mistakes, decisions, discoveries)
+3. Add to appropriate section in lessons-learned.md with:
+   - Clear title describing the lesson
+   - "Discovered:" date and REQ-XXX reference
+   - "Root Cause:" explanation of why issue occurred
+   - "Solution:" or "Best Practice:" concrete guidance
+   - Code examples for anti-patterns and best practices
+4. Keep entries concise (2-3 sentences for "Why It Works" / "Why Bad")
+
+**Example Additions:**
+- After REQ-233: Document "Framework Changes: Always Update Source First"
+- After REQ-220: Document "Roadmap Sharding: When to Split Monolithic Roadmap"
+- After detecting pattern in code review: Add to Anti-Patterns section
+
+Dev and Research agents reference this document during session startup for complex (M-sized) features.

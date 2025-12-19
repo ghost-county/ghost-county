@@ -276,3 +276,75 @@ Advanced startup complete when:
 - Context restored for complex multi-session work (if applicable)
 - Ready to proceed with clear assignment and stable foundation
 - Understand why basic protocol was insufficient (learning for future sessions)
+
+## Lessons-Learned Reference
+
+For complex (M-sized) work, check the lessons-learned database for relevant project knowledge before implementation.
+
+### When to Check Lessons-Learned
+
+Use `.haunt/docs/lessons-learned.md` when:
+
+**M-sized requirements:**
+- Features spanning multiple sessions (2-4 hours)
+- Complex features with architectural decisions
+- Multi-component changes requiring coordination
+- Features touching previously problematic areas
+
+**After encountering blockers:**
+- Debugging issues that seem familiar
+- Architectural questions about existing patterns
+- Uncertainty about project conventions or gotchas
+
+**Before code review:**
+- Verify work against documented anti-patterns
+- Ensure architectural decisions align with project rationale
+- Check best practices for similar work
+
+### What to Look For
+
+**Common Mistakes:** Has this error been made before? What's the solution?
+
+**Anti-Patterns:** Are there code patterns to avoid? (Silent fallbacks, magic numbers, etc.)
+
+**Architecture Decisions:** Why did the project choose approach X over Y?
+
+**Project Gotchas:** Are there Ghost County-specific quirks to be aware of?
+
+**Best Practices:** What patterns work consistently well for this project?
+
+### Workflow
+
+```bash
+# During session startup (after assignment identification):
+# 1. Read assignment from roadmap
+# 2. If M-sized or complex feature:
+#    - Read .haunt/docs/lessons-learned.md
+#    - Skim relevant sections (check table of contents)
+#    - Note applicable lessons for current work
+# 3. Proceed with implementation, applying documented guidance
+```
+
+**Example:**
+```
+Assignment: REQ-XXX - Implement roadmap sharding feature (M-sized)
+
+Session startup:
+1. Assignment identified: REQ-XXX (M-sized, 4-6 hours)
+2. Check lessons-learned.md:
+   - "Framework Changes: Always Update Source First" → Reminder to edit Haunt/ first
+   - "Roadmap Sharding" architecture decision → Understand existing rationale
+   - "Session Startup Optimization" → Related work for context
+3. Implement with lessons in mind (avoid documented mistakes)
+```
+
+### Integration with Story Files
+
+**Story files** (`.haunt/plans/stories/REQ-XXX-story.md`) provide implementation-specific context for individual requirements.
+
+**Lessons-learned** provides project-wide knowledge across all requirements.
+
+**Use both when:**
+- Story file exists for current REQ-XXX → Load for feature-specific context
+- Lessons-learned → Skim for general project patterns/gotchas
+- Combined context reduces mistakes and improves implementation quality

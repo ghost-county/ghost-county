@@ -995,7 +995,7 @@ Formalize "check your own work" as explicit protocol step in completion checklis
 
 ---
 
-### ⚪ REQ-236: Create Lessons-Learned Database for Ghost County Project
+### 🟢 REQ-236: Create Lessons-Learned Database for Ghost County Project
 
 **Type:** Enhancement (Knowledge Management)
 **Reported:** 2025-12-18
@@ -1005,7 +1005,7 @@ Formalize "check your own work" as explicit protocol step in completion checklis
 Create lessons-learned.md database to capture common mistakes, anti-patterns, architecture decisions, and project-specific gotchas. PM updates after batch completion, Dev/Research agents read during session startup for complex features. Reduces repeated mistakes and improves agent context over time.
 
 **Tasks:**
-- [ ] Create `.haunt/docs/lessons-learned.md` with template structure:
+- [x] Create `.haunt/docs/lessons-learned.md` with template structure:
   - [ ] Common Mistakes section (errors we've made and solutions)
   - [ ] Anti-Patterns section (bad patterns discovered via defeat tests)
   - [ ] Architecture Decisions section (key design choices and rationale)
@@ -1033,6 +1033,9 @@ Create lessons-learned.md database to capture common mistakes, anti-patterns, ar
 **Completion:** Lessons-learned.md created with template and initial content, PM/Dev agents reference it, session startup includes lessons check for complex work
 **Blocked by:** None
 
+
+**Implementation Notes:**
+Created comprehensive lessons-learned.md database (470 lines) with 5 main sections: Common Mistakes, Anti-Patterns, Architecture Decisions, Project Gotchas, Best Practices. Populated with initial content from REQ-233, REQ-220, REQ-221. Updated PM agent with Lessons-Learned Maintenance section, session-startup skill with Lessons-Learned Reference section, Dev agent with Lessons-Learned for Complex Features section. All changes deployed via setup-haunt.sh.
 ---
 
 ## Batch: Testing & Quality - Phase 2 (Advanced)

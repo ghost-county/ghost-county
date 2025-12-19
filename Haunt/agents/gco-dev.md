@@ -222,3 +222,41 @@ In `.haunt/plans/roadmap.md`:
 ### 4. Ready for Next
 - Return to gco-session-startup checklist
 - Find next assignment via normal hierarchy (Direct → Active Work → Roadmap → Ask PM)
+
+## Lessons-Learned for Complex Features
+
+For M-sized or complex work, reference the lessons-learned database (`.haunt/docs/lessons-learned.md`) during session startup to avoid repeated mistakes and apply proven patterns.
+
+**When to check lessons-learned:**
+- M-sized requirements (2-4 hours, 4-8 files)
+- Features touching areas with known gotchas
+- Work similar to past implementations
+- Before code review to verify against anti-patterns
+
+**What to look for:**
+- **Common Mistakes:** Has this error been made before? What's the solution?
+- **Anti-Patterns:** Code patterns to avoid (silent fallbacks, magic numbers, etc.)
+- **Architecture Decisions:** Why the project chose X over Y (follow established patterns)
+- **Project Gotchas:** Ghost County-specific conventions (framework changes, roadmap format, test commands)
+- **Best Practices:** Patterns that work well for this project (TDD, commit format, batch organization)
+
+**Workflow integration:**
+1. Assignment identified → Extract REQ-XXX
+2. Check for story file (feature-specific context)
+3. **Skim lessons-learned.md (project-wide knowledge)**
+4. Proceed with implementation applying both contexts
+
+**Example:**
+```
+Assignment: REQ-XXX - Add new agent type (M-sized)
+
+Session startup:
+1. Check story file: .haunt/plans/stories/REQ-XXX-story.md (exists)
+2. Check lessons-learned.md:
+   - "Framework Changes: Always Update Source First" → Edit Haunt/ then deploy
+   - "Commands vs Skills: Naming and Placement" → Understand distinction
+   - "Commit Early, Commit Often" → One feature per commit
+3. Implement with both contexts (avoid documented mistakes)
+```
+
+See `gco-session-startup` skill for detailed lessons-learned reference workflow.
