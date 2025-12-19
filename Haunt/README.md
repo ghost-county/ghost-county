@@ -232,6 +232,41 @@ Check `.haunt/plans/roadmap.md`:
 
 ---
 
+## How It Works: The Séance Workflow
+
+Haunt implements a three-phase workflow that transforms user ideas into structured, agent-ready requirements:
+
+![Séance Workflow](docs/assets/seance-workflow.svg)
+
+### Phase 1: Scrying 🔮 (Requirements Development)
+**Input:** User idea or feature request
+**Output:** Formal requirements document (REQ-XXX.md)
+
+The PM agent extracts core needs, identifies constraints, and generates structured requirements with clear acceptance criteria.
+
+### Phase 2: Summoning 👻 (Strategic Analysis)
+**Input:** Requirements document
+**Output:** Analysis document with prioritization
+
+Strategic frameworks provide business context:
+- **Jobs-to-be-Done:** Why users need this feature
+- **Kano Model:** Feature classification (basic/performance/delight)
+- **RICE Scoring:** Prioritization based on reach, impact, confidence, effort
+
+### Phase 3: Reaping 🌾 (Roadmap Creation)
+**Input:** Analysis document
+**Output:** Updated roadmap with sized, assigned requirements
+
+Requirements decomposed into agent-ready tasks:
+- Effort sizing (XS/S/M based on hours and file count)
+- Agent assignment (Dev-Backend, Dev-Frontend, etc.)
+- Dependency identification
+- Batch organization for parallel execution
+
+**Result:** Ready for implementation with clear scope, priorities, and assignments.
+
+---
+
 ## Architecture Overview
 
 ### The Four-Layer System

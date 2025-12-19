@@ -309,10 +309,10 @@ Add three explicit phase flags to the `/seance` command for complete workflow co
 Create SVG/Mermaid diagram showing complete séance workflow from idea to implementation (3 phases: Requirements Development → Requirements Analysis → Roadmap Creation). Embed in README.md to reduce onboarding cognitive load.
 
 **Tasks:**
-- [ ] Create Mermaid source diagram for séance workflow
-- [ ] Generate SVG from Mermaid (3-phase flow with inputs/outputs)
-- [ ] Store in `Haunt/docs/assets/seance-workflow.mmd` and `.svg`
-- [ ] Embed diagram in `Haunt/README.md` "How It Works" section
+- [x] Create Mermaid source diagram for séance workflow
+- [x] Generate SVG from Mermaid (3-phase flow with inputs/outputs)
+- [x] Store in `Haunt/docs/assets/seance-workflow.mmd` and `.svg`
+- [x] Embed diagram in `Haunt/README.md` "How It Works" section
 - [ ] Test rendering in GitHub markdown preview
 
 **Files:**
@@ -390,25 +390,26 @@ Created Mermaid flowchart showing 4-step session startup protocol with decision 
 
 ---
 
-### 🟡 REQ-231: Implement /haunt status --batch Command
+### 🟢 REQ-231: Implement /haunt status --batch Command
 
 **Type:** Enhancement (Tooling)
 **Reported:** 2025-12-18
+**Completed:** 2025-12-18
 **Source:** BMAD research - coordination dashboard for PM visibility
 
 **Description:**
 Create command to display batch completion progress and identify blocking requirements. Parses roadmap for all batches, shows completion ratio, status, and blockers.
 
 **Tasks:**
-- [ ] Create `Haunt/commands/haunt.md` for status subcommands
-- [ ] Implement `--batch` flag handler
-- [ ] Parse roadmap for batch headers (## Batch: *)
-- [ ] Parse requirements per batch (count ⚪ 🟡 🟢 🔴)
-- [ ] Calculate completion ratio (X/Y complete)
-- [ ] Identify blocking requirements (🔴 items)
-- [ ] Display per-batch summary with status
-- [ ] Suggest unblocking actions for 🔴 items
-- [ ] Deploy to `.claude/commands/haunt.md`
+- [x] Create `Haunt/commands/haunt.md` for status subcommands
+- [x] Implement `--batch` flag handler
+- [x] Parse roadmap for batch headers (## Batch: *)
+- [x] Parse requirements per batch (count ⚪ 🟡 🟢 🔴)
+- [x] Calculate completion ratio (X/Y complete)
+- [x] Identify blocking requirements (🔴 items)
+- [x] Display per-batch summary with status
+- [x] Suggest unblocking actions for 🔴 items
+- [x] Deploy to `.claude/commands/haunt.md`
 
 **Files:**
 - `Haunt/commands/haunt.md` (create)
@@ -419,6 +420,9 @@ Create command to display batch completion progress and identify blocking requir
 **Agent:** Dev-Infrastructure
 **Completion:** `/haunt status --batch` displays all batches with completion ratios and highlights blockers
 **Blocked by:** None
+
+**Implementation Notes:**
+Extended `Haunt/commands/haunt.md` with `--batch` flag handler. Command now supports two modes: standard status (default) and batch progress (`--batch`). Batch mode parses roadmap for all batch headers, counts requirements by status (⚪ 🟡 🟢 🔴), calculates completion percentages, identifies blocked items, and suggests unblocking actions. Output uses Ghost County theming with terminal formatting. Includes parsing logic for extracting "Blocked by:" dependencies and critical path analysis. Deployed to `.claude/commands/haunt.md`.
 
 ---
 

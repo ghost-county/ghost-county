@@ -1,0 +1,29 @@
+graph TD
+    Start([User Idea/Feature Request]) --> Scry{Phase 1: Scrying<br/>Requirements Development}
+
+    Scry --> DevReq[Develop Requirements<br/>- Parse user input<br/>- Extract core needs<br/>- Identify constraints]
+    DevReq --> ReqDoc[Requirements Document<br/>REQ-XXX.md]
+
+    ReqDoc --> Summon{Phase 2: Summoning<br/>Requirements Analysis}
+
+    Summon --> JTBD[Jobs-to-be-Done Analysis<br/>- User goals<br/>- Desired outcomes<br/>- Success metrics]
+    JTBD --> Kano[Kano Model Classification<br/>- Must-have features<br/>- Performance features<br/>- Delighters]
+    Kano --> RICE[RICE Prioritization<br/>- Reach<br/>- Impact<br/>- Confidence<br/>- Effort]
+    RICE --> AnalysisDoc[Analysis Document<br/>Strategic insights]
+
+    AnalysisDoc --> Reap{Phase 3: Reaping<br/>Roadmap Creation}
+
+    Reap --> Decompose[Decompose into Tasks<br/>- Break down features<br/>- Size requirements XS/S/M<br/>- Identify dependencies]
+    Decompose --> Assign[Assign Agents<br/>- Dev-Backend<br/>- Dev-Frontend<br/>- Dev-Infrastructure]
+    Assign --> Roadmap[Update Roadmap<br/>.haunt/plans/roadmap.md]
+
+    Roadmap --> Ready([Ready for Implementation])
+
+    style Scry fill:#9b59b6,stroke:#8e44ad,color:#fff
+    style Summon fill:#3498db,stroke:#2980b9,color:#fff
+    style Reap fill:#2ecc71,stroke:#27ae60,color:#fff
+    style Start fill:#e74c3c,stroke:#c0392b,color:#fff
+    style Ready fill:#f39c12,stroke:#d68910,color:#fff
+    style ReqDoc fill:#ecf0f1,stroke:#95a5a6
+    style AnalysisDoc fill:#ecf0f1,stroke:#95a5a6
+    style Roadmap fill:#ecf0f1,stroke:#95a5a6
