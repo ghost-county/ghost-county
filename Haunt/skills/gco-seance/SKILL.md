@@ -13,9 +13,9 @@ The Seance is Ghost County's primary workflow orchestration layer - a ritual tha
 - **Existing Projects:** Incremental workflow for single enhancement/bug/issue
 - **Trigger Phrases:** "start a seance", "hold a seance", "time for a seance", "let's seance"
 
-## Six Operating Modes
+## Six Operating Modes + Planning Depth
 
-The Seance workflow has six modes - three context-aware (interactive) and three explicit (phase-specific):
+The Seance workflow has six modes (three context-aware and three phase-specific), with three planning depth levels that modify how deeply requirements are analyzed:
 
 ### Mode 1: With Prompt (Immediate Workflow)
 
@@ -248,6 +248,184 @@ Active roadmap cleaned.
 - If no 🟢 items: "No completed requirements to archive."
 - If archive write fails: "Error writing archive. Check permissions."
 
+## Planning Depth Modifiers
+
+All planning modes (1, 2, 3, 4) support three depth levels that control how thoroughly requirements are analyzed:
+
+### Planning Depth: Quick (--quick)
+
+**Triggered by:** `/seance --quick` or `/seance --quick <idea>`
+
+**Purpose:** Fast-track simple tasks through minimal planning - skip strategic analysis, create basic requirement.
+
+**Flow:**
+1. Check if idea provided in command args
+2. If no idea: Ask "What needs fixing?" and wait for user input
+3. Create single requirement with minimal ceremony:
+   - Parse idea to extract title
+   - Infer affected files if obvious
+   - Auto-assign to appropriate agent type
+   - Set effort to XS or S based on description
+   - Basic completion criteria (2-3 bullets)
+4. **Skip Phase 2 entirely** - no JTBD, Kano, RICE, SWOT, VRIO analysis
+5. Add requirement to roadmap immediately
+6. Prompt to summon agent (same as other modes)
+
+**Output:**
+- Single requirement added to `.haunt/plans/roadmap.md`
+- Minimal analysis overhead (<60 seconds total)
+- Ready for immediate execution
+
+**When to Use:**
+- XS-S sized tasks only (typos, config changes, simple bug fixes)
+- Obvious changes with clear scope
+- Low-risk modifications
+- Time-sensitive fixes
+
+**When NOT to Use:**
+- M-sized or larger features
+- Changes with unclear scope
+- Features requiring strategic analysis
+- Cross-cutting changes affecting multiple systems
+
+**Example:**
+```
+User: /seance --quick "Fix timeout value in config"
+Agent:
+⚡ Quick scrying...
+
+Created REQ-225: Fix timeout value in config
+- Type: Enhancement
+- Effort: XS (~30 min)
+- Agent: Dev-Infrastructure
+- Files: config.yaml
+
+Completion:
+- Timeout value updated to recommended 30s
+- Config file validated
+- Changes tested
+
+Ready to summon the spirits?
+```
+
+**Template for Quick Requirements:**
+
+```markdown
+### ⚪ REQ-XXX: [Title from user input]
+
+**Type:** [Enhancement|Bug Fix]
+**Reported:** [Today's date]
+**Source:** Quick séance
+
+**Description:**
+[User's original input, lightly cleaned]
+
+**Tasks:**
+- [ ] [Inferred task 1]
+- [ ] [Inferred task 2]
+- [ ] [Inferred task 3]
+
+**Files:**
+- [Inferred file paths if obvious, otherwise "TBD - determine during implementation"]
+
+**Effort:** [XS or S based on description keywords]
+**Complexity:** SIMPLE
+**Agent:** [Auto-assigned based on file types or description]
+**Completion:** [2-3 basic acceptance criteria]
+**Blocked by:** None
+```
+
+**Auto-Assignment Logic:**
+
+Based on keywords in description:
+- "config", "setup", "script" → Dev-Infrastructure
+- "API", "endpoint", "database", "backend" → Dev-Backend
+- "UI", "component", "page", "frontend" → Dev-Frontend
+- "documentation", "README", "docs" → Dev-Infrastructure
+- "test" only → Dev (whichever type matches file)
+
+**Effort Detection:**
+
+Based on keywords:
+- "typo", "fix typo", "update config" → XS
+- "add simple", "quick fix", "small change" → XS
+- "add", "create simple", "update" → S
+- Default: S (conservative)
+
+**Error Handling:**
+- If description is too vague: Ask clarifying question
+- If scope appears too large: Warn and suggest standard mode instead
+- If `.haunt/` missing: Create it with minimal setup
+
+### Planning Depth: Standard (default)
+
+**Triggered by:** No depth modifier, or explicitly `/seance <idea>` (no `--quick` or `--deep`)
+
+**Purpose:** Balanced analysis for most features - full 3-phase workflow with strategic frameworks.
+
+**Flow:**
+1. Phase 1: Requirements Development (14-dimension rubric, understanding confirmation)
+2. Phase 2: Requirements Analysis (JTBD, Kano, RICE scoring)
+3. Phase 3: Roadmap Creation (batching, sizing, agent assignment)
+
+**When to Use:**
+- S-M sized features
+- Standard features with clear-ish scope
+- When depth needs are unknown (default choice)
+- Most day-to-day development work
+
+**Output:**
+- `.haunt/plans/requirements-document.md` (new projects)
+- `.haunt/plans/requirements-analysis.md` (new projects)
+- `.haunt/plans/roadmap.md` (updated)
+
+### Planning Depth: Deep (--deep)
+
+**Triggered by:** `/seance --deep <idea>`
+
+**Purpose:** Extended strategic analysis for high-impact, high-risk features.
+
+**Flow:**
+1. Phase 1: Requirements Development (standard)
+2. **Phase 2 Extended:** Requirements Analysis PLUS:
+   - Expanded SWOT matrix
+   - VRIO competitive analysis
+   - Risk assessment matrix
+   - Stakeholder impact analysis
+   - Architectural implications document
+3. Phase 3: Roadmap Creation (standard)
+
+**When to Use:**
+- M-SPLIT sized features
+- High strategic impact features
+- Features with significant architectural decisions
+- Features affecting multiple systems or stakeholders
+- When risk assessment is critical
+
+**Output:**
+- Standard outputs (requirements-document.md, requirements-analysis.md, roadmap.md)
+- **PLUS:** `.haunt/plans/REQ-XXX-strategic-analysis.md` (extended analysis)
+
+**Example Deep Analysis Document:**
+```markdown
+# REQ-XXX Strategic Analysis
+
+## Expanded SWOT Matrix
+[Detailed strengths, weaknesses, opportunities, threats]
+
+## VRIO Competitive Analysis
+[Value, Rarity, Imitability, Organization assessment]
+
+## Risk Assessment Matrix
+[Likelihood x Impact grid with mitigation strategies]
+
+## Stakeholder Impact Analysis
+[User segments, internal teams, external partners]
+
+## Architectural Implications
+[System dependencies, migration paths, rollback strategies]
+```
+
 ## Workflow Steps
 
 ### Step 1: Detect Mode and Context
@@ -255,10 +433,28 @@ Active roadmap cleaned.
 ```python
 import os
 
-has_args = bool(arguments.strip())
+args = arguments.strip()
 has_haunt = os.path.exists(".haunt/")
 
-if has_args:
+# Extract planning depth modifiers first
+planning_depth = "standard"  # default
+if "--quick" in args:
+    planning_depth = "quick"
+    args = args.replace("--quick", "").strip()
+elif "--deep" in args:
+    planning_depth = "deep"
+    args = args.replace("--deep", "").strip()
+
+# Check for explicit phase flags (after removing depth modifiers)
+if args in ["--scry", "--plan"]:
+    mode = 4
+elif args.startswith("--scry ") or args.startswith("--plan "):
+    mode = 4
+elif args in ["--summon", "--execute"]:
+    mode = 5
+elif args in ["--reap", "--archive"]:
+    mode = 6
+elif args:
     mode = 1  # Immediate workflow with prompt
     workflow_type = "full" if not has_haunt else "incremental"
 elif has_haunt:
@@ -305,27 +501,37 @@ This provides:
 ```
 🕯️ A fresh haunting ground. What would you like to build?
 ```
-🕯️ A fresh haunting ground. What would you like to build?
-```
+
+**Planning Depth Messages:**
+- Quick: `⚡ Quick scrying...`
+- Standard: `🔮 Scrying the future...`
+- Deep: `🔮 Deep scrying the future...`
 
 ### Step 2: Execute Mode-Specific Flow
 
-**Mode 1 (With Prompt):** Invoke Project Manager immediately
+**Mode 1 (With Prompt):** Handle planning based on depth
 
-**For Full Workflow (New Project):**
+**If planning_depth == "quick":**
+- Skip PM entirely
+- Create requirement directly (see Quick Planning implementation below)
+- Add to roadmap immediately
+- Prompt to summon
+
+**If planning_depth == "standard":**
 ```
 Spawn gco-project-manager with:
 - User's original prompt/idea
-- Instruction: "New project - execute full idea-to-roadmap workflow"
-- Run-through or review mode (ask user preference)
+- Instruction: "New project - execute full idea-to-roadmap workflow" OR "Existing project - add to roadmap"
+- Planning depth: standard
 ```
 
-**For Incremental Workflow (Existing Project):**
+**If planning_depth == "deep":**
 ```
 Spawn gco-project-manager with:
-- User's feature/bug/enhancement request
-- Instruction: "Existing project - add to roadmap"
-- Context: Existing roadmap path (.haunt/plans/roadmap.md)
+- User's original prompt/idea
+- Instruction: "New project - execute full idea-to-roadmap workflow" OR "Existing project - add to roadmap"
+- Planning depth: deep (extended Phase 2 analysis)
+- Create strategic analysis document: .haunt/plans/REQ-XXX-strategic-analysis.md
 ```
 
 **Mode 2 (Choice Prompt):** Handle user choice
@@ -368,12 +574,59 @@ Which requirements should the spirits work on?
 
 **Mode 3 (New Project Prompt):**
 1. Wait for user input to "What would you like to build?"
-2. Spawn gco-project-manager with full workflow:
-```
-Spawn gco-project-manager with:
-- User's project idea
-- Instruction: "New project - execute full idea-to-roadmap workflow"
-- Run-through or review mode (ask user preference)
+2. Handle based on planning_depth (same as Mode 1)
+
+**Mode 4 (Explicit Scrying --scry/--plan):**
+1. Check if idea provided in args
+2. If no idea: Ask "What would you like to scry?" and wait
+3. Handle based on planning_depth (same as Mode 1)
+4. Do NOT prompt to summon (user explicitly wants planning only)
+5. Suggest next step: `/seance --summon`
+
+## Quick Planning Implementation
+
+When `planning_depth == "quick"`, create requirements directly without PM:
+
+```python
+# Parse user input (from args or prompt)
+idea = user_input.strip()
+
+# Detect type
+bug_keywords = ["fix", "bug", "error", "broken", "issue"]
+is_bug = any(kw in idea.lower() for kw in bug_keywords)
+req_type = "Bug Fix" if is_bug else "Enhancement"
+
+# Auto-assign agent
+if any(kw in idea.lower() for kw in ["config", "setup", "script", "doc"]):
+    agent = "Dev-Infrastructure"
+elif any(kw in idea.lower() for kw in ["api", "endpoint", "database", "backend"]):
+    agent = "Dev-Backend"
+elif any(kw in idea.lower() for kw in ["ui", "component", "page", "frontend"]):
+    agent = "Dev-Frontend"
+else:
+    agent = "Dev-Infrastructure"  # Default
+
+# Infer effort
+xs_keywords = ["typo", "config", "small", "quick"]
+effort = "XS" if any(kw in idea.lower() for kw in xs_keywords) else "S"
+
+# Generate requirement
+req_number = get_next_req_number()  # Parse roadmap for highest REQ-XXX
+requirement = create_quick_requirement(
+    number=req_number,
+    title=idea,
+    type=req_type,
+    agent=agent,
+    effort=effort
+)
+
+# Add to roadmap
+append_to_roadmap(requirement)
+
+# Display summary
+print(f"✅ Created REQ-{req_number}: {title}")
+print(f"   Agent: {agent}")
+print(f"   Effort: {effort} (~30 min)" if effort == "XS" else f"   Effort: {effort} (~2 hours)")
 ```
 
 ### Step 3: Planning Phase

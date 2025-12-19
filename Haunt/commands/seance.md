@@ -14,6 +14,21 @@ Hold a séance to guide ideas through the complete Ghost County workflow: the th
 - **Mystical:** `--scry`, `--summon`, `--reap` (embrace the occult vibes)
 - **Normie:** `--plan`, `--execute`, `--archive` (keep it practical)
 
+## Scale-Adaptive Planning
+
+The séance adapts to task complexity:
+
+- **`--quick`** - Skip strategic analysis for simple tasks (typos, configs, small fixes)
+- **Default** - Standard 3-phase workflow with JTBD/Kano/RICE analysis
+- **`--deep`** - Extended strategic analysis for high-impact features (SWOT, VRIO, risk matrix, stakeholder impact)
+
+```bash
+# Examples
+/seance --quick "Fix typo in error message"        # Minimal ceremony, <60 sec
+/seance "Add user login endpoint"                  # Standard analysis (default)
+/seance --deep "Redesign authentication system"    # Extended strategic analysis
+```
+
 ## Usage Modes
 
 ### Mode 1: With Prompt
@@ -45,9 +60,18 @@ In a repository without `.haunt/`:
 ```bash
 /seance --scry "Add rate limiting to API"
 /seance --plan "Implement caching layer"
+
+# With planning depth modifiers
+/seance --scry --quick "Fix typo in header"
+/seance --scry --deep "Redesign authentication architecture"
 ```
 **Purpose:** Transform raw idea into formal roadmap
 **Output:** `.haunt/plans/roadmap.md` with sized, assigned requirements
+
+**Planning Depth:**
+- `--quick`: Minimal ceremony (XS-S tasks only, skip strategic frameworks)
+- No flag: Standard 3-phase workflow (default)
+- `--deep`: Extended analysis (M-SPLIT features, add strategic analysis document)
 
 ### Mode 5: Explicit Summoning (Execution)
 ```bash
@@ -65,6 +89,29 @@ In a repository without `.haunt/`:
 **Purpose:** Archive completed work and clean roadmap
 **Output:** Clean roadmap + archived history in `.haunt/completed/`
 
+### Mode 7: Quick Planning (--quick)
+```bash
+/seance --quick "Fix typo in README"
+/seance --quick "Update config timeout value"
+```
+**Purpose:** Fast-track simple tasks - skip strategic analysis, create basic REQ
+**Output:** Single requirement with minimal ceremony (<60 seconds)
+**When to use:** XS-S sized tasks - typos, config changes, simple bug fixes
+
+### Mode 8: Deep Planning (--deep)
+```bash
+/seance --deep "Redesign authentication system"
+/seance --deep "Implement multi-tenancy architecture"
+```
+**Purpose:** Extended strategic analysis for high-impact features
+**Output:** Standard roadmap PLUS `.haunt/plans/REQ-XXX-strategic-analysis.md` with:
+- Expanded SWOT matrix
+- VRIO competitive analysis
+- Risk assessment matrix
+- Stakeholder impact analysis
+- Architectural implications
+**When to use:** M-SPLIT sized features with high strategic impact
+
 ## Task: $ARGUMENTS
 
 **Step 1: Parse Arguments and Detect Mode**
@@ -75,7 +122,16 @@ import os
 args = "$ARGUMENTS".strip()
 has_haunt = os.path.exists(".haunt/")
 
-# Check for explicit phase flags
+# Extract planning depth modifiers
+planning_depth = "standard"  # default
+if "--quick" in args:
+    planning_depth = "quick"
+    args = args.replace("--quick", "").strip()
+elif "--deep" in args:
+    planning_depth = "deep"
+    args = args.replace("--deep", "").strip()
+
+# Check for explicit phase flags (after extracting planning depth)
 if args in ["--scry", "--plan"]:
     mode = 4  # Explicit scrying
     prompt = ""  # Will prompt user for idea
@@ -96,15 +152,16 @@ else:
 
 **Step 2: Execute Mode-Specific Flow**
 
-Invoke the `gco-seance` skill with detected mode and arguments:
+Invoke the `gco-seance` skill with detected mode, arguments, and planning depth:
 
 ```
 MODE: {mode}
-ARGUMENTS: $ARGUMENTS
+ARGUMENTS: {args}  # With --quick/--deep removed
+PLANNING_DEPTH: {planning_depth}  # "quick", "standard", or "deep"
 HAS_HAUNT: {has_haunt}
 ```
 
-The skill will handle the appropriate flow based on mode.
+The skill will handle the appropriate flow based on mode and planning depth.
 
 ## Complete Workflow Examples
 
@@ -160,6 +217,34 @@ $ /seance "Fix login bug and add tests"
 > [Work happens...]
 > 🌾 Reaping the harvest...
 > ✅ Complete
+```
+
+### Quick Mode (Simple Tasks)
+```bash
+$ /seance --quick "Fix typo in error message"
+> ⚡ Quick scrying...
+> ✅ Created REQ-225: Fix typo in error message
+>    Agent: Dev-Infrastructure
+>    Effort: XS (~30 min)
+> Ready to summon? [yes]
+> 👻 Summoning gco-dev-infrastructure...
+> ✅ Complete in 8 minutes
+```
+
+### Deep Mode (Strategic Features)
+```bash
+$ /seance --deep "Redesign authentication system"
+> 🔮 Deep scrying the future...
+> [Phase 1: Requirements Development...]
+> [Phase 2: Strategic Analysis...]
+>   - SWOT matrix created
+>   - VRIO analysis complete
+>   - Risk assessment documented
+>   - Stakeholder impact mapped
+> [Phase 3: Roadmap Creation...]
+> ✅ Roadmap created: .haunt/plans/roadmap.md
+> ✅ Strategic analysis: .haunt/plans/REQ-XXX-strategic-analysis.md
+> Ready to summon the spirits? [yes/no]
 ```
 
 ## See Also

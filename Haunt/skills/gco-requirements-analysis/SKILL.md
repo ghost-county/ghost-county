@@ -361,9 +361,263 @@ Before completing Phase 2:
 - [ ] Strategic risks identified
 - [ ] Implementation sequence recommended
 
+## Deep Mode: Extended Strategic Analysis
+
+When `--deep` flag is used, create an additional strategic analysis document with extended frameworks.
+
+### Deep Mode Output Location
+
+`.haunt/plans/REQ-XXX-strategic-analysis.md` (created AFTER roadmap, using first REQ number)
+
+### Deep Mode Template
+
+```markdown
+# Strategic Analysis: [Feature Name]
+
+**Requirement:** REQ-XXX
+**Created:** YYYY-MM-DD
+**Author:** Project Manager Agent
+**Analysis Type:** Deep Strategic Assessment
+
+---
+
+## Executive Summary
+
+[2-3 paragraphs summarizing strategic importance, key risks, and recommendation]
+
+---
+
+## Expanded SWOT Analysis
+
+### Strengths
+- [Internal capability that supports this feature]
+- [Existing asset that provides advantage]
+- [Team strength relevant to implementation]
+
+### Weaknesses
+- [Internal limitation to address]
+- [Resource constraint]
+- [Knowledge gap]
+
+### Opportunities
+- [Market opportunity this enables]
+- [Strategic positioning benefit]
+- [Revenue/growth potential]
+
+### Threats
+- [Competitive pressure]
+- [Market risk]
+- [Technical obsolescence risk]
+
+---
+
+## VRIO Competitive Analysis
+
+| Criterion | Assessment | Evidence | Implications |
+|-----------|------------|----------|--------------|
+| **Valuable** | Yes/No | [How it impacts cost/revenue] | [Competitive impact] |
+| **Rare** | Yes/No | [Competitor landscape] | [Differentiation potential] |
+| **Inimitable** | Yes/No | [Barriers to copying] | [Sustainability] |
+| **Organized** | Yes/No | [Our capability to execute] | [Exploitation readiness] |
+
+**Competitive Implication:**
+- [ ] Competitive Disadvantage (not valuable)
+- [ ] Competitive Parity (valuable but not rare)
+- [ ] Temporary Advantage (valuable, rare, but imitable)
+- [ ] Sustained Advantage (all four criteria met)
+
+**Rationale:** [Explanation of selection]
+
+---
+
+## Risk Assessment Matrix
+
+| Risk | Probability | Impact | Severity | Mitigation Strategy |
+|------|-------------|--------|----------|---------------------|
+| [Technical risk] | High/Med/Low | High/Med/Low | Critical/High/Med/Low | [How to mitigate] |
+| [Market risk] | High/Med/Low | High/Med/Low | Critical/High/Med/Low | [How to mitigate] |
+| [Resource risk] | High/Med/Low | High/Med/Low | Critical/High/Med/Low | [How to mitigate] |
+| [Integration risk] | High/Med/Low | High/Med/Low | Critical/High/Med/Low | [How to mitigate] |
+
+**Critical Risks (Severity: Critical/High):**
+1. [Highest severity risk with detailed mitigation plan]
+2. [Second highest risk with mitigation plan]
+
+**Risk Response Strategy:**
+- **Avoid:** [Risks to avoid by changing approach]
+- **Mitigate:** [Risks to reduce through controls]
+- **Transfer:** [Risks to outsource or insure]
+- **Accept:** [Acceptable risks with monitoring plan]
+
+---
+
+## Stakeholder Impact Analysis
+
+| Stakeholder Group | Current State | Desired State | Impact Level | Engagement Strategy |
+|-------------------|---------------|---------------|--------------|---------------------|
+| [Group 1] | [Current experience] | [Future experience] | High/Med/Low | [How to involve] |
+| [Group 2] | [Current experience] | [Future experience] | High/Med/Low | [How to involve] |
+| [Group 3] | [Current experience] | [Future experience] | High/Med/Low | [How to involve] |
+
+**Stakeholder Roles:**
+- **Champions:** [Who will advocate for this, how to empower them]
+- **Resisters:** [Who may oppose, why, how to address concerns]
+- **Decision Makers:** [Who must approve, what they care about, approval criteria]
+- **Implementers:** [Who will build this, what support they need]
+
+**Communication Plan:**
+- **Announcement:** [When and how to announce]
+- **Updates:** [Frequency and channels for progress updates]
+- **Feedback:** [How to collect and incorporate stakeholder feedback]
+
+---
+
+## Architectural Implications
+
+### System Impact
+- **Components Affected:** [List of systems/services that will change]
+- **Integration Points:** [New or modified integrations with other systems]
+- **Data Flow Changes:** [How data movement and processing changes]
+- **API Changes:** [New or modified APIs, breaking changes]
+
+### Technical Debt
+- **Created:** [New technical debt this introduces]
+- **Resolved:** [Existing technical debt this addresses]
+- **Net Impact:** [Overall technical debt trajectory]
+
+### Scalability Considerations
+- **Performance:** [Impact on system performance, latency, throughput]
+- **Capacity:** [Resource requirements - compute, storage, network]
+- **Elasticity:** [Horizontal/vertical scaling characteristics]
+- **Bottlenecks:** [Potential scaling bottlenecks to address]
+
+### Migration & Rollback
+- **Migration Strategy:** [How to move from current to new state]
+- **Backward Compatibility:** [How to maintain compatibility during transition]
+- **Rollback Plan:** [How to revert if issues arise]
+- **Data Migration:** [Data migration requirements and approach]
+
+### Technology Evaluation (if applicable)
+
+**Options Considered:**
+
+| Option | Pros | Cons | Fit Score (1-10) | Total Cost |
+|--------|------|------|------------------|------------|
+| [Technology A] | [Benefits] | [Drawbacks] | X/10 | $X or hours |
+| [Technology B] | [Benefits] | [Drawbacks] | X/10 | $X or hours |
+| [Technology C] | [Benefits] | [Drawbacks] | X/10 | $X or hours |
+
+**Evaluation Criteria:**
+- **Technical Fit:** [How well it solves the problem]
+- **Team Familiarity:** [Learning curve considerations]
+- **Community Support:** [Ecosystem maturity, documentation quality]
+- **Long-term Viability:** [Vendor stability, project momentum]
+- **Cost:** [Licensing, hosting, operational costs]
+
+**Recommendation:** [Which technology and comprehensive rationale]
+
+---
+
+## Strategic Recommendation
+
+**Decision:** Proceed / Proceed with Modifications / Defer / Do Not Proceed
+
+**Rationale:**
+[2-3 paragraphs explaining recommendation based on analysis above. Address:
+- Strategic value vs cost/risk trade-off
+- Alignment with business objectives
+- Readiness assessment (capability, capacity, timing)
+- Key decision factors that led to recommendation]
+
+**Prerequisites (if Proceed or Proceed with Modifications):**
+1. [What must be in place before starting - dependencies, approvals]
+2. [Resource allocations needed]
+3. [Technical prerequisites]
+
+**Modifications (if Proceed with Modifications):**
+1. [Scope adjustment to reduce risk]
+2. [Phasing strategy to deliver incrementally]
+3. [Additional validation/prototyping needed]
+
+**Deferral Conditions (if Defer):**
+- [Conditions that must be met to revisit]
+- [Timeline for re-evaluation]
+
+**Success Metrics:**
+- **Leading Indicators:** [Early signals of success during development]
+- **Lagging Indicators:** [Post-launch validation metrics]
+- **Key Results:** [Specific, measurable outcomes within timeframe]
+
+**Review Gates:**
+- **Design Review:** [When to validate design, what to check]
+- **Prototype Review:** [What to test/validate before full build]
+- **Launch Readiness:** [Criteria for go-live decision]
+- **Post-Launch:** [When to review outcomes, success criteria]
+
+**Contingency Plans:**
+- **If metrics don't meet targets:** [What to do]
+- **If timeline slips:** [How to adjust scope or sequence]
+- **If costs exceed estimates:** [Decision framework for continue/pivot/stop]
+
+---
+
+## Appendix: Framework References
+
+**Frameworks Applied:**
+- Jobs To Be Done (JTBD) - User motivation analysis
+- Kano Model - Feature classification
+- RICE Scoring - Quantitative prioritization
+- SWOT Analysis - Internal/external factors
+- VRIO Framework - Competitive advantage assessment
+- Risk Matrix - Likelihood x Impact
+- Stakeholder Analysis - Impact and engagement mapping
+
+**Created:** YYYY-MM-DD
+**Author:** Project Manager Agent
+**Next Review:** [Date for re-assessment if deferred]
+```
+
+### When to Generate Deep Analysis
+
+Generate the strategic analysis document when:
+- Feature is M-SPLIT sized (4+ hours, 8+ files, >300 lines)
+- High strategic impact on value proposition
+- Significant architectural changes required
+- Multiple stakeholder groups affected
+- Complex risk profile (3+ critical/high risks)
+- Competitive differentiation opportunity
+- Requires executive/leadership approval
+
+### Deep Mode Workflow
+
+1. Complete standard Phase 2 (requirements-analysis.md)
+2. Create REQ-XXX-strategic-analysis.md using template above
+3. Fill in all sections with detailed analysis
+4. Reference strategic analysis in roadmap requirement notes:
+
+```markdown
+### ⚪ REQ-XXX: [Feature Title]
+
+**Type:** Enhancement
+**Reported:** YYYY-MM-DD
+**Source:** Deep séance analysis
+
+**Description:**
+[Standard description]
+
+**Strategic Analysis:**
+See `.haunt/plans/REQ-XXX-strategic-analysis.md` for:
+- Competitive advantage assessment (VRIO: Sustained Advantage)
+- Risk matrix with mitigation strategies
+- Stakeholder impact analysis
+- Architectural implications
+
+[Rest of standard requirement fields...]
+```
+
 ## Handoff to Phase 3
 
-After creating `requirements-analysis.md`:
+After creating `requirements-analysis.md` (and `REQ-XXX-strategic-analysis.md` if --deep):
 
 If user selected **review mode**:
 > "I've completed the strategic analysis at `.haunt/plans/requirements-analysis.md`.
@@ -372,6 +626,12 @@ If user selected **review mode**:
 > - RICE scores suggest [priority order]
 > - Primary value driver: [driver]
 > - Main risk: [risk]
+>
+> [IF --deep mode:]
+> I've also created an extended strategic analysis at `.haunt/plans/REQ-XXX-strategic-analysis.md` with:
+> - VRIO assessment: [result]
+> - Critical risks: [count] identified with mitigation plans
+> - Stakeholder impact: [summary]
 >
 > Please review and let me know if you'd like any changes before I create the roadmap."
 

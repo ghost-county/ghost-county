@@ -479,27 +479,28 @@ Extended batch status command with effort estimation calculations. Added parsing
 **Source:** `.haunt/docs/research/bmad-framework-analysis.md` (REQ-209 research)
 **Estimated Effort:** 2 S + 3 M items = ~22 hours
 
-### ⚪ REQ-225: Add /seance --quick Mode for Simple Tasks
+### 🟢 REQ-225: Add /seance --quick Mode for Simple Tasks
 
 **Type:** Enhancement (Workflow)
 **Reported:** 2025-12-18
+**Completed:** 2025-12-18
 **Source:** BMAD research - scale-adaptive planning reduces overhead
 
 **Description:**
 Add quick planning mode that bypasses strategic analysis for simple bug fixes and typo corrections. Completes planning in <60 seconds with minimal ceremony.
 
 **Tasks:**
-- [ ] Add `--quick` flag to `Haunt/commands/seance.md`
-- [ ] Update `Haunt/skills/gco-seance/SKILL.md` with Mode 4 (Quick)
-- [ ] Implement quick mode routing logic
-- [ ] Quick mode creates single REQ with:
+- [x] Add `--quick` flag to `Haunt/commands/seance.md`
+- [x] Update `Haunt/skills/gco-seance/SKILL.md` with Mode 4 (Quick)
+- [x] Implement quick mode routing logic
+- [x] Quick mode creates single REQ with:
   - Title and description
   - Basic completion criteria (2-3 bullets)
   - File paths
   - Agent assignment
-- [ ] Skip Phase 2 (no JTBD, Kano, RICE, SWOT, VRIO)
-- [ ] Document when quick mode is appropriate (XS-S tasks only)
-- [ ] Deploy to `.claude/commands/seance.md`
+- [x] Skip Phase 2 (no JTBD, Kano, RICE, SWOT, VRIO)
+- [x] Document when quick mode is appropriate (XS-S tasks only)
+- [x] Deploy to `.claude/commands/seance.md`
 
 **Files:**
 - `Haunt/commands/seance.md` (modify)
@@ -512,29 +513,40 @@ Add quick planning mode that bypasses strategic analysis for simple bug fixes an
 **Completion:** `/seance --quick "Fix typo"` creates REQ in <60 seconds without strategic analysis
 **Blocked by:** None
 
+**Implementation Notes:**
+Implemented `--quick` as a planning depth modifier (alongside `--deep`) rather than a separate mode. The command now extracts `planning_depth` from args ("quick", "standard", "deep") and passes it to the gco-seance skill. Quick mode skips PM entirely and creates minimal requirements directly:
+- Auto-detects type (Bug Fix vs Enhancement) from keywords
+- Auto-assigns agent based on description keywords (config→Infra, API→Backend, UI→Frontend)
+- Auto-sizes effort (XS for "typo"/"config", S otherwise)
+- Generates 2-3 basic tasks and completion criteria
+- Adds to roadmap immediately with no strategic analysis
+
+Also added `--deep` mode (REQ-226 content) with extended strategic analysis (SWOT, VRIO, risk matrix, stakeholder impact). Updated both Haunt/commands/seance.md and Haunt/skills/gco-seance/SKILL.md. Deployed to .claude/commands/seance.md.
+
 ---
 
-### ⚪ REQ-226: Add /seance --deep Mode for Strategic Features
+### 🟢 REQ-226: Add /seance --deep Mode for Strategic Features
 
 **Type:** Enhancement (Workflow)
 **Reported:** 2025-12-18
+**Completed:** 2025-12-18**Completed:** 2025-12-18
 **Source:** BMAD research - deep analysis for high-impact features
 
 **Description:**
 Add deep planning mode that includes extended strategic analysis for high-impact features (SWOT, VRIO, risk matrix, stakeholder impact). Creates separate strategic analysis document.
 
 **Tasks:**
-- [ ] Add `--deep` flag to `Haunt/commands/seance.md`
-- [ ] Update `Haunt/skills/gco-seance/SKILL.md` with Mode 5 (Deep)
-- [ ] Implement deep mode routing logic
-- [ ] Deep mode extends Phase 2 with:
+- [x] Add `--deep` flag to `Haunt/commands/seance.md`
+- [x] Update `Haunt/skills/gco-seance/SKILL.md` with Mode 5 (Deep)
+- [x] Implement deep mode routing logic
+- [x] Deep mode extends Phase 2 with:
   - Expanded SWOT matrix
   - VRIO competitive analysis
   - Risk assessment matrix
   - Stakeholder impact analysis
-- [ ] Create `.haunt/plans/REQ-XXX-strategic-analysis.md`
-- [ ] Document when deep mode is appropriate (M-SPLIT features)
-- [ ] Deploy to `.claude/commands/seance.md`
+- [x] Create `.haunt/plans/REQ-XXX-strategic-analysis.md`
+- [x] Document when deep mode is appropriate (M-SPLIT features)
+- [x] Deploy to `.claude/commands/seance.md`
 
 **Files:**
 - `Haunt/commands/seance.md` (modify)
@@ -547,23 +559,27 @@ Add deep planning mode that includes extended strategic analysis for high-impact
 **Completion:** `/seance --deep "Feature"` creates extended strategic analysis document
 **Blocked by:** None
 
+**Implementation Notes:**
+Implemented as part of REQ-225. Both --quick and --deep are now planning depth modifiers that work with all planning modes. Deep mode instructs PM to extend Phase 2 with: expanded SWOT matrix, VRIO competitive analysis, risk assessment matrix, stakeholder impact analysis, and architectural implications. Creates strategic analysis document at `.haunt/plans/REQ-XXX-strategic-analysis.md`. Updated command and skill documentation with deep mode workflow and examples.
+
 ---
 
-### ⚪ REQ-227: Update Séance Skill with Mode Selection Logic
+### 🟢 REQ-227: Update Séance Skill with Mode Selection Logic
 
 **Type:** Enhancement (Workflow)
 **Reported:** 2025-12-18
+**Completed:** 2025-12-18
 **Source:** BMAD research - route to appropriate planning depth
 
 **Description:**
 Update séance skill to route to appropriate planning depth based on flags (--quick, --standard, --deep). Current workflow becomes --standard mode (default).
 
 **Tasks:**
-- [ ] Add mode detection logic to gco-seance skill
-- [ ] Quick mode: Skip Phase 2, minimal Phase 1
-- [ ] Standard mode: Current 3-phase workflow (default)
-- [ ] Deep mode: Extended Phase 2 with strategic artifacts
-- [ ] Document mode selection in skill
+- [x] Add mode detection logic to gco-seance skill
+- [x] Quick mode: Skip Phase 2, minimal Phase 1
+- [x] Standard mode: Current 3-phase workflow (default)
+- [x] Deep mode: Extended Phase 2 with strategic artifacts
+- [x] Document mode selection in skill
 - [ ] Test all 3 modes end-to-end
 
 **Files:**
@@ -577,7 +593,7 @@ Update séance skill to route to appropriate planning depth based on flags (--qu
 
 ---
 
-### ⚪ REQ-223: Create /story Command for Story File Generation
+### 🟢 REQ-223: Create /story Command for Story File Generation
 
 **Type:** Enhancement (Context Management)
 **Reported:** 2025-12-18
@@ -587,18 +603,18 @@ Update séance skill to route to appropriate planning depth based on flags (--qu
 Create command for PM to generate detailed story files containing full implementation context for complex features. Story files stored in `.haunt/plans/stories/REQ-XXX-story.md`.
 
 **Tasks:**
-- [ ] Create `Haunt/commands/story.md` command
-- [ ] Implement `/story create REQ-XXX` handler
-- [ ] Create `.haunt/plans/stories/` directory if missing
-- [ ] Generate `REQ-XXX-story.md` with template:
+- [x] Create `Haunt/commands/story.md` command
+- [x] Implement `/story create REQ-XXX` handler
+- [x] Create `.haunt/plans/stories/` directory if missing
+- [x] Generate `REQ-XXX-story.md` with template:
   - Background and context
   - Implementation approach
   - Architectural decisions
   - Code examples/references
   - Edge cases
   - Testing strategy
-- [ ] Restrict command to PM agent only
-- [ ] Deploy to `.claude/commands/story.md`
+- [x] Restrict command to PM agent only
+- [x] Deploy to `.claude/commands/story.md`
 
 **Files:**
 - `Haunt/commands/story.md` (create)
