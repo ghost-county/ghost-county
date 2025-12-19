@@ -833,3 +833,66 @@ Updated roadmap-workflow skill (Haunt/skills/gco-roadmap-workflow/SKILL.md) with
 Updated Ghost County theming with archive-related messages ("The spirits lay the completed work to rest...", "The batch is archived. The realm moves forward."). Added "Archive batch when" guidance to sharding decision matrix.
 
 All changes deployed via setup-haunt.sh to `.claude/commands/roadmap.md` and `.claude/skills/gco-roadmap-workflow/SKILL.md`. Archive command is now available for PM to use as part of batch lifecycle management. REQ-220 (sharding) and REQ-221 (session startup) create complete token-efficient batch workflow: shard → activate → work → archive → repeat.
+
+---
+
+## Batch: Terminology and Branding
+
+### 🟢 REQ-233: Rename "Coven" to "Haunt" Across Framework
+
+**Type:** Enhancement (Branding)
+**Reported:** 2025-12-18
+**Source:** User feedback - "coven" is too gendered/specific, "haunt" (collective noun for ghosts) aligns with framework name
+
+**Description:**
+Replace all references to "coven" with "haunt" throughout the framework. A "haunt" is the actual collective noun for a group of ghosts, making it more thematically appropriate and neutral than "coven" (witch-specific). Update skill name, commands, documentation, and the newly created SVG workflow diagram.
+
+**Terminology Changes:**
+- "summon the coven" → "summon a haunt" or "gather the haunt"
+- "coven mode" → "haunt mode"
+- "call a coven" → "call a haunt"
+
+**Key Decisions to Make During Implementation:**
+- Command naming: Evaluate `/coven` vs `/summon` and decide if consolidation is needed
+  - Option A: Rename `/coven` to `/haunt summon` (subcommand of existing `/haunt status`)
+  - Option B: Keep separate commands but update internal terminology
+- Skill naming: `gco-coven-mode` → `gco-haunt-mode`
+
+**Tasks:**
+- [x] Rename skill directory: `Haunt/skills/gco-coven-mode/` → `Haunt/skills/gco-haunt-mode/`
+- [x] Update skill content: `Haunt/skills/gco-haunt-mode/SKILL.md` (all "coven" → "haunt")
+- [x] Update command: `Haunt/commands/coven.md` → `Haunt/commands/haunt-gather.md` (renamed and updated)
+- [x] Update commands that reference coven:
+  - [x] `Haunt/commands/summon.md`
+  - [x] `Haunt/commands/checkup.md`
+  - [x] `Haunt/commands/decompose.md`
+- [x] Update documentation:
+  - [x] `Haunt/README.md`
+  - [x] `Haunt/docs/SKILLS-REFERENCE.md`
+  - [x] `Haunt/docs/INTEGRATION-PATTERNS.md`
+  - [x] `Haunt/skills/gco-task-decomposition/SKILL.md`
+- [x] Update SVG: `Haunt/docs/assets/seance-workflow-detailed.svg` ("Summon Coven?" → "Summon Haunt?")
+- [x] Run `Haunt/scripts/setup-haunt.sh` to deploy all changes to `.claude/`
+- [x] Verify all references updated (grep -i "coven" returns no framework files)
+- [x] Test skill invocation with new name (setup script validated gco-haunt-mode)
+- [x] Update CLAUDE.md if it references coven terminology (no references found)
+
+**Files:**
+- `Haunt/skills/gco-coven-mode/` → `Haunt/skills/gco-haunt-mode/` (rename directory)
+- `Haunt/skills/gco-haunt-mode/SKILL.md` (modify)
+- `Haunt/commands/coven.md` (modify or rename)
+- `Haunt/commands/summon.md` (modify)
+- `Haunt/commands/checkup.md` (modify)
+- `Haunt/commands/decompose.md` (modify)
+- `Haunt/README.md` (modify)
+- `Haunt/docs/SKILLS-REFERENCE.md` (modify)
+- `Haunt/docs/INTEGRATION-PATTERNS.md` (modify)
+- `Haunt/docs/assets/seance-workflow-detailed.svg` (modify)
+- `Haunt/skills/gco-task-decomposition/SKILL.md` (modify)
+- Corresponding `.claude/*` deployed files (via setup script)
+
+**Effort:** M
+**Complexity:** SIMPLE
+**Agent:** Dev-Infrastructure
+**Completion:** All references to "coven" replaced with "haunt", skill renamed and functional, SVG updated, grep confirms no remaining "coven" references in framework files
+**Blocked by:** None

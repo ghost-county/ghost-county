@@ -311,7 +311,7 @@ User: "REQ-123 is too big"
 ### See Also
 
 - `/summon` - Spawn agents to work on decomposed pieces
-- `/coven` - Coordinate parallel execution of decomposed tasks
+- `/haunt` - Coordinate parallel execution of decomposed tasks
 - `/haunting` - View roadmap status including decomposed items
 - `Haunt/skills/gco-task-decomposition/SKILL.md` - Full decomposition methodology
 - `Haunt/rules/gco-roadmap-format.md` - Sizing rules (XS/S/M/SPLIT)

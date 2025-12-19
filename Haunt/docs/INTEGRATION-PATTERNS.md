@@ -668,14 +668,14 @@ Don't use hybrid patterns for simple tasks:
 
 ## Advanced Patterns
 
-### Pattern 6: Coven Mode (Multi-Agent Orchestration)
+### Pattern 6: Haunt Mode (Multi-Agent Orchestration)
 
-For very large features requiring coordinated parallel work across multiple agents, use `/coven` command:
+For very large features requiring coordinated parallel work across multiple agents, use `/haunt` command:
 
 ```
-User: "/coven Implement e-commerce checkout flow"
+User: "/haunt Implement e-commerce checkout flow"
 
-Coven Mode:
+Haunt Mode:
   ├─ Analyzes feature scope
   ├─ Defines agent contracts (file ownership, interfaces)
   ├─ Spawns coordinated agents:
@@ -686,7 +686,7 @@ Coven Mode:
   └─ Aggregates results and resolves conflicts
 ```
 
-**See:** `Haunt/skills/gco-coven-mode/SKILL.md` for details.
+**See:** `Haunt/skills/gco-haunt-mode/SKILL.md` for details.
 
 ### Pattern 7: Seance Orchestration (Full Workflow)
 
@@ -783,4 +783,4 @@ Hybrid workflows combining built-in and Haunt agents provide:
 - `Haunt/docs/TOOL-PERMISSIONS.md` - Agent tool access reference
 - `.haunt/docs/research/claude-builtin-agents-analysis.md` - Built-in agent research
 - `Haunt/skills/gco-seance/SKILL.md` - Seance orchestration workflow
-- `Haunt/skills/gco-coven-mode/SKILL.md` - Multi-agent coordination
+- `Haunt/skills/gco-haunt-mode/SKILL.md` - Multi-agent coordination

@@ -139,7 +139,7 @@ What was done:
 | Command | Purpose |
 |---------|---------|
 | `/seance` | Full workflow orchestration (idea → requirements → roadmap → implementation) |
-| `/coven` | Summon parallel agent team for complex features |
+| `/haunt` | Summon parallel agent team for complex features |
 | `/decompose` | Break down large requirements into smaller pieces |
 | `/qa` | Generate test scenarios from requirements |
 | `/ritual` | Run weekly refactor session |
@@ -347,7 +347,7 @@ Uses SDK infrastructure (prompt caching, tool permissions) without replacing cus
 
 ## Real-World Workflows
 
-### Parallel Development (Coven Mode)
+### Parallel Development (Haunt Mode)
 ```
 User: "Add dark mode to the app"
 
@@ -428,7 +428,7 @@ Haunt/
 │   └── ...
 ├── commands/                     # Slash commands
 │   ├── seance.md
-│   ├── coven.md
+│   ├── haunt-gather.md
 │   └── ...
 └── scripts/
     ├── setup-haunt.sh            # One-command install

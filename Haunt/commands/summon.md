@@ -1,6 +1,6 @@
 # Summon Spirit(s)
 
-Call forth Ghost County agents to handle tasks. Summon a single spirit for specific work, or gather the full coven to work all unblocked roadmap items in parallel.
+Call forth Ghost County agents to handle tasks. Summon a single spirit for specific work, or gather the full haunt to work all unblocked roadmap items in parallel.
 
 ## Usage Modes
 
@@ -29,7 +29,7 @@ The `--mode` parameter controls investigation thoroughness for research agents:
 
 If `--mode` is not specified, research agents default to **standard** mode.
 
-### Full Coven Summoning
+### Full Haunt Summoning
 
 **Format:** `/summon all` or `/summon --all`
 
@@ -44,7 +44,7 @@ Prompts the user:
 🌫️ Which spirit do you wish to summon?
 
 [1] Individual spirit - Spawn one agent for a specific task
-[2] Full coven - Work all unblocked roadmap items in parallel
+[2] Full haunt - Work all unblocked roadmap items in parallel
 
 Choice (1/2): _
 ```
@@ -62,7 +62,7 @@ Which spirit? _
 What task? _
 ```
 
-If choice 2, proceed with full coven summoning (same as `/summon all`).
+If choice 2, proceed with full haunt summoning (same as `/summon all`).
 
 ## Supported Agent Types
 
@@ -156,7 +156,7 @@ mode, task = parse_summon_args('--mode=quick "Find authentication patterns"')
 # task = 'Find authentication patterns'
 ```
 
-## Full Coven Summoning Logic (`/summon all` or `/summon --all`)
+## Full Haunt Summoning Logic (`/summon all` or `/summon --all`)
 
 ### Execution Workflow
 
@@ -226,7 +226,7 @@ Task(
 
 Report to user:
 ```
-🕯️ GATHERING THE FULL COVEN 🕯️
+🕯️ GATHERING THE FULL HAUNT 🕯️
 
 Found X unblocked requirements in the roadmap:
 
@@ -286,9 +286,9 @@ Task: {task-description}
 The spirit will report back when complete.
 ```
 
-### Full Coven Success
+### Full Haunt Success
 ```
-🕯️ GATHERING THE FULL COVEN 🕯️
+🕯️ GATHERING THE FULL HAUNT 🕯️
 
 Scanning roadmap for unblocked work...
 Found 12 open requirements (10 ⚪ Not Started, 2 🟡 In Progress)
@@ -307,7 +307,7 @@ Summoning the spirits...
 ✓ REQ-150: Create /ritual command → gco-dev (background)
 ... (9 more)
 
-🌙 THE COVEN IS ASSEMBLED 🌙
+🌙 THE HAUNT IS ASSEMBLED 🌙
 
 12 spirits are working the roadmap in parallel.
 
@@ -335,9 +335,9 @@ Check roadmap:
   cat .haunt/plans/roadmap.md
 ```
 
-### Partial Failures (Full Coven)
+### Partial Failures (Full Haunt)
 ```
-🕯️ COVEN SUMMONING COMPLETE (WITH WARNINGS) 🕯️
+🕯️ HAUNT SUMMONING COMPLETE (WITH WARNINGS) 🕯️
 
 Successfully spawned: 10 spirits
 Failed to spawn: 2 spirits
@@ -395,7 +395,7 @@ Note: --mode parameter only applies to research agents.
 ## Requirements for Successful Execution
 
 1. **Single spirit**: Agent type and task description
-2. **Full coven**:
+2. **Full haunt**:
    - Roadmap exists: `.haunt/plans/roadmap.md`
    - Valid format: Requirements follow GCO roadmap format
    - Task tool available: Claude Code Task tool accessible
@@ -410,7 +410,7 @@ Note: --mode parameter only applies to research agents.
 | Quick investigation or fix | Batch processing requirements |
 | Task assigned directly by user | Speed over coordination |
 
-| Use `/summon all` when: | Use `/coven` when: |
+| Use `/summon all` when: | Use `/haunt` when: |
 |-------------------------|---------------------|
 | Many independent tasks | Single complex feature |
 | Requirements don't share files | Need file ownership coordination |
@@ -423,7 +423,7 @@ Note: --mode parameter only applies to research agents.
 
 ## Integration with Seance
 
-The full coven mode (`/summon all`) is the default behavior for:
+The full haunt mode (`/summon all`) is the default behavior for:
 ```
 /seance
 > [B] Summon the spirits
@@ -440,7 +440,7 @@ When user chooses "Summon the spirits" in an existing project, invoke `/summon a
 - Check Task tool is available
 - Ensure task description is clear and actionable
 
-### Full Coven Mode
+### Full Haunt Mode
 
 **No agents spawned:**
 - Check roadmap exists: `ls -la .haunt/plans/roadmap.md`
@@ -460,6 +460,6 @@ When user chooses "Summon the spirits" in an existing project, invoke `/summon a
 ## See Also
 
 - `/seance` - Workflow orchestration (planning → summoning)
-- `/coven` - Coordinated parallel work with integration contracts
+- `/haunt` - Coordinated parallel work with integration contracts
 - `/haunting` - View currently active work across all agents
 - `/haunt status` - Overall project status

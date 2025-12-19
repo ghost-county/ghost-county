@@ -40,7 +40,7 @@ Haunt/skills/
 ├── gco-pattern-defeat/SKILL.md
 ├── gco-seance/SKILL.md
 ├── gco-witching-hour/SKILL.md
-├── gco-coven-mode/SKILL.md
+├── gco-haunt-mode/SKILL.md
 ├── gco-task-decomposition/SKILL.md
 └── gco-playwright-tests/SKILL.md
 ```

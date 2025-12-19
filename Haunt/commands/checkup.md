@@ -59,7 +59,7 @@ fi
 - `gco-code-patterns/`
 - `gco-commit-conventions/`
 - `gco-context7-usage/`
-- `gco-coven-mode/`
+- `gco-haunt-mode/`
 - `gco-feature-contracts/`
 - `gco-pattern-defeat/`
 - `gco-roadmap-workflow/`
@@ -247,7 +247,7 @@ fi
 - `apparition.md`
 - `haunt-update.md`
 - `witching-hour.md`
-- `coven.md`
+- `haunt-gather.md`
 - `checkup.md` (this command!)
 - `qa.md`
 - `decompose.md`

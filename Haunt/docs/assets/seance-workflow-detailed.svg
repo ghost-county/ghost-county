@@ -1,0 +1,196 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1100" style="background-color: #fafbfc;">
+  <!-- Define styles -->
+  <defs>
+    <style>
+      .title { font: bold 28px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #1a202c; }
+      .subtitle { font: italic 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #718096; }
+      .step-num { font: bold 20px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #fff; }
+      .step-title { font: bold 16px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #fff; }
+      .step-desc { font: 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: rgba(255,255,255,0.9); }
+      .step-detail { font: 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: rgba(255,255,255,0.8); }
+      .phase-label { font: bold 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #fff; }
+      .decision-text { font: 14px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #2d3748; text-anchor: middle; }
+      .arrow { stroke: #4a5568; stroke-width: 2.5; fill: none; marker-end: url(#arrowhead); }
+      .arrow-label { font: italic 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #718096; }
+      .artifact-box { fill: #fff; stroke: #cbd5e0; stroke-width: 2; rx: 6; }
+      .artifact-title { font: bold 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #2d3748; }
+      .artifact-path { font: italic 10px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #718096; }
+    </style>
+
+    <!-- Arrow marker -->
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#4a5568" />
+    </marker>
+
+    <!-- Shadow filter -->
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Title -->
+  <text x="450" y="45" class="title" text-anchor="middle">The Séance Workflow</text>
+  <text x="450" y="68" class="subtitle" text-anchor="middle">Transform ideas into implementation-ready roadmaps</text>
+
+  <!-- Step 0: Initiation -->
+  <g filter="url(#shadow)">
+    <rect x="275" y="100" width="350" height="75" rx="10" fill="#667eea" stroke="#5a67d8" stroke-width="2"/>
+    <circle cx="300" cy="138" r="18" fill="rgba(255,255,255,0.2)"/>
+    <text x="300" y="145" class="step-num" text-anchor="middle">0</text>
+    <text x="330" y="125" class="step-title">🔮 Initiation</text>
+    <text x="330" y="145" class="step-desc">User invokes: /seance or "hold a séance"</text>
+    <text x="330" y="162" class="step-detail">→ Project Manager agent spawned</text>
+  </g>
+
+  <line x1="450" y1="175" x2="450" y2="210" class="arrow"/>
+
+  <!-- Context Detection Decision Diamond -->
+  <g filter="url(#shadow)">
+    <polygon points="450,210 580,270 450,330 320,270" fill="#fc8181" stroke="#f56565" stroke-width="2"/>
+    <text x="450" y="260" class="phase-label" text-anchor="middle">📂 Context Detection</text>
+    <text x="450" y="278" class="phase-label" text-anchor="middle" font-size="11">New or existing project?</text>
+  </g>
+
+  <!-- Branch: New Project -->
+  <line x1="320" y1="270" x2="180" y2="270" class="arrow"/>
+  <line x1="180" y1="270" x2="180" y2="380" class="arrow"/>
+  <text x="235" y="265" class="arrow-label">New project</text>
+
+  <g filter="url(#shadow)">
+    <rect x="60" y="380" width="240" height="70" rx="8" fill="#b794f4" stroke="#9f7aea" stroke-width="2"/>
+    <text x="180" y="407" class="phase-label" text-anchor="middle">🏗️ Project Setup</text>
+    <text x="180" y="427" class="step-desc" text-anchor="middle">Initialize .haunt/ structure</text>
+    <text x="180" y="442" class="step-detail" text-anchor="middle">Create plans/, completed/, tests/ dirs</text>
+  </g>
+
+  <line x1="180" y1="450" x2="180" y2="480" class="arrow"/>
+  <line x1="180" y1="480" x2="450" y2="480" class="arrow"/>
+
+  <!-- Branch: Existing Project -->
+  <line x1="580" y1="270" x2="720" y2="270" class="arrow"/>
+  <line x1="720" y1="270" x2="720" y2="480" class="arrow"/>
+  <text x="640" y="265" class="arrow-label">Existing project</text>
+  <line x1="720" y1="480" x2="450" y2="480" class="arrow"/>
+
+  <!-- Convergence point -->
+  <line x1="450" y1="480" x2="450" y2="520" class="arrow"/>
+
+  <!-- Phase 1: Requirements Development -->
+  <g filter="url(#shadow)">
+    <rect x="225" y="520" width="450" height="95" rx="10" fill="#48bb78" stroke="#38a169" stroke-width="2"/>
+    <circle cx="255" cy="567" r="18" fill="rgba(255,255,255,0.2)"/>
+    <text x="255" y="574" class="step-num" text-anchor="middle">1</text>
+    <text x="285" y="548" class="step-title">📝 Phase 1: Requirements Development</text>
+    <text x="285" y="568" class="step-desc">Brain dump → Formal requirements</text>
+    <text x="285" y="585" class="step-detail">• Extract core needs • Identify constraints • Create testable specs</text>
+    <text x="285" y="602" class="step-detail">Skill: gco-requirements-development</text>
+  </g>
+
+  <!-- Artifact: Requirements Doc -->
+  <g filter="url(#shadow)">
+    <rect x="700" y="540" width="170" height="55" class="artifact-box"/>
+    <text x="785" y="560" class="artifact-title" text-anchor="middle">📄 Requirements Doc</text>
+    <text x="785" y="575" class="artifact-path" text-anchor="middle">requirements-XXX.md</text>
+    <text x="785" y="587" class="artifact-path" text-anchor="middle">.haunt/plans/</text>
+  </g>
+  <line x1="675" y1="567" x2="700" y2="567" class="arrow" stroke-width="1.5"/>
+
+  <line x1="450" y1="615" x2="450" y2="655" class="arrow"/>
+
+  <!-- Phase 2: Requirements Analysis -->
+  <g filter="url(#shadow)">
+    <rect x="225" y="655" width="450" height="110" rx="10" fill="#ed8936" stroke="#dd6b20" stroke-width="2"/>
+    <circle cx="255" cy="710" r="18" fill="rgba(255,255,255,0.2)"/>
+    <text x="255" y="717" class="step-num" text-anchor="middle">2</text>
+    <text x="285" y="683" class="step-title">🔍 Phase 2: Requirements Analysis</text>
+    <text x="285" y="703" class="step-desc">Strategic frameworks for prioritization</text>
+    <text x="285" y="720" class="step-detail">• JTBD analysis • Kano Model • RICE scoring • VRIO/SWOT</text>
+    <text x="285" y="737" class="step-detail">• Prioritize features • Assess strategic impact</text>
+    <text x="285" y="754" class="step-detail">Skill: gco-requirements-analysis</text>
+  </g>
+
+  <!-- Artifact: Analysis Doc -->
+  <g filter="url(#shadow)">
+    <rect x="700" y="680" width="170" height="55" class="artifact-box"/>
+    <text x="785" y="700" class="artifact-title" text-anchor="middle">📊 Analysis Document</text>
+    <text x="785" y="715" class="artifact-path" text-anchor="middle">requirements-XXX-analysis.md</text>
+    <text x="785" y="727" class="artifact-path" text-anchor="middle">.haunt/plans/</text>
+  </g>
+  <line x1="675" y1="710" x2="700" y2="710" class="arrow" stroke-width="1.5"/>
+
+  <line x1="450" y1="765" x2="450" y2="805" class="arrow"/>
+
+  <!-- Phase 3: Roadmap Creation -->
+  <g filter="url(#shadow)">
+    <rect x="225" y="805" width="450" height="95" rx="10" fill="#4299e1" stroke="#3182ce" stroke-width="2"/>
+    <circle cx="255" cy="852" r="18" fill="rgba(255,255,255,0.2)"/>
+    <text x="255" y="859" class="step-num" text-anchor="middle">3</text>
+    <text x="285" y="833" class="step-title">🗺️ Phase 3: Roadmap Creation</text>
+    <text x="285" y="853" class="step-desc">Atomic sizing, dependency batching, agent assignments</text>
+    <text x="285" y="870" class="step-detail">• Size work (XS/S/M/SPLIT) • Create batches • Assign agents</text>
+    <text x="285" y="887" class="step-detail">Skill: gco-roadmap-creation</text>
+  </g>
+
+  <!-- Artifact: Roadmap -->
+  <g filter="url(#shadow)">
+    <rect x="700" y="822" width="170" height="55" class="artifact-box"/>
+    <text x="785" y="842" class="artifact-title" text-anchor="middle">🗺️ Updated Roadmap</text>
+    <text x="785" y="857" class="artifact-path" text-anchor="middle">roadmap.md</text>
+    <text x="785" y="869" class="artifact-path" text-anchor="middle">.haunt/plans/</text>
+  </g>
+  <line x1="675" y1="852" x2="700" y2="852" class="arrow" stroke-width="1.5"/>
+
+  <line x1="450" y1="900" x2="450" y2="940" class="arrow"/>
+
+  <!-- Decision: Summon Haunt? -->
+  <g filter="url(#shadow)">
+    <polygon points="450,940 560,990 450,1040 340,990" fill="#f6ad55" stroke="#ed8936" stroke-width="2"/>
+    <text x="450" y="985" class="phase-label" text-anchor="middle" font-size="14">👥 Summon Haunt?</text>
+    <text x="450" y="1003" class="phase-label" text-anchor="middle" font-size="10">(Optional)</text>
+  </g>
+
+  <!-- Branch: Yes - Spawn Agents -->
+  <line x1="340" y1="990" x2="180" y2="990" class="arrow"/>
+  <text x="245" y="985" class="arrow-label">Yes (parallel)</text>
+
+  <g filter="url(#shadow)">
+    <rect x="60" y="960" width="240" height="60" rx="8" fill="#9f7aea" stroke="#805ad5" stroke-width="2"/>
+    <text x="180" y="983" class="phase-label" text-anchor="middle">🧙 Spawn Worker Agents</text>
+    <text x="180" y="1003" class="step-desc" text-anchor="middle">Dev, Research, Code-Reviewer</text>
+  </g>
+
+  <!-- Branch: No - Manual -->
+  <line x1="560" y1="990" x2="720" y2="990" class="arrow"/>
+  <text x="625" y="985" class="arrow-label">No (manual)</text>
+
+  <g filter="url(#shadow)">
+    <rect x="600" y="960" width="240" height="60" rx="8" fill="#cbd5e0" stroke="#a0aec0" stroke-width="2"/>
+    <text x="720" y="983" class="phase-label" text-anchor="middle" fill="#2d3748">👤 Manual Implementation</text>
+    <text x="720" y="1003" class="step-desc" text-anchor="middle" fill="#4a5568">User works from roadmap</text>
+  </g>
+
+  <!-- Convergence to Ready -->
+  <line x1="180" y1="1020" x2="180" y2="1050" class="arrow"/>
+  <line x1="180" y1="1050" x2="360" y2="1050" class="arrow"/>
+
+  <line x1="720" y1="1020" x2="720" y2="1050" class="arrow"/>
+  <line x1="720" y1="1050" x2="540" y2="1050" class="arrow"/>
+
+  <!-- Final: Ready to Work -->
+  <g filter="url(#shadow)">
+    <ellipse cx="450" cy="1050" rx="130" ry="30" fill="#48bb78" stroke="#38a169" stroke-width="2"/>
+    <text x="450" y="1057" class="phase-label" text-anchor="middle" font-size="16">✅ Ready to Work</text>
+  </g>
+
+  <!-- Legend -->
+  <g filter="url(#shadow)">
+    <rect x="20" y="15" width="200" height="75" rx="6" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <text x="30" y="35" font-size="13" font-weight="bold" fill="#2d3748">Legend:</text>
+
+    <rect x="30" y="45" width="16" height="12" rx="2" fill="#48bb78"/>
+    <text x="52" y="54" font-size="11" fill="#4a5568">Planning Phase</text>
+
+    <polygon points="30,67 38,72 30,77 22,72" fill="#f6ad55"/>
+    <text x="52" y="75" font-size="11" fill="#4a5568">Decision Point</text>
+  </g>
+</svg>

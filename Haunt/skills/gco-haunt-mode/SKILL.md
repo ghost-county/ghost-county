@@ -1,29 +1,29 @@
 ---
-name: gco-coven-mode
-description: Gather the coven - coordinate multiple agents working in parallel on the same task. Use when a single task requires diverse expertise (backend + frontend + infrastructure), when parallel work will speed completion, or when user says "gather the coven", "summon the coven", "call a coven", or "coven mode".
+name: gco-haunt-mode
+description: Gather the haunt - coordinate multiple agents working in parallel on the same task. Use when a single task requires diverse expertise (backend + frontend + infrastructure), when parallel work will speed completion, or when user says "gather the haunt", "summon the haunt", "call a haunt", or "haunt mode".
 ---
 
-# Coven Mode: Multi-Agent Coordination
+# Haunt Mode: Multi-Agent Coordination
 
-When the spirits work in concert, great things are accomplished. The Coven is Ghost County's pattern for coordinating multiple agents working together in parallel on the same task or tightly-coupled set of tasks.
+When the spirits work in concert, great things are accomplished. The Haunt is Ghost County's pattern for coordinating multiple agents working together in parallel on the same task or tightly-coupled set of tasks.
 
 ## When to Use
 
 - **Complex Features:** Require backend + frontend + infrastructure changes together
 - **Parallel Speedup:** Work can be split into independent parallel streams
 - **Cross-Domain Tasks:** Require diverse agent expertise working in coordination
-- **Trigger Phrases:** "gather the coven", "summon the coven", "call a coven", "coven mode"
+- **Trigger Phrases:** "gather the haunt", "summon the haunt", "call a haunt", "haunt mode"
 
-## Coven vs Seance
+## Haunt vs Seance
 
-| Aspect | Seance | Coven |
+| Aspect | Seance | Haunt |
 |--------|--------|-------|
 | **Purpose** | Sequential workflow orchestration | Parallel multi-agent coordination |
 | **Timing** | Planning → Implementation | Implementation only |
 | **Agent Pattern** | One at a time, batched by dependencies | Multiple in parallel, coordinated |
 | **Use Case** | New features, roadmap creation | Complex existing task requiring multiple skills |
 
-**Simple rule:** Seance for planning, Coven for parallel execution.
+**Simple rule:** Seance for planning, Haunt for parallel execution.
 
 ## Coordination Patterns
 
@@ -93,11 +93,11 @@ Parallel research and implementation streams.
 - Critic validates approach matches research findings
 - Adjust implementation if research changes recommendation
 
-## Coven Coordination Workflow
+## Haunt Coordination Workflow
 
 ### Step 1: Task Analysis
 
-Before gathering the coven, understand:
+Before gathering the haunt, understand:
 - What's the complete task/feature?
 - What domains are involved? (backend, frontend, infrastructure, etc.)
 - Can work truly happen in parallel, or are there blocking dependencies?
@@ -128,7 +128,7 @@ Establish shared interfaces before parallel work begins:
 - Add to requirement in roadmap under "Integration Contract"
 - Or create `.haunt/docs/integration-contracts/REQ-XXX.md`
 
-### Step 3: Spawn Coven Members
+### Step 3: Spawn Haunt Members
 
 Spawn each agent with:
 1. **Clear scope:** Which part of the work they own
@@ -140,14 +140,14 @@ Spawn each agent with:
 
 ```
 Summon gco-dev-backend:
-"You are part of a coven working on REQ-123 (user profiles).
+"You are part of a haunt working on REQ-123 (user profiles).
 Your scope: API endpoints and database schema.
 Contract: See .haunt/docs/integration-contracts/REQ-123.md for API spec.
 Files: Own src/api/profile.py and migrations/. DO NOT modify frontend files.
 Integration: Frontend agent will consume your API once complete."
 
 Summon gco-dev-frontend:
-"You are part of a coven working on REQ-123 (user profiles).
+"You are part of a haunt working on REQ-123 (user profiles).
 Your scope: Profile UI and form validation.
 Contract: See .haunt/docs/integration-contracts/REQ-123.md for API spec.
 Use mock API responses during development.
@@ -155,7 +155,7 @@ Files: Own src/components/Profile/ and src/pages/profile.tsx.
 Integration: Connect to real API once backend agent completes."
 
 Summon gco-dev-infrastructure:
-"You are part of a coven working on REQ-123 (user profiles).
+"You are part of a haunt working on REQ-123 (user profiles).
 Your scope: CDN for profile images and caching layer.
 Contract: See .haunt/docs/integration-contracts/REQ-123.md.
 Files: Own terraform/cdn.tf and deploy/cache-config.yml.
@@ -166,17 +166,17 @@ Integration: Backend will use your CDN URLs and cache endpoints."
 
 Track each agent's progress:
 - Check roadmap for task completion checkboxes
-- Watch for blocking issues that affect other coven members
+- Watch for blocking issues that affect other haunt members
 - Identify when integration points are ready
 
 **Communication pattern:**
-- Coven members update roadmap tasks as they complete
+- Haunt members update roadmap tasks as they complete
 - If one agent hits blocker affecting others, escalate to coordinator (PM or user)
 - When agent completes their scope, mark ready for integration
 
 ### Step 5: Integration & Testing
 
-Once all coven members complete their scopes:
+Once all haunt members complete their scopes:
 
 1. **Integration phase:** Connect the parallel streams
    - Backend + Frontend connect via API
@@ -214,7 +214,7 @@ Assign clear file ownership to prevent git conflicts:
 For files that multiple agents need (config, constants, types):
 
 **Option 1: Pre-create stubs**
-- Before spawning coven, create shared type definitions
+- Before spawning haunt, create shared type definitions
 - Each agent uses but doesn't modify
 
 **Option 2: Designate owner**
@@ -248,7 +248,7 @@ When multiple agents write tests for same system:
 
 ## Result Aggregation
 
-After coven completes work:
+After haunt completes work:
 
 ### Aggregate Changes
 
@@ -283,10 +283,10 @@ terraform plan
 
 ### Unified Commit
 
-Create single commit representing the coven's work:
+Create single commit representing the haunt's work:
 
 ```
-[REQ-123] Add: User profile feature (coven)
+[REQ-123] Add: User profile feature (haunt)
 
 What was done:
 - Backend: Profile API endpoints and user table schema (gco-dev-backend)
@@ -298,29 +298,29 @@ What was done:
 🤖 Generated with Claude Code
 ```
 
-Note the "(coven)" tag in header to indicate multi-agent work.
+Note the "(haunt)" tag in header to indicate multi-agent work.
 
-## Example Coven Session
+## Example Haunt Session
 
 ```
-User: "Gather the coven to implement REQ-089: Real-time notifications"
+User: "Gather the haunt to implement REQ-089: Real-time notifications"
 
 Coordinator:
-🌙 Gathering the coven for REQ-089...
+🌙 Gathering the haunt for REQ-089...
 
 Analyzing task complexity:
 - Backend: WebSocket server, notification queue, persistence
 - Frontend: Notification bell UI, WebSocket client, toast components
 - Infrastructure: Redis for pub/sub, load balancer WebSocket support
 
-This is suitable for coven mode (3 parallel streams).
+This is suitable for haunt mode (3 parallel streams).
 
 Defining contract:
 - WebSocket message format: { type, payload, timestamp }
 - API: /api/notifications (REST), ws://api/notifications (WebSocket)
 - Redis channel: "notifications:{user_id}"
 
-Ready to summon the coven?
+Ready to summon the haunt?
 
 [User: "yes"]
 
@@ -334,7 +334,7 @@ Summoning gco-dev-infrastructure for Redis and load balancer...
 [Each updates roadmap tasks as they progress]
 [Integration phase begins when all complete]
 
-🎉 The coven has completed its work!
+🎉 The haunt has completed its work!
 
 Summary:
 - Backend: WebSocket server operational, 8 tests passing
@@ -347,11 +347,11 @@ All changes ready for commit.
 
 ## Quality Checklist
 
-Before completing coven coordination:
+Before completing haunt coordination:
 
 - [ ] Task analyzed and confirmed suitable for parallel work
 - [ ] Contracts defined (API specs, interfaces, naming conventions)
-- [ ] Clear scope assigned to each coven member (no overlap)
+- [ ] Clear scope assigned to each haunt member (no overlap)
 - [ ] All agents completed their scopes
 - [ ] Integration phase completed successfully
 - [ ] No unresolved file or logical conflicts
@@ -361,11 +361,11 @@ Before completing coven coordination:
 
 ## Anti-Patterns (Don't Do This)
 
-**Don't gather coven when work is sequential:**
+**Don't gather haunt when work is sequential:**
 - If backend must finish before frontend can start → Use Seance batching
 - If infrastructure must provision before app can deploy → Use Seance batching
 
-**Don't spawn coven without contracts:**
+**Don't spawn haunt without contracts:**
 - Parallel work without agreed interfaces = integration chaos
 - Always define API/interface contracts BEFORE parallel work
 
@@ -375,7 +375,7 @@ Before completing coven coordination:
 
 **Don't skip integration testing:**
 - Unit tests passing ≠ integrated system working
-- Always validate E2E flow after coven completes
+- Always validate E2E flow after haunt completes
 
 ## Skill References
 
@@ -383,6 +383,6 @@ This skill works alongside:
 
 - **gco-seance** - For sequential workflow orchestration (planning then execution)
 - **gco-roadmap-workflow** - For understanding requirement structure
-- **gco-tdd-workflow** - For ensuring each coven member writes tests
+- **gco-tdd-workflow** - For ensuring each haunt member writes tests
 
-The Coven complements Seance - use Seance for planning and sequential work, use Coven for parallel execution of complex tasks.
+The Haunt complements Seance - use Seance for planning and sequential work, use Haunt for parallel execution of complex tasks.

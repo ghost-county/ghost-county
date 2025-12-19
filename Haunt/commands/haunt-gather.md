@@ -1,10 +1,10 @@
-# Gather the Coven (Multi-Agent Coordination)
+# Gather the Haunt (Multi-Agent Coordination)
 
-Gather the coven to coordinate multiple agents working in parallel on the same complex task. Use when a single feature requires diverse expertise or when parallel work streams will speed completion.
+Gather the haunt to coordinate multiple agents working in parallel on the same complex task. Use when a single feature requires diverse expertise or when parallel work streams will speed completion.
 
-## What is a Coven?
+## What is a Haunt?
 
-A coven is Ghost County's pattern for multi-agent parallel coordination. It:
+A haunt is Ghost County's pattern for multi-agent parallel coordination. It:
 
 1. **Analyzes the task** - Determines if parallel work is appropriate
 2. **Defines contracts** - Establishes shared interfaces before spawning
@@ -13,7 +13,7 @@ A coven is Ghost County's pattern for multi-agent parallel coordination. It:
 
 ## Task: $ARGUMENTS
 
-Invoke the `gco-coven-mode` skill with the user's request:
+Invoke the `gco-haunt-mode` skill with the user's request:
 
 ```
 $ARGUMENTS
@@ -27,48 +27,48 @@ The skill will:
 - Monitor progress and facilitate integration
 - Aggregate results into unified completion
 
-## When to Use Coven vs Seance
+## When to Use Haunt vs Seance
 
-| Use `/seance` when: | Use `/coven` when: |
+| Use `/seance` when: | Use `/haunt` when: |
 |---------------------|-------------------|
 | Starting new project | Implementing existing complex task |
 | Planning features | Executing across multiple domains |
 | Sequential workflow | Parallel work appropriate |
 | Need roadmap creation | Already have requirement in roadmap |
 
-**Simple rule:** Seance for planning, Coven for parallel execution.
+**Simple rule:** Seance for planning, Haunt for parallel execution.
 
 ## Example Usage
 
 ```
-/coven REQ-089: Real-time notifications
-/coven Implement user profile feature across all layers
-/coven Add authentication to backend, frontend, and infrastructure
+/haunt REQ-089: Real-time notifications
+/haunt Implement user profile feature across all layers
+/haunt Add authentication to backend, frontend, and infrastructure
 ```
 
 ## Coordination Patterns
 
-The coven supports several coordination patterns:
+The haunt supports several coordination patterns:
 
 - **Domain Split:** Backend + Frontend + Infrastructure working independently
 - **Layer Split:** Cross-cutting changes across architectural layers
 - **Feature Decomposition:** Large feature broken into parallel sub-features
 - **Research + Implementation:** Parallel research and development streams
 
-## Example Coven Session
+## Example Haunt Session
 
 ```
-User: /coven REQ-089: Real-time notifications
+User: /haunt REQ-089: Real-time notifications
 
 Response:
-🌙 Gathering the coven for REQ-089...
+🌙 Gathering the haunt for REQ-089...
 
 Analyzing task:
 - Backend: WebSocket server, notification queue
 - Frontend: Notification UI, WebSocket client
 - Infrastructure: Redis pub/sub, load balancer
 
-✅ Suitable for parallel coven work (3 independent streams)
+✅ Suitable for parallel haunt work (3 independent streams)
 
 Defining contracts:
 - WebSocket message format: { type, payload, timestamp }
@@ -77,7 +77,7 @@ Defining contracts:
 
 Contract saved to: .haunt/docs/integration-contracts/REQ-089.md
 
-Ready to summon the coven?
+Ready to summon the haunt?
 [User confirms]
 
 🕯️ The spirits gather...
@@ -90,13 +90,13 @@ Summoning gco-dev-infrastructure for Redis setup...
 [Integration phase]
 [Testing validation]
 
-🎉 The coven has completed its work!
+🎉 The haunt has completed its work!
 All changes integrated and tested.
 ```
 
 ## Quality Assurance
 
-Before completing, the coven ensures:
+Before completing, the haunt ensures:
 - All parallel streams completed successfully
 - No file or logical conflicts
 - Integration contracts honored

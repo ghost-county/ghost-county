@@ -595,6 +595,6 @@ Before finalizing decomposition:
 ## Integration with Other Skills
 
 - **gco-roadmap-creation:** Use sizing rules and batch organization
-- **gco-coven-mode:** Use for parallel execution coordination
+- **gco-haunt-mode:** Use for parallel execution coordination
 - **gco-seance:** Invokes decomposition when SPLIT detected
 - **gco-roadmap-workflow:** Update roadmap with decomposed items
