@@ -385,7 +385,11 @@ Archive a completed batch and automatically activate the next batch.
 ### Archival Logic
 
 1. **Verify batch completion**: All requirements in batch must be 🟢 Complete
-2. **Move batch file**: Move from `.haunt/plans/batches/` to `.haunt/completed/batches/`
+2. **Archive story files**: For each REQ in batch, check for `.haunt/plans/stories/REQ-XXX-story.md`
+   - If story exists: Move to `.haunt/completed/stories/REQ-XXX-story.md`
+   - Creates `.haunt/completed/stories/` directory if needed
+   - Preserves implementation context for historical reference
+3. **Move batch file**: Move from `.haunt/plans/batches/` to `.haunt/completed/batches/`
 3. **Add archive metadata**: Timestamp archival date in batch file
 4. **Update overview roadmap**: Remove batch from "Other Batches" summary
 5. **Activate next batch**: Load next unarchived batch as active (if available)
@@ -615,3 +619,33 @@ This command integrates with existing Haunt workflow:
 - **Archive lifecycle**: Completed batches preserve full history in `.haunt/completed/batches/` for reference
 
 Sharding is **optional** and **reversible**. The roadmap remains functional in both sharded and monolithic forms. Archival is a lifecycle management tool - archived batches remain accessible for historical reference but are excluded from active context loading.
+
+## Story File Lifecycle Management
+
+When archiving requirements or batches, story files should be cleaned up:
+
+**Individual requirement archival:**
+1. Check if `.haunt/plans/stories/REQ-XXX-story.md` exists
+2. If yes: Move to `.haunt/completed/stories/REQ-XXX-story.md`
+3. Preserves context for historical reference
+4. Keeps active stories/ directory clean
+
+**Batch archival:**
+1. For each requirement in batch, check for story file
+2. Move all story files to `.haunt/completed/stories/`
+3. Batch archive references story files in metadata
+
+**Manual cleanup:**
+```bash
+# Move story file when requirement completes
+mv .haunt/plans/stories/REQ-XXX-story.md .haunt/completed/stories/
+
+# Or use story cleanup helper (if implemented)
+/story archive REQ-XXX
+```
+
+**Why archive (not delete):**
+- Preserves implementation context for future reference
+- Helps with similar features later
+- Documents decision rationale
+- Useful for post-mortems and retrospectives

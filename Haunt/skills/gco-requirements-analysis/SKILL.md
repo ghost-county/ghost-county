@@ -518,6 +518,191 @@ When `--deep` flag is used, create an additional strategic analysis document wit
 
 ---
 
+
+---
+
+## Solution Design (Solutioning Phase)
+
+This section provides the technical blueprint for implementation - answering HOW to build the feature.
+
+### Component Architecture
+
+**High-Level Design:**
+```
+[Component diagram using ASCII art or Mermaid reference]
+
+Example:
+┌─────────────┐      ┌──────────────┐      ┌─────────────┐
+│   Frontend  │─────▶│  API Gateway │─────▶│   Backend   │
+│  Component  │      │   (Auth)     │      │   Service   │
+└─────────────┘      └──────────────┘      └─────────────┘
+                            │
+                            ▼
+                     ┌──────────────┐
+                     │   Database   │
+                     └──────────────┘
+```
+
+**Component Responsibilities:**
+- **[Component 1]:** [What it does, inputs/outputs, dependencies]
+- **[Component 2]:** [What it does, inputs/outputs, dependencies]
+- **[Component 3]:** [What it does, inputs/outputs, dependencies]
+
+**Key Interactions:**
+1. [Component A] → [Component B]: [What data flows, when, why]
+2. [Component B] → [Component C]: [What data flows, when, why]
+
+### API Contracts
+
+**New Endpoints:**
+
+```
+POST /api/[resource]
+Request: {
+  "field1": "string",
+  "field2": number
+}
+Response: {
+  "id": "string",
+  "created": "ISO8601"
+}
+Status Codes: 201 (Created), 400 (Bad Request), 401 (Unauthorized)
+```
+
+**Modified Endpoints:**
+```
+GET /api/[existing-resource]
+Changes: Added query param ?filter=[value]
+Breaking: No
+```
+
+**Contracts:**
+- **Authentication:** [How auth is handled - JWT, session, API key?]
+- **Rate Limiting:** [Limits imposed, enforcement mechanism]
+- **Pagination:** [Cursor-based, offset-based, limits]
+- **Error Format:** [Standardized error response structure]
+
+### Data Model Design
+
+**New Tables/Collections:**
+
+```sql
+CREATE TABLE [table_name] (
+  id UUID PRIMARY KEY,
+  [field1] VARCHAR(255) NOT NULL,
+  [field2] INTEGER,
+  created_at TIMESTAMP DEFAULT NOW(),
+  CONSTRAINT [constraint_name] ...
+);
+```
+
+**Modified Tables:**
+```sql
+ALTER TABLE [existing_table]
+ADD COLUMN [new_field] TYPE;
+```
+
+**Relationships:**
+- [Table A] → [Table B]: One-to-Many via [foreign_key]
+- [Table B] ← [Table C]: Many-to-Many via [junction_table]
+
+**Indexes:**
+- `CREATE INDEX idx_[name] ON [table]([columns])` - [Why this index]
+
+**Data Migration:**
+- Existing data handling: [Backfill strategy, transformation logic]
+- Migration script location: `migrations/YYYY-MM-DD-[description].sql`
+
+### State Management (for frontend features)
+
+**State Shape:**
+```typescript
+interface [FeatureName]State {
+  [field1]: Type;
+  [field2]: Type;
+  loading: boolean;
+  error: string | null;
+}
+```
+
+**State Location:**
+- Context (React Context API)
+- Store (Redux/Zustand/Jotai)
+- URL (query params for filtering/pagination)
+- Local Storage (user preferences)
+
+**State Flow:**
+1. [Action] → [State change] → [UI update]
+2. [User interaction] → [API call] → [State update]
+
+### Implementation Approach
+
+**Development Sequence:**
+1. **Foundation (Day 1-2):**
+   - [Set up infrastructure/boilerplate]
+   - [Create data models/migrations]
+   - [Scaffold components]
+
+2. **Core Functionality (Day 3-5):**
+   - [Implement main logic]
+   - [Wire up API endpoints]
+   - [Connect frontend to backend]
+
+3. **Validation & Testing (Day 6-7):**
+   - [Write tests (unit, integration, e2e)]
+   - [Manual testing scenarios]
+   - [Edge case validation]
+
+4. **Polish & Deploy (Day 8):**
+   - [Error handling refinement]
+   - [Performance optimization]
+   - [Documentation]
+   - [Deployment]
+
+**Critical Path Items:**
+- [Item that blocks other work]
+- [Dependency that must complete first]
+
+**Parallel Work Opportunities:**
+- [Work that can happen simultaneously]
+- [Independent components that can be built in parallel]
+
+### Design Patterns
+
+**Patterns to Use:**
+- **[Pattern 1]:** [Why it fits this problem]
+- **[Pattern 2]:** [What it enables]
+
+**Patterns to Avoid:**
+- **[Anti-pattern 1]:** [Why it's wrong for this context]
+- **[Anti-pattern 2]:** [Better alternative]
+
+### Testing Strategy
+
+**Test Coverage:**
+- **Unit Tests:** [What to test at unit level]
+- **Integration Tests:** [What integrations to verify]
+- **E2E Tests:** [User flows to automate]
+- **Performance Tests:** [Load/stress test scenarios if applicable]
+
+**Test Data:**
+- [Fixtures/mocks needed]
+- [Test database seeding approach]
+
+**Coverage Target:** [X%] minimum
+
+### Code Examples & References
+
+**Similar Patterns in Codebase:**
+- `path/to/file.ext:line` - [Description of similar implementation]
+- `path/to/other.ext:line` - [Pattern to follow]
+
+**External References:**
+- [Library documentation URL]
+- [Tutorial or guide that demonstrates approach]
+- [Similar open source implementation to reference]
+
+
 ## Strategic Recommendation
 
 **Decision:** Proceed / Proceed with Modifications / Defer / Do Not Proceed

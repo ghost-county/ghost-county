@@ -88,6 +88,78 @@ Claude Code's Agent SDK provides automatic context management. Understanding the
 
 **Never start new features with WIP in progress.**
 
+### Scenario: Assignment in Different Batch (Sharded Roadmaps)
+
+**Problem:** Sharded roadmap shows assignment in different batch than active batch.
+
+**Resolution:**
+1. Check "Other Batches" section in `roadmap.md` for batch file path
+2. Read full batch file: `.haunt/plans/batches/batch-N-[name].md`
+3. Find assigned requirement in batch file
+4. Proceed with work using batch file context
+
+**Example:**
+```bash
+# Assignment: Implement REQ-105 (in different batch)
+# 1. Roadmap.md shows: "Batch: Command Improvements - File: batches/batch-1-command-improvements.md"
+# 2. Read batch file
+cat .haunt/plans/batches/batch-1-command-improvements.md
+
+# 3. Find REQ-105 details in batch file
+# 4. Proceed with implementation
+```
+
+## Batch Loading (Sharded Roadmaps)
+
+**When roadmap is sharded:** Token-efficient mode for large projects (10+ requirements).
+
+**How sharding works:**
+- Main `roadmap.md` contains: overview + active batch requirements only
+- Other batches stored in: `.haunt/plans/batches/batch-N-[name].md`
+- Achieves 60-80% token reduction by loading only relevant batch
+
+**Detection:**
+- Check if `.haunt/plans/batches/` directory exists
+- Check for "Sharding Info" section in `roadmap.md`
+- Check for "Other Batches" heading in `roadmap.md`
+
+**Workflow for active batch (normal case):**
+1. Read `roadmap.md` (contains active batch already)
+2. Find assignment in active batch
+3. Proceed with work - no additional loading needed
+
+**Workflow for different batch (edge case):**
+1. Assignment found in "Other Batches" section
+2. Note batch file path from overview
+3. Read `.haunt/plans/batches/batch-N-[name].md`
+4. Extract full requirement details from batch file
+5. Proceed with work using batch context
+
+**Example: Assignment in different batch**
+```bash
+# Scenario: Assigned REQ-105, but active batch is "Setup Improvements"
+# REQ-105 is in "Command Improvements" batch
+
+# 1. Check roadmap.md "Other Batches" section
+cat .haunt/plans/roadmap.md
+# Shows: "Batch: Command Improvements - File: batches/batch-1-command-improvements.md"
+
+# 2. Load specific batch file
+cat .haunt/plans/batches/batch-1-command-improvements.md
+
+# 3. Find REQ-105 full details
+# 4. Proceed with implementation
+```
+
+**Backward compatibility:**
+- If roadmap not sharded, use normal workflow (load full `roadmap.md`)
+- No changes needed to agent behavior
+
+**Token savings:**
+- Sharded: Load 500-1000 tokens (overview + active batch)
+- Monolithic: Load 3000-5000 tokens (entire roadmap)
+- Savings: 60-80% reduction
+
 ## Story File Loading
 
 **When to check:** After assignment identification, before starting work.

@@ -220,3 +220,49 @@ Story files are recommended for:
 When reporting success, use themed language:
 - "Story woven for REQ-XXX. The tale awaits its hero."
 - "Context preserved. The Dev agent will find the path clearly marked."
+
+## Story File Lifecycle
+
+Story files follow the requirement lifecycle:
+
+### Creation (REQ is ⚪ or 🟡)
+- PM creates story via `/story create REQ-XXX`
+- Stored in `.haunt/plans/stories/REQ-XXX-story.md`
+- Dev agents load automatically during session startup
+
+### Active Use (REQ is 🟡)
+- Dev agents reference story for implementation context
+- PM can update story as new information emerges
+- Story evolves with multi-session work
+
+### Completion (REQ marked 🟢)
+- **Manual archival:** `mv .haunt/plans/stories/REQ-XXX-story.md .haunt/completed/stories/`
+- **Automatic archival:** When PM archives batch via `/roadmap archive`, story files move automatically
+- Archived stories preserve implementation context for reference
+
+### Why Archive (Not Delete)
+- Preserves decision rationale for future features
+- Helps with similar implementations later
+- Useful for post-mortems and team retrospectives
+- Documents approach for onboarding new team members
+
+## Cleanup Workflow
+
+**When completing individual requirement:**
+```bash
+# Mark requirement complete in roadmap
+# Then move story file manually
+mv .haunt/plans/stories/REQ-XXX-story.md .haunt/completed/stories/
+```
+
+**When archiving batch:**
+```bash
+# Use batch archive command (handles story files automatically)
+/roadmap archive "Batch 1: Foundation"
+# Moves all story files for requirements in batch
+```
+
+**Cleanup directory created:**
+```bash
+mkdir -p .haunt/completed/stories
+```

@@ -29,7 +29,14 @@ Read CLAUDE.md Active Work section (already loaded in your context):
 
 ## Step 3: Check Roadmap
 
-Read `.haunt/plans/roadmap.md`:
+**Sharding Detection:**
+1. Check if `.haunt/plans/batches/` directory exists
+2. If yes, roadmap is sharded:
+   - Read `roadmap.md` (contains overview + active batch only)
+   - Active batch is already loaded in context
+   - If your assignment is in a different batch, you'll need to load that batch file
+3. If no, roadmap is monolithic:
+   - Read `roadmap.md` normally (contains all requirements)
 
 **What to look for:**
 - ⚪ Not Started items in your domain
@@ -39,6 +46,11 @@ Read `.haunt/plans/roadmap.md`:
 **If found:**
 1. Update status to 🟡 In Progress
 2. Proceed with the work
+
+**If assignment found in different batch (sharded roadmap only):**
+1. Check "Other Batches" section in `roadmap.md` for batch file location
+2. Read `.haunt/plans/batches/batch-N-[name].md` for full requirement details
+3. Proceed with the work using batch file context
 
 **If nothing found:** Continue to Step 4
 
