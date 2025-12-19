@@ -896,3 +896,187 @@ Replace all references to "coven" with "haunt" throughout the framework. A "haun
 **Agent:** Dev-Infrastructure
 **Completion:** All references to "coven" replaced with "haunt", skill renamed and functional, SVG updated, grep confirms no remaining "coven" references in framework files
 **Blocked by:** None
+
+---
+
+## Batch: Testing & Quality - Phase 1 (Quick Wins)
+
+**Goal:** Implement foundational quality and self-improvement mechanisms inspired by BMAD research
+**Source:** BMAD framework analysis - testing and agent self-improvement research
+**Estimated Effort:** 3 XS + 1 S = ~4 hours
+
+### 🟢 REQ-234: Create Security Checklist
+
+**Type:** Enhancement (Quality)
+**Reported:** 2025-12-18
+**Completed:** 2025-12-18
+**Source:** BMAD research - security-checklist as separate artifact for agent reference
+
+**Description:**
+Create dedicated security checklist that Dev agents reference before marking requirements complete. Covers common vulnerabilities (OWASP Top 10) and project-specific security concerns. Inspired by BMAD's separate security-checklist dependency pattern.
+
+**Tasks:**
+- [x] Create `.haunt/checklists/` directory
+- [x] Create `.haunt/checklists/security-checklist.md` with sections:
+  - [x] Injection vulnerabilities (SQL, NoSQL, command injection)
+  - [x] XSS prevention (input sanitization, output encoding)
+  - [x] Authentication/Authorization (session handling, access control)
+  - [x] Secrets management (no hardcoded credentials, env vars)
+  - [x] HTTPS/TLS enforcement
+  - [x] CSRF protection
+  - [x] Security headers (CSP, X-Frame-Options, etc.)
+  - [x] Dependency vulnerabilities (npm audit, pip check)
+  - [x] File upload validation
+  - [x] Rate limiting and DoS prevention
+- [x] Add "Security Review" section to gco-completion-checklist
+- [x] Update gco-dev agent to reference security checklist
+- [x] Update gco-code-reviewer agent to enforce security checklist
+- [x] Test with sample requirement requiring security review
+
+**Files:**
+- `.haunt/checklists/security-checklist.md` (created - 10 OWASP Top 10 sections with examples)
+- `Haunt/rules/gco-completion-checklist.md` (modified - added step 6 Security Review)
+- `Haunt/agents/gco-dev.md` (modified - added security review to completion protocol)
+- `Haunt/agents/gco-code-reviewer.md` (modified - enforces security checklist in review process)
+- `.claude/rules/gco-completion-checklist.md` (deployed)
+- `.claude/agents/gco-dev.md` (deployed)
+- `.claude/agents/gco-code-reviewer.md` (deployed)
+
+**Effort:** XS
+**Complexity:** SIMPLE
+**Agent:** Dev-Infrastructure
+**Completion:** Security checklist created, agents reference it, completion checklist includes security review step
+**Blocked by:** None
+
+**Implementation Notes:**
+Created comprehensive security checklist (`.haunt/checklists/security-checklist.md`) covering all OWASP Top 10 vulnerabilities with specific examples of WRONG vs RIGHT patterns in Python, JavaScript, and other languages. Each section includes:
+- Risk description
+- Security checks
+- Code examples (vulnerable vs safe)
+- Project-specific concerns (Ghost County/Haunt framework)
+
+Updated completion checklist rule to add step 6 (Security Review) with criteria for when security review is required. Updated Dev agent to reference security checklist during completion verification. Updated Code Reviewer agent to enforce security checklist during review process (step 5). All changes deployed via setup-haunt.sh.
+
+---
+
+### ⚪ REQ-235: Add Self-Validation Protocol to Completion Checklist
+
+**Type:** Enhancement (Quality)
+**Reported:** 2025-12-18
+**Source:** BMAD research - agents run validations before handoff to next agent
+
+**Description:**
+Formalize "check your own work" as explicit protocol step in completion checklist. Dev agents must self-validate against requirements, test coverage, and edge cases before marking 🟢 Complete and handing to Code Reviewer.
+
+**Tasks:**
+- [ ] Read current `gco-completion-checklist` rule/skill
+- [ ] Add "Self-Validation" as step 6 in checklist (before marking complete):
+  - [ ] Re-read original requirement and verify all completion criteria met
+  - [ ] Review own code changes for obvious issues
+  - [ ] Confirm tests actually test the feature (not just exist)
+  - [ ] Check edge cases are covered
+  - [ ] Run security checklist on own code (REQ-234)
+  - [ ] Verify no debugging code left (console.log, print statements)
+- [ ] Update examples in checklist showing self-validation in action
+- [ ] Add "Self-Validation" section to gco-dev agent character sheet
+- [ ] Deploy changes
+
+**Files:**
+- `Haunt/rules/gco-completion-checklist.md` (modify) OR `Haunt/skills/gco-completion-checklist/SKILL.md` (if converted to skill)
+- `Haunt/agents/gco-dev.md` (modify - add self-validation step)
+- `.claude/rules/gco-completion-checklist.md` (deploy)
+- `.claude/agents/gco-dev.md` (deploy)
+
+**Effort:** XS
+**Complexity:** SIMPLE
+**Agent:** Dev-Infrastructure
+**Completion:** Completion checklist includes self-validation step, Dev agent references it, examples demonstrate usage
+**Blocked by:** REQ-234 (security checklist reference in self-validation)
+
+---
+
+### ⚪ REQ-236: Create Lessons-Learned Database for Ghost County Project
+
+**Type:** Enhancement (Knowledge Management)
+**Reported:** 2025-12-18
+**Source:** BMAD research - "lessons-learned" knowledge bases agents can reference
+
+**Description:**
+Create lessons-learned.md database to capture common mistakes, anti-patterns, architecture decisions, and project-specific gotchas. PM updates after batch completion, Dev/Research agents read during session startup for complex features. Reduces repeated mistakes and improves agent context over time.
+
+**Tasks:**
+- [ ] Create `.haunt/docs/lessons-learned.md` with template structure:
+  - [ ] Common Mistakes section (errors we've made and solutions)
+  - [ ] Anti-Patterns section (bad patterns discovered via defeat tests)
+  - [ ] Architecture Decisions section (key design choices and rationale)
+  - [ ] Project Gotchas section (Ghost County-specific quirks)
+  - [ ] Best Practices section (patterns that work well for this project)
+- [ ] Populate initial content from recent work:
+  - [ ] Document "always update source in Haunt/ first" lesson (REQ-233)
+  - [ ] Document roadmap sharding decision (REQ-220)
+  - [ ] Document session startup optimization lessons (REQ-221)
+- [ ] Update gco-project-manager agent to maintain lessons-learned
+- [ ] Update gco-session-startup skill to reference lessons-learned for M-sized work
+- [ ] Update gco-dev agent to check lessons-learned for complex features
+- [ ] Add example of PM updating lessons-learned after batch completion
+
+**Files:**
+- `.haunt/docs/lessons-learned.md` (create with initial content)
+- `Haunt/agents/gco-project-manager.md` (modify - add maintenance responsibility)
+- `Haunt/skills/gco-session-startup/SKILL.md` (modify - add lessons-learned check)
+- `Haunt/agents/gco-dev.md` (modify - reference lessons-learned)
+- Deploy via `setup-haunt.sh`
+
+**Effort:** S
+**Complexity:** SIMPLE
+**Agent:** Dev-Infrastructure
+**Completion:** Lessons-learned.md created with template and initial content, PM/Dev agents reference it, session startup includes lessons check for complex work
+**Blocked by:** None
+
+---
+
+## Batch: Testing & Quality - Phase 2 (Advanced)
+
+**Goal:** Implement advanced self-improvement mechanisms
+**Source:** BMAD research insights + new innovations beyond BMAD
+**Estimated Effort:** 1 M item = ~6 hours
+
+### ⚪ REQ-237: Implement Pattern Capture Automation
+
+**Type:** Enhancement (Self-Improvement)
+**Reported:** 2025-12-18
+**Source:** New innovation - automate pattern defeat test creation when Code Reviewer finds issues
+
+**Description:**
+When Code Reviewer identifies anti-pattern in Dev agent's work, auto-generate skeleton pattern defeat test. Creates systematic feedback loop: Mistake → Test → Prevention. Extends Haunt's existing pattern-defeat methodology with automation.
+
+**Tasks:**
+- [ ] Create `/pattern capture` command for Code Reviewer:
+  - [ ] Parse anti-pattern description from reviewer feedback
+  - [ ] Generate test filename: `test_prevent_[pattern-name].py`
+  - [ ] Create skeleton test with metadata:
+    - [ ] Pattern description (what went wrong)
+    - [ ] Defeat strategy (what should happen instead)
+    - [ ] Discovery metadata (date, REQ-XXX, agent)
+  - [ ] Save to `.haunt/tests/patterns/`
+- [ ] Add pattern capture to gco-code-reviewer agent workflow:
+  - [ ] When rejecting code with anti-pattern, offer to capture
+  - [ ] Prompt: "Should I create a pattern defeat test for this? [yes/no]"
+  - [ ] If yes, invoke `/pattern capture`
+- [ ] Update gco-pattern-detection skill with capture workflow
+- [ ] Create example pattern capture for demonstration
+- [ ] Test end-to-end: Code Review → Pattern Capture → Defeat Test
+
+**Files:**
+- `Haunt/commands/pattern.md` (create - pattern capture command)
+- `Haunt/agents/gco-code-reviewer.md` (modify - add capture workflow)
+- `Haunt/skills/gco-pattern-detection/SKILL.md` (modify - document automation)
+- `.haunt/tests/patterns/test_example_captured_pattern.py` (create - demonstration)
+- Deploy via `setup-haunt.sh`
+
+**Effort:** M
+**Complexity:** MODERATE
+**Agent:** Dev-Infrastructure
+**Completion:** `/pattern capture` command works, Code Reviewer offers pattern capture on rejections, skeleton tests auto-generated, demonstration example exists
+**Blocked by:** None
+

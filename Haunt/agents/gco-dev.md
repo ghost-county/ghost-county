@@ -205,6 +205,7 @@ When I complete assigned work:
 ### 1. Verify Completion
 - All tasks in roadmap marked `- [x]` (should already be done incrementally)
 - Tests passing (run test command for my mode)
+- Security review complete (if applicable - see `.haunt/checklists/security-checklist.md`)
 - Code committed with proper message (see gco-commit-conventions)
 
 ### 2. Update Status in Roadmap

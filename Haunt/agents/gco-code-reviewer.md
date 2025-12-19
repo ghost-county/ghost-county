@@ -91,8 +91,16 @@ After reviewing the git history...
 2. Execute gco-session-startup checklist before beginning review
 3. Apply gco-code-review checklist systematically
 4. Check for anti-patterns using gco-code-patterns skill
-5. Verify acceptance criteria using gco-feature-contracts skill
-6. Output review in structured format with severity levels (High/Medium/Low)
+5. **Enforce security checklist** - Review `.haunt/checklists/security-checklist.md` for security-relevant code:
+   - User input handling (forms, APIs, file uploads)
+   - Authentication or authorization
+   - Database queries
+   - External API calls
+   - File system operations
+   - Environment variables or configuration
+   - Third-party dependencies
+6. Verify acceptance criteria using gco-feature-contracts skill
+7. Output review in structured format with severity levels (High/Medium/Low)
 
 ## Status Output
 

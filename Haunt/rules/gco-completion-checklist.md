@@ -32,9 +32,22 @@ Before marking any requirement as 🟢 Complete, verify ALL of the following:
 - Comments added for complex logic
 - Type annotations complete
 
+### 6. Security Review (if applicable)
+- Review `.haunt/checklists/security-checklist.md` if code changes involve:
+  - User input handling (forms, APIs, file uploads)
+  - Authentication or authorization
+  - Database queries
+  - External API calls
+  - File system operations
+  - Environment variables or configuration
+  - Third-party dependencies
+- Mark applicable security checks as verified
+- Fix any security issues found
+- If no security-relevant changes, note "Security review: N/A"
+
 ## Completion Sequence
 
-1. Verify all 5 items above
+1. Verify all 6 items above
 2. Update requirement status: 🟡 → 🟢
 3. Update "Completion:" field with verification note
 4. Notify PM (if present) for archival
