@@ -128,6 +128,8 @@ Agents use models specified in their character sheets:
 |-------|-------|-----|
 | Project Manager | Sonnet/Opus | Strategic analysis (JTBD, Kano, RICE) - high leverage |
 | Research | Sonnet | Deep investigation and architecture recommendations |
+| Research Analyst | Sonnet | Investigation and validation require thorough analysis |
+| Research Critic | Sonnet | Adversarial review and critical analysis require deep reasoning |
 | Dev | Sonnet | Implementation requires reasoning (TDD, patterns, edge cases) |
 | Code Reviewer | Sonnet | Quality gates and pattern detection |
 | Release Manager | Sonnet | Risk assessment and coordination |

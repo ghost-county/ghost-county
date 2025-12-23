@@ -1183,7 +1183,7 @@ Rename the `gco-seance` skill to `gco-orchestrator` to prevent confusion in the 
 
 ---
 
-### ⚪ REQ-239: Create gco-research-critic Agent
+### 🟢 REQ-239: Create gco-research-critic Agent
 
 **Type:** Enhancement
 **Reported:** 2025-12-23
@@ -1200,23 +1200,23 @@ Create a new `gco-research-critic` agent specialized for adversarial review of r
 - **Tone:** Constructively skeptical, thorough, brief (2-3 min reviews)
 
 **Tasks:**
-- [ ] Create `Haunt/agents/gco-research-critic.md` with:
-  - [ ] Role definition: adversarial reviewer for requirements validation
-  - [ ] Mandate: Challenge assumptions, find gaps, identify risks
-  - [ ] Review focus areas:
-    - [ ] Unstated assumptions in requirements
-    - [ ] Edge cases not considered
-    - [ ] Scope creep or optimistic estimates
-    - [ ] Missing error handling or failure modes
-    - [ ] Risks not captured in analysis
-    - [ ] Validate requirements solve stated problem
-  - [ ] Output format: Brief critical review (bulleted findings)
-  - [ ] Tool permissions: Read-only access (Glob, Grep, Read, memory)
-  - [ ] Model: Sonnet
-  - [ ] Skills: None required (agent-specific critical thinking)
-- [ ] Add agent to CLAUDE.md agent architecture table
-- [ ] Deploy via `bash Haunt/scripts/setup-haunt.sh`
-- [ ] Test by spawning agent to review existing requirements doc
+- [x] Create `Haunt/agents/gco-research-critic.md` with:
+  - [x] Role definition: adversarial reviewer for requirements validation
+  - [x] Mandate: Challenge assumptions, find gaps, identify risks
+  - [x] Review focus areas:
+    - [x] Unstated assumptions in requirements
+    - [x] Edge cases not considered
+    - [x] Scope creep or optimistic estimates
+    - [x] Missing error handling or failure modes
+    - [x] Risks not captured in analysis
+    - [x] Validate requirements solve stated problem
+  - [x] Output format: Brief critical review (bulleted findings)
+  - [x] Tool permissions: Read-only access (Glob, Grep, Read, memory)
+  - [x] Model: Sonnet
+  - [x] Skills: None required (agent-specific critical thinking)
+- [x] Add agent to CLAUDE.md agent architecture table
+- [x] Deploy via `bash Haunt/scripts/setup-haunt.sh`
+- [x] Test by spawning agent to review existing requirements doc
 
 **Files:**
 - `Haunt/agents/gco-research-critic.md` (create - ~50 lines character sheet)
