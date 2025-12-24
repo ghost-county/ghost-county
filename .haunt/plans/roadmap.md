@@ -1359,9 +1359,15 @@ The Windows PowerShell setup script (`setup-haunt.ps1`) is not installing slash 
 - [x] Verify commands are installed to correct location:
   - [x] Global scope: `~/.claude/commands/`
   - [x] Project scope: `./.claude/commands/`
-- [ ] Test that commands are accessible after setup (pending user testing)
+- [ ] Test that commands are accessible after setup (USER TESTING REQUIRED - code complete)
 - [x] Add verification step to confirm commands installed
 - [x] Update setup completion message to confirm commands location
+
+**Implementation Notes:**
+- Added commands verification to Test-Installation function
+- Updated completion message to show where commands are installed
+- Verification now checks for commands directory and files
+- All code changes complete - awaiting user testing on Windows
 
 **Files:**
 - `Haunt/scripts/setup-haunt.ps1` (modify - fix commands installation)
@@ -1617,7 +1623,7 @@ Add --quick/--standard/--deep modes to /seance for scale-appropriate planning.
 
 ---
 
-### ⚪ REQ-251: Add Haunt Reinstall Prompt to Orchestrator Workflow
+### 🟡 REQ-251: Add Haunt Reinstall Prompt to Orchestrator Workflow
 
 **Type:** Enhancement
 **Reported:** 2024-12-24

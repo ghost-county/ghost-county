@@ -1023,6 +1023,23 @@ function Test-Installation {
         Write-Warn "Skills: Directory missing - $skillsDir"
     }
 
+    # Check commands
+    $commandsDir = if ($Scope -eq 'global') { $GlobalCommandsDir } else { $ProjectCommandsDir }
+    if (Test-Path $commandsDir) {
+        $commandCount = (Get-ChildItem -Path $commandsDir -Filter "*.md" -ErrorAction SilentlyContinue).Count
+        if ($commandCount -gt 0) {
+            Write-Success "Commands: $commandCount found in $commandsDir"
+        }
+        else {
+            $issues += "No commands found in $commandsDir"
+            Write-Warn "Commands: None found in $commandsDir"
+        }
+    }
+    else {
+        $issues += "Commands directory missing: $commandsDir"
+        Write-Warn "Commands: Directory missing - $commandsDir"
+    }
+
     # Check .haunt directory
     if (Test-Path $HauntDir) {
         Write-Success ".haunt directory exists"
@@ -1058,6 +1075,7 @@ function Test-Installation {
                 Install-Agents
                 Install-Skills
                 Install-Rules
+                Install-Commands
                 Install-ProjectStructure
             }
             elseif ($AgentsOnly) {
@@ -1235,10 +1253,17 @@ function Main {
     # Summary
     Write-Section "Setup Complete!"
 
+    Write-Host "Installed components:" -ForegroundColor Green
+    $commandsDir = if ($Scope -eq 'global') { $GlobalCommandsDir } else { $ProjectCommandsDir }
+    Write-Host "  - Agents, skills, rules installed to $(if ($Scope -eq 'global') { '~/.claude/' } else { '.claude/' })"
+    Write-Host "  - Slash commands installed to $commandsDir"
+    Write-Host "  - Project structure created in .haunt/"
+    Write-Host ""
     Write-Host "Next steps:" -ForegroundColor Green
     Write-Host "  1. Start a dev session:  claude -a dev"
     Write-Host "  2. List available agents: claude --list-agents"
-    Write-Host "  3. Check the roadmap:     Get-Content .haunt\plans\roadmap.md"
+    Write-Host "  3. Try a slash command:   /summon --help"
+    Write-Host "  4. Check the roadmap:     Get-Content .haunt\plans\roadmap.md"
     Write-Host ""
     Write-Host "Happy haunting!" -ForegroundColor Magenta
 }
