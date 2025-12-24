@@ -713,6 +713,24 @@ install_python() {
             warning "Skipping Python installation"
             return 1
         fi
+    elif [[ "$pkg_manager" == "yum" ]] || [[ "$pkg_manager" == "dnf" ]]; then
+        if prompt_install "Python 3.11+" "$pkg_manager"; then
+            info "Installing Python 3.11 via ${pkg_manager}..."
+            sudo $pkg_manager install -y python311 python311-pip || {
+                error "Failed to install Python"
+                return 1
+            }
+            success "Python installed successfully"
+        else
+            warning "Skipping Python installation"
+            return 1
+        fi
+    else
+        error "No supported package manager found"
+        info "Please install Python 3.11+ manually: https://www.python.org/downloads/"
+        return 1
+    fi
+}
 
 # ============================================================================
 # PHASE 1.5: FRONTEND PLUGIN SETUP (OPTIONAL)
@@ -785,25 +803,6 @@ setup_frontend_plugin() {
     fi
 
     echo ""
-}
-
-    elif [[ "$pkg_manager" == "yum" ]] || [[ "$pkg_manager" == "dnf" ]]; then
-        if prompt_install "Python 3.11+" "$pkg_manager"; then
-            info "Installing Python 3.11 via ${pkg_manager}..."
-            sudo $pkg_manager install -y python311 python311-pip || {
-                error "Failed to install Python"
-                return 1
-            }
-            success "Python installed successfully"
-        else
-            warning "Skipping Python installation"
-            return 1
-        fi
-    else
-        error "No supported package manager found"
-        info "Please install Python 3.11+ manually: https://www.python.org/downloads/"
-        return 1
-    fi
 }
 
 # Install Node.js 18+
