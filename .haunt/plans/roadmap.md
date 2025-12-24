@@ -1374,10 +1374,11 @@ The Windows PowerShell setup script (`setup-haunt.ps1`) is not installing slash 
 
 ---
 
-### 🟡 REQ-244: Add interactive frontend-design plugin installation to setup
+### 🟢 REQ-244: Add interactive frontend-design plugin installation to setup
 
 **Type:** Enhancement
 **Reported:** 2024-12-24
+**Completed:** 2024-12-24
 **Source:** User request - ensure frontend-design plugin is available for UI work
 
 **Description:**
@@ -1409,6 +1410,13 @@ Add frontend-design plugin installation to setup scripts with interactive prompt
 **Agent:** Dev-Infrastructure
 **Completion:** Setup scripts prompt for frontend-design plugin installation, plugin is used for UI work
 **Blocked by:** None
+
+**Implementation Notes:**
+Added interactive plugin installation as Phase 1.5 (after prerequisites, before agents). Both bash and PowerShell scripts check if Claude CLI exists, check if plugin already installed, prompt user for installation, handle marketplace addition, install plugin with error handling. Plugin is optional and skippable.
+
+Updated Dev agent Frontend Mode section to document plugin capabilities (component scaffolding, responsive design, accessibility, browser preview). Updated gco-ui-testing skill with Frontend Design Plugin Integration section explaining when to use plugin vs Playwright tests.
+
+Implementation complete except for cross-platform testing (user can test on Windows).
 
 ---
 
