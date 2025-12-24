@@ -47,9 +47,16 @@ Phase 3 - High Impact (3 requirements, ~14 hours):
 **Also on roadmap:**
 ⚪ REQ-205: GitHub Issues Integration (Research-Analyst → Dev-Infrastructure)
 ⚪ REQ-206: Create /bind Command (Dev-Infrastructure)
-🟢 REQ-243: Fix Windows setup not installing slash commands (Dev-Infrastructure, S) - COMPLETE
-⚪ REQ-244: Add interactive frontend-design plugin installation to setup (Dev-Infrastructure, M)
-⚪ REQ-245: Implement interactive dependency installation prompts (Dev-Infrastructure, M)
+🟢 REQ-243: Fix Windows slash commands bug (S) - COMPLETE
+🟢 REQ-244: Frontend-design plugin installation (M) - COMPLETE
+🟡 REQ-245: Interactive dependency prompts - bash complete, PowerShell pending (M)
+
+**Token Efficiency Optimizations (High Priority):**
+⚪ REQ-246: Edit Retry Detection (S, RICE: 450) - saves 100K tokens/task
+⚪ REQ-247: File Read Caching Awareness (S, RICE: 315) - saves 38K tokens/task
+⚪ REQ-248: Story Files for M-Sized Features (M, RICE: 63)
+⚪ REQ-249: Roadmap Sharding (M, RICE: 27) - LOW PRIORITY
+⚪ REQ-250: Adaptive Workflow Modes (M, RICE: 18) - LOW PRIORITY
 
 See `.haunt/plans/roadmap.md` for full details.
 
