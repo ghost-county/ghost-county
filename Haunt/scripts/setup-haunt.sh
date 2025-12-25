@@ -573,6 +573,20 @@ detect_package_manager() {
     fi
 }
 
+# Read input from terminal (works even when stdin is piped)
+# Usage: read_from_terminal variable_name
+read_from_terminal() {
+    local var_name="$1"
+
+    # Try to read from /dev/tty if available (handles curl | bash case)
+    if [[ -r /dev/tty ]]; then
+        read -r "$var_name" < /dev/tty
+    else
+        # Fallback to stdin (may not work if piped, but try anyway)
+        read -r "$var_name"
+    fi
+}
+
 # Prompt user for installation (returns 0 for yes, 1 for no)
 prompt_install() {
     local package_name="$1"
@@ -586,7 +600,8 @@ prompt_install() {
 
     # Interactive prompt
     echo -e "${YELLOW}?${NC} Install ${package_name} via ${install_command}? (Y/n): "
-    read -r response
+    local response
+    read_from_terminal response
 
     # Default to Yes if empty
     if [[ -z "$response" ]] || [[ "$response" =~ ^[Yy]$ ]]; then
@@ -775,7 +790,8 @@ setup_frontend_plugin() {
         info "Auto-installing frontend-design plugin (--yes flag set)"
         response="Y"
     else
-        read -p "$(echo -e "${CYAN}?${NC} Install frontend-design plugin for UI development? (Y/n): ")" response
+        echo -e "${CYAN}?${NC} Install frontend-design plugin for UI development? (Y/n): "
+        read_from_terminal response
         response=${response:-Y}  # Default to Y if empty
     fi
 
