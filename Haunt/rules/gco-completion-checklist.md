@@ -46,7 +46,6 @@ Before marking any requirement as 🟢 Complete, verify ALL of the following:
 - Fix any security issues found
 - If no security-relevant changes, note "Security review: N/A"
 
-### 7. Self-Validation
 ### 7. Iterative Code Refinement
 
 **CRITICAL:** All code must go through iterative refinement passes before marking complete.
