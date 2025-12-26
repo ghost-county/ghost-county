@@ -2,9 +2,9 @@
 name: gco-dev
 description: Development agent for backend, frontend, and infrastructure implementation. Use for writing code, tests, and features.
 tools: Glob, Grep, Read, Edit, Write, Bash, TodoWrite, mcp__context7__*, mcp__agent_memory__*, mcp__playwright__*
-skills: gco-tdd-workflow, gco-commit-conventions, gco-code-patterns, gco-session-startup, gco-playwright-tests
+skills: gco-tdd-workflow, gco-commit-conventions, gco-code-patterns, gco-session-startup, gco-playwright-tests, gco-ui-testing
 model: sonnet
-# Tool permissions enforced by Task tool subagent_type (Dev-Backend, Dev-Frontend, Dev-Infrastructure)  
+# Tool permissions enforced by Task tool subagent_type (Dev-Backend, Dev-Frontend, Dev-Infrastructure)
 # Model: sonnet - Implementation requires reasoning for TDD, patterns, and edge cases
 ---
 
@@ -42,7 +42,8 @@ I reference these skills on-demand rather than duplicating their content:
 - **gco-code-patterns** (Haunt/skills/gco-code-patterns/SKILL.md) - Anti-patterns to avoid and error handling best practices
 - **gco-tdd-workflow** (Haunt/skills/gco-tdd-workflow/SKILL.md) - Red-Green-Refactor cycle and testing guidance
 - **gco-context7-usage** (Haunt/skills/gco-context7-usage/SKILL.md) - When and how to look up library documentation
-- **gco-playwright-tests** (Haunt/skills/gco-playwright-tests/SKILL.md) - E2E test generation for UI features
+- **gco-playwright-tests** (Haunt/skills/gco-playwright-tests/SKILL.md) - E2E test generation patterns and code examples
+- **gco-ui-testing** (Haunt/skills/gco-ui-testing/SKILL.md) - UI testing protocol with user journey mapping for E2E tests
 
 ## Session Startup Enhancement: Story File Loading
 
@@ -120,19 +121,26 @@ I follow `.claude/rules/gco-interactive-decisions.md` for clarification and deci
 **All user-facing UI changes REQUIRE E2E tests using Playwright.**
 
 **Workflow:**
-1. **Before Implementation (Optional):** Use Chrome Recorder to capture expected user flow
+1. **BEFORE Writing Tests (REQUIRED):** Map the user journey
+   - Ask: "What is the user trying to accomplish?" (JTBD Framework)
+   - Map complete journey from user's perspective
+   - Define expected outcome for EACH step
+   - Write Gherkin scenarios (Given-When-Then format)
+   - Use journey template (`.haunt/templates/user-journey-template.md`) for M-sized features
+2. **Before Implementation (Optional):** Use Chrome Recorder to capture expected user flow
    - Open Chrome DevTools → Recorder
    - Record user interaction
    - Export as Playwright
    - Refine selectors to use `data-testid`
-2. **During Implementation (TDD):**
-   - Write failing E2E test first (RED)
+3. **During Implementation (TDD):**
+   - Write failing E2E test first (RED) based on mapped journey
    - Implement feature to pass test (GREEN)
    - Refactor while keeping test green (REFACTOR)
-3. **Before Marking Complete:**
+4. **Before Marking Complete:**
    - Run `npx playwright test` to verify all tests pass
    - Verify tests use proper selectors (`data-testid` preferred)
-   - Verify tests cover happy path AND error cases
+   - Verify tests cover happy path AND error recovery paths
+   - Verify E2E test design checklist (`.haunt/checklists/e2e-test-design-checklist.md`)
 
 **Commands:**
 - `npx playwright test` - Run all E2E tests

@@ -1775,7 +1775,7 @@ Research how to make Haunt development agents insistent about using E2E testing 
 ---
 
 
-### ⚪ REQ-254: Research User Journey Mapping for E2E Test Design
+### 🟢 REQ-254: Research User Journey Mapping for E2E Test Design
 
 **Type:** Research
 **Reported:** 2025-12-25
@@ -1806,15 +1806,15 @@ Research how to design good E2E tests by mapping complete user journeys through 
 - Examples of good vs. bad journey-based tests
 
 **Tasks:**
-- [ ] Research user journey mapping methodologies (JTBD, user story mapping)
-- [ ] Research BDD/Gherkin patterns for E2E test scenarios
-- [ ] Analyze how to identify critical user journeys
-- [ ] Research defining testable expected outcomes
-- [ ] Study examples of journey-driven E2E tests vs. technical tests
-- [ ] Create user journey mapping template
-- [ ] Create E2E test design checklist
-- [ ] Propose integration with existing gco-ui-testing skill
-- [ ] Provide examples of good journey-based tests
+- [x] Research user journey mapping methodologies (JTBD, user story mapping)
+- [x] Research BDD/Gherkin patterns for E2E test scenarios
+- [x] Analyze how to identify critical user journeys
+- [x] Research defining testable expected outcomes
+- [x] Study examples of journey-driven E2E tests vs. technical tests
+- [x] Create user journey mapping template
+- [x] Create E2E test design checklist
+- [x] Propose integration with existing gco-ui-testing skill
+- [x] Provide examples of good journey-based tests
 
 **Files:**
 - `.haunt/docs/research/req-254-user-journey-e2e-testing.md` (create)
