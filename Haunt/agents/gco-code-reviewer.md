@@ -85,13 +85,59 @@ I then checked every function and found these issues...
 After reviewing the git history...
 ```
 
+## E2E Testing Review (for UI Changes)
+
+When reviewing UI/frontend code, verify E2E testing requirements:
+
+### Verification Checklist:
+- [ ] E2E tests exist for all user-facing behavior
+- [ ] Tests are located in correct directory (`tests/e2e/` or `.haunt/tests/e2e/`)
+- [ ] Tests use proper selectors (data-testid preferred)
+- [ ] Tests cover happy path AND error cases
+- [ ] Tests are independent (no shared state, no order dependency)
+- [ ] Test names are descriptive (describe user behavior)
+- [ ] All Playwright tests pass in CI/CD
+
+### Selector Quality Check:
+
+**WRONG (Brittle selectors to reject):**
+```typescript
+await page.click('#story > section > div:nth-child(3) > button');
+await page.click('.form-container button.submit');
+```
+
+**RIGHT (Stable selectors to approve):**
+```typescript
+await page.click('[data-testid="submit-story-button"]');
+await page.getByRole('button', { name: 'Submit' }).click();
+```
+
+### Rejection Criteria:
+
+**Reject PR if:**
+1. **UI changes present but NO E2E tests** - Explain requirement, request tests
+2. **Tests use brittle selectors** (CSS nth-child, deep CSS paths) - Request refactor to data-testid
+3. **Tests only cover happy path** - Request error case tests (validation failures, network errors, empty states)
+4. **Tests are not independent** - Request refactor to remove shared state/order dependency
+5. **Playwright tests fail in CI/CD** - Block merge until tests pass
+
+### Approval Criteria:
+
+**Approve PR if:**
+✅ All user-facing behavior has corresponding E2E tests
+✅ Tests use stable selectors (data-testid, ARIA roles, accessible names)
+✅ Tests cover both happy path and error cases
+✅ Tests are independent and can run in any order
+✅ All Playwright tests pass in CI/CD
+
 ## Review Process
 
 1. Read skills on-demand when needed (use Read tool to load SKILL.md files)
 2. Execute gco-session-startup checklist before beginning review
 3. Apply gco-code-review checklist systematically
 4. Check for anti-patterns using gco-code-patterns skill
-5. **Enforce security checklist** - Review `.haunt/checklists/security-checklist.md` for security-relevant code:
+5. **Enforce E2E testing requirements** for UI changes (see "E2E Testing Review" section above)
+6. **Enforce security checklist** - Review `.haunt/checklists/security-checklist.md` for security-relevant code:
    - User input handling (forms, APIs, file uploads)
    - Authentication or authorization
    - Database queries

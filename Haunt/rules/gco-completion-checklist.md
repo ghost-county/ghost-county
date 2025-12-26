@@ -17,10 +17,11 @@ Before marking any requirement as 🟢 Complete, verify ALL of the following:
 ### 3. Tests Passing
 - Run appropriate test command for your work:
   - Backend: `pytest tests/ -x -q`
-  - Frontend: `npm test`
+  - Frontend: `npm test` AND `npx playwright test` (E2E tests REQUIRED for UI work)
   - Infrastructure: Verify state
 - All tests must pass
 - No new test failures introduced
+- **For UI work:** E2E tests MUST exist and pass before marking complete
 
 ### 4. Files Updated
 - All files listed in "Files:" section have been modified/created
@@ -57,6 +58,7 @@ Before marking any requirement as 🟢 Complete, verify ALL of the following:
   - Tests fail when feature is broken (not false positives)
   - Edge cases are covered (empty input, boundary values, error conditions)
   - Tests are independent (don't rely on order or shared state)
+  - **For UI work:** E2E tests use proper selectors (data-testid preferred, NOT CSS nth-child)
 - **Run the code yourself** (if applicable):
   - Execute feature manually to verify behavior
   - Check error messages are user-friendly
@@ -68,9 +70,59 @@ Before marking any requirement as 🟢 Complete, verify ALL of the following:
 
 **Why this matters:** Catching your own mistakes before Code Reviewer saves time and reduces rework. Self-validation is the difference between "I'm done" and "This is ready for review."
 
+### 8. UI/UX Validation (REQUIRED for Frontend Work)
+
+**Applies to:** All UI generation, component creation, or visual design changes.
+
+**Checklist items (see `.claude/rules/gco-ui-design-standards.md` for details):**
+
+- [ ] **8px Grid Spacing** - All spacing uses 8px increments (16px, 24px, 32px, etc.)
+  - Verify: Inspect CSS/styles - all margin/padding/gap values divisible by 8
+  - Fine-tuning: 4px allowed ONLY for optical alignment
+- [ ] **4.5:1 Contrast Minimum** - All text meets WCAG AA contrast standards
+  - Verify: Use WebAIM Contrast Checker or browser DevTools
+  - Test: Light mode AND dark mode (if applicable)
+- [ ] **5 Interactive States** - All buttons/links define: default, hover, active, focus, disabled
+  - Verify: Manually test each state or inspect CSS for all 5 state definitions
+- [ ] **44×44px Touch Targets** - All clickable elements meet minimum size
+  - Verify: Measure button/link dimensions (48×48px preferred)
+- [ ] **Keyboard Navigation** - All interactive elements accessible via keyboard
+  - Test: Tab through page, verify focus order and Enter/Space activation
+- [ ] **Skip Links** - Page includes skip-to-content link
+  - Test: Tab on page load, first focusable element should be skip link
+- [ ] **Semantic HTML** - Proper element usage (button, nav, main, etc.)
+  - Verify: No `<div onclick>`, use `<button>` instead
+- [ ] **Focus Indicators** - Visible 3px minimum outline on focus
+  - Test: Tab through page, verify all focusable elements show outline
+- [ ] **Color Blindness** - UI works in grayscale/protanopia/deuteranopia
+  - Test: Use browser DevTools vision deficiency emulation
+- [ ] **Mobile Responsive** - Layout tested at 320px width minimum
+  - Test: Browser DevTools responsive mode, verify no horizontal scroll
+
+**Quick validation commands:**
+```bash
+# Check contrast (manual - use online tool)
+# https://webaim.org/resources/contrastchecker/
+
+# Test responsive (Chrome DevTools)
+# Cmd+Opt+I → Toggle device toolbar → Test 320px, 768px, 1024px widths
+
+# Test color blindness (Chrome DevTools)
+# Cmd+Opt+I → Rendering → Emulate vision deficiencies
+```
+
+**Failure modes to reject:**
+- Light gray text on white background (common AI mistake - fails contrast)
+- Buttons without hover states (incomplete state management)
+- Arbitrary spacing (15px, 20px, 25px instead of 8px grid)
+- Touch targets <44px (mobile usability failure)
+- Missing focus indicators (keyboard accessibility failure)
+
+**Why this matters:** UI/UX validation prevents common AI-generated UI failures: poor contrast, inconsistent spacing, missing interactive states, and accessibility gaps. These issues are expensive to fix later and frustrate users.
+
 ## Completion Sequence
 
-1. Verify all 7 items above
+1. Verify all applicable items above (7 items for all work, +8 for frontend work)
 2. Update requirement status: 🟡 → 🟢
 3. Update "Completion:" field with verification note
 4. Notify PM (if present) for archival

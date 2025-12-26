@@ -1661,3 +1661,231 @@ When user runs `/seance`, before starting the orchestrator workflow:
 **Completion:** Orchestrator detects outdated Haunt, prompts for reinstall, provides restart instructions
 **Blocked by:** None
 
+---
+
+## Batch: UI/UX & Testing Improvements
+
+**Goal:** Research and implement UI/UX design principles and E2E testing best practices for Claude Code
+**Source:** User conversation - need better UI design guidance and testing enforcement
+**Estimated Effort:** 2 M items = ~12 hours
+
+### ⚪ REQ-252: Research UI/UX Design Principles for Claude Code
+
+**Type:** Research
+**Reported:** 2025-12-25
+**Source:** User request - Claude needs better design principles for UI generation
+
+**Description:**
+Research comprehensive UI/UX design principles that can help Claude Code make better design decisions. Focus on visual hierarchy, typography, color/contrast (ADA/WCAG compliance), touch targets, layout fundamentals, and accessibility. Identify what's currently missing in AI-generated UIs and create actionable guidelines.
+
+**Research Areas:**
+- Visual hierarchy (size, weight, contrast, spacing, 60-30-10 rule)
+- Typography best practices (line height, line length, font pairing, minimum sizes, heading scale)
+- Color & contrast for ADA/WCAG compliance (4.5:1 ratio, color blindness considerations)
+- Touch & click targets (44x44px minimum, spacing, Fitts's Law)
+- Layout fundamentals (8px grid, F/Z patterns, above the fold, Gestalt principles)
+- Accessibility (semantic HTML, focus states, alt text, ARIA labels, skip links, reduced motion)
+- What's missing in AI-generated UIs (consistent spacing, contrast checking, responsive design, state management, etc.)
+
+**Deliverables:**
+- Research report: `.haunt/docs/research/req-252-ui-ux-design-principles.md`
+- Actionable rule/skill for frontend-design plugin enhancement
+- Guidelines for Dev-Frontend agent character sheet
+- Checklist for UI generation validation
+
+**Tasks:**
+- [ ] Research visual hierarchy and spacing systems (8px grid, 60-30-10 rule)
+- [ ] Research typography best practices (line height, font pairing, accessibility)
+- [ ] Research color/contrast standards (WCAG AA/AAA, colorblindness testing)
+- [ ] Research touch target sizing and interaction design
+- [ ] Research layout fundamentals and scanning patterns
+- [ ] Research accessibility requirements (semantic HTML, ARIA, keyboard nav)
+- [ ] Analyze common gaps in AI-generated UIs
+- [ ] Create actionable guidelines document
+- [ ] Propose skill/rule enhancements for frontend work
+- [ ] Update Dev-Frontend agent with design principles
+
+**Files:**
+- `.haunt/docs/research/req-252-ui-ux-design-principles.md` (create)
+- `Haunt/agents/gco-dev.md` (modify - add Frontend UI design section)
+- `Haunt/skills/frontend-design-enhancement/SKILL.md` (create - if needed)
+- Potentially: new rule for UI generation standards
+
+**Effort:** M
+**Complexity:** MODERATE
+**Agent:** Research-Analyst
+**Completion:** Research report complete with actionable guidelines, Dev agent updated with design principles, validation checklist created
+**Blocked by:** None
+
+---
+
+### 🟢 REQ-253: Research E2E UI Testing Integration Strategies
+
+**Type:** Research
+**Reported:** 2025-12-25
+**Source:** User request - ensure Haunt developers use E2E testing tools consistently
+**Completed:** 2025-12-25
+
+**Description:**
+Research how to make Haunt development agents insistent about using E2E testing tools (Playwright, Puppeteer, Google Chrome extension) for UI work. Investigate the new Google Chrome extension for UI testing and how it integrates with existing testing workflows. Create enforcement mechanisms and best practices.
+
+**Research Areas:**
+- Playwright usage patterns and best practices for Haunt
+- Puppeteer integration strategies
+- New Google Chrome extension for E2E testing (capabilities, integration)
+- When to use each tool (Playwright vs Puppeteer vs Chrome extension)
+- Enforcement strategies (rules, skills, completion checklist updates)
+- Integration with existing gco-ui-testing skill
+- How to make E2E testing non-negotiable for UI work
+
+**Deliverables:**
+- Research report: `.haunt/docs/research/req-253-e2e-testing-integration.md`
+- Updated gco-ui-testing skill with tool selection guidance
+- Updated Dev agent completion checklist with E2E test enforcement
+- Chrome extension integration guide (if applicable)
+
+**Tasks:**
+- [x] Research Playwright best practices and usage patterns
+- [x] Research Puppeteer capabilities and when to use vs Playwright
+- [x] Research Google Chrome extension for E2E testing (Chrome DevTools Recorder)
+- [x] Analyze current gco-ui-testing skill for gaps
+- [x] Design enforcement mechanisms (when agents MUST write E2E tests)
+- [x] Create tool selection decision tree (which tool for which scenario)
+- [x] Update gco-ui-testing skill with Chrome Recorder integration
+- [x] Update Dev agent completion checklist to enforce E2E tests
+- [x] Update gco-dev.md Frontend Mode with E2E requirements
+- [x] Update gco-code-reviewer.md with E2E testing review checklist
+- [x] Create Chrome Recorder integration guide
+- [x] Deploy all changes
+
+**Files:**
+- `.haunt/docs/research/req-253-e2e-testing-integration.md` (created - complete research)
+- `Haunt/skills/gco-ui-testing/SKILL.md` (modified - added Chrome Recorder, tool selection, pre-commit guidance, CI/CD examples)
+- `Haunt/agents/gco-dev.md` (modified - added E2E Testing Requirements section to Frontend Mode)
+- `Haunt/agents/gco-code-reviewer.md` (modified - added E2E Testing Review section with rejection criteria)
+- `Haunt/rules/gco-completion-checklist.md` (modified - strengthened E2E test requirements)
+- `Haunt/docs/CHROME-RECORDER-GUIDE.md` (created - complete integration guide)
+
+**Effort:** M (4 hours)
+**Complexity:** MODERATE
+**Agent:** Dev-Infrastructure
+**Completion:** ✅ All files updated and deployed, E2E testing now enforced at 4 levels (Dev → Code Reviewer → CI/CD → Pre-commit discouraged), Chrome Recorder integrated as skeleton generator, tool selection decision tree created
+**Blocked by:** None
+
+---
+
+
+### ⚪ REQ-254: Research User Journey Mapping for E2E Test Design
+
+**Type:** Research
+**Reported:** 2025-12-25
+**Source:** User request - need guidance on designing E2E tests with user journey mapping
+
+**Description:**
+Research how to design good E2E tests by mapping complete user journeys through the application. Focus on identifying user flows, defining expected outcomes at each step, and creating user story-driven test scenarios that match real user behavior (not just technical coverage).
+
+**Research Areas:**
+- User journey identification and mapping techniques
+- Breaking down user flows into testable scenarios
+- Defining expected outcomes for each journey step
+- User story-driven test design (BDD/Gherkin patterns)
+- Real user behavior modeling in E2E tests
+- Journey mapping best practices for AI-assisted development
+- How to avoid over-testing technical implementation vs. user value
+
+**Example Journeys to Research:**
+- Login flow: Visit site → Click login → Enter credentials → Submit → Expected: redirect to /dashboard, user data visible, logout button present
+- Checkout flow: Browse → Add to cart → View cart → Checkout → Payment → Confirmation (expected outcomes at each step)
+- Error recovery flows: Invalid input → Error message → Correction → Success
+
+**Deliverables:**
+- Research report: `.haunt/docs/research/req-254-user-journey-e2e-testing.md`
+- User journey mapping templates
+- E2E test design checklist (journey → scenarios → expected outcomes)
+- Integration guidance with gco-ui-testing skill
+- Examples of good vs. bad journey-based tests
+
+**Tasks:**
+- [ ] Research user journey mapping methodologies (JTBD, user story mapping)
+- [ ] Research BDD/Gherkin patterns for E2E test scenarios
+- [ ] Analyze how to identify critical user journeys
+- [ ] Research defining testable expected outcomes
+- [ ] Study examples of journey-driven E2E tests vs. technical tests
+- [ ] Create user journey mapping template
+- [ ] Create E2E test design checklist
+- [ ] Propose integration with existing gco-ui-testing skill
+- [ ] Provide examples of good journey-based tests
+
+**Files:**
+- `.haunt/docs/research/req-254-user-journey-e2e-testing.md` (create)
+- `Haunt/skills/gco-ui-testing/SKILL.md` (modify - add journey mapping guidance)
+- `.haunt/templates/user-journey-template.md` (create - optional)
+
+**Effort:** M
+**Complexity:** MODERATE
+**Agent:** Research-Analyst
+**Completion:** Research report complete with journey mapping templates, E2E test design guidance, and integration recommendations
+**Blocked by:** None
+
+---
+
+### ⚪ REQ-255: Research AI-Assisted Coding Best Practices
+
+**Type:** Research
+**Reported:** 2025-12-25
+**Source:** User request - research where AI coding falls short and how to prompt dev agents better
+
+**Description:**
+Research best practices for AI-assisted coding, focusing on where AI typically falls short in code generation and testing. Identify common mistakes AI makes when writing code, and develop prompting strategies to help Haunt dev agents write better code, create better tests, and avoid common pitfalls.
+
+**Research Areas:**
+- Common mistakes AI makes when generating code (edge cases, error handling, security, etc.)
+- Where AI falls short in understanding context and requirements
+- Best practices for prompting AI to write better code
+- Testing patterns AI commonly misses or gets wrong
+- Code quality issues in AI-generated code (maintainability, readability, performance)
+- How to structure prompts for better dev agent output
+- Comparison of AI coding vs. human coding patterns
+- Anti-patterns in AI-generated code
+
+**Example Areas to Investigate:**
+- Does AI skip error handling? How to enforce it?
+- Does AI write brittle tests? How to improve test quality?
+- Does AI over-engineer or under-engineer solutions?
+- How to get AI to write maintainable, readable code?
+- What security vulnerabilities does AI introduce?
+- How to get AI to follow project-specific patterns?
+
+**Deliverables:**
+- Research report: `.haunt/docs/research/req-255-ai-coding-best-practices.md`
+- Dev agent prompting guidelines
+- Code quality checklist for AI-generated code
+- Testing best practices for dev agents
+- Integration with existing dev agent character sheets
+- Anti-pattern detection rules
+
+**Tasks:**
+- [ ] Research common mistakes in AI-generated code (2025 studies)
+- [ ] Analyze where AI falls short vs. human developers
+- [ ] Research best practices for prompting AI to write quality code
+- [ ] Identify testing patterns AI commonly misses
+- [ ] Study security vulnerabilities in AI-generated code
+- [ ] Research code review patterns for AI code
+- [ ] Create dev agent prompting guidelines
+- [ ] Create code quality checklist for AI output
+- [ ] Propose updates to dev agent character sheets
+- [ ] Provide examples of good vs. bad AI prompting
+
+**Files:**
+- `.haunt/docs/research/req-255-ai-coding-best-practices.md` (create)
+- `Haunt/agents/gco-dev.md` (modify - add AI coding best practices)
+- `Haunt/rules/gco-code-quality-standards.md` (create - if needed)
+- `.haunt/checklists/ai-code-quality-checklist.md` (create)
+
+**Effort:** M
+**Complexity:** MODERATE
+**Agent:** Research-Analyst
+**Completion:** Research report complete with prompting guidelines, code quality checklist, and dev agent updates proposed
+**Blocked by:** None
+
+---

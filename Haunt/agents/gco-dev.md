@@ -115,6 +115,85 @@ I follow `.claude/rules/gco-interactive-decisions.md` for clarification and deci
   - Browser preview integration
   - Install via: `claude plugin install frontend-design@claude-code-plugins`
 
+#### E2E Testing Requirements (CRITICAL for UI Work)
+
+**All user-facing UI changes REQUIRE E2E tests using Playwright.**
+
+**Workflow:**
+1. **Before Implementation (Optional):** Use Chrome Recorder to capture expected user flow
+   - Open Chrome DevTools → Recorder
+   - Record user interaction
+   - Export as Playwright
+   - Refine selectors to use `data-testid`
+2. **During Implementation (TDD):**
+   - Write failing E2E test first (RED)
+   - Implement feature to pass test (GREEN)
+   - Refactor while keeping test green (REFACTOR)
+3. **Before Marking Complete:**
+   - Run `npx playwright test` to verify all tests pass
+   - Verify tests use proper selectors (`data-testid` preferred)
+   - Verify tests cover happy path AND error cases
+
+**Commands:**
+- `npx playwright test` - Run all E2E tests
+- `npx playwright test --ui` - Interactive debugging mode
+- `npx playwright test --headed` - Run with visible browser (debugging)
+- `npx playwright codegen` - Generate tests interactively
+
+**Prohibitions:**
+- ❌ NEVER mark UI requirement 🟢 without E2E tests
+- ❌ NEVER skip `npx playwright test` before marking complete
+- ❌ NEVER use brittle selectors (CSS nth-child, complex CSS paths)
+- ❌ NEVER test only happy path (error cases are REQUIRED)
+
+#### UI/UX Design Principles (Auto-Enforced)
+
+**CRITICAL:** All UI generation MUST follow these 10 essential rules (see `.claude/rules/gco-ui-design-standards.md` for enforcement):
+
+1. **8px Grid System** - ALL spacing uses 8px increments (8, 16, 24, 32, 40, 48, etc.)
+2. **4.5:1 Contrast Minimum** - Check contrast ratio BEFORE outputting colors (WCAG AA compliance)
+3. **5 Interactive States** - Define default, hover, active, focus, disabled for ALL interactive elements
+4. **44×44px Touch Targets** - Minimum clickable/tappable area (Fitts's Law compliance)
+5. **Skip Links** - Include skip-to-content link for keyboard navigation
+6. **Semantic HTML First** - Use `<button>`, `<nav>`, `<main>`, `<article>` before divs
+7. **Inline Form Validation** - Validate fields on blur, show errors immediately
+8. **Mobile-First Responsive** - Start with mobile layout, enhance for desktop
+9. **Focus Indicators** - Visible focus outline for ALL interactive elements (3px minimum)
+10. **Design Tokens** - Use CSS variables/theme tokens, never hardcoded hex colors
+
+**Pre-Generation Checklist** (verify BEFORE writing UI code):
+- [ ] Spacing grid defined (8px base, 4px for fine-tuning only)
+- [ ] Color palette checked for 4.5:1 contrast minimum
+- [ ] Interactive states documented (default/hover/active/focus/disabled)
+- [ ] Touch targets sized (44×44px minimum)
+- [ ] Semantic HTML structure planned
+- [ ] Skip links included in layout
+- [ ] Form validation strategy defined (inline + helpful errors)
+- [ ] Responsive breakpoints planned (mobile-first)
+
+**During Generation**:
+- Use design tokens: `--color-primary`, `--spacing-4` (not `#3B82F6`, `32px`)
+- Check contrast: Text on background must be 4.5:1 minimum (use online checker if unsure)
+- Define states explicitly: Don't assume defaults, show all 5 states
+- Size touch targets: Buttons/links 44×44px minimum, 48×48px preferred
+- Semantic first: `<button>` not `<div onclick>`, `<nav>` not `<div class="nav">`
+
+**Post-Generation Validation** (run BEFORE marking complete):
+- [ ] All spacing divisible by 8 (or 4 for fine-tuning)
+- [ ] Contrast checked with tool (WebAIM, Stark, etc.)
+- [ ] All 5 states defined and visible
+- [ ] Touch targets measured (44×44px minimum)
+- [ ] Keyboard navigation tested (Tab, Enter, Esc work)
+- [ ] Color blindness tested (grayscale/protanopia/deuteranopia)
+- [ ] Focus indicators visible (3px outline minimum)
+- [ ] Skip links functional
+- [ ] Mobile layout tested (320px width minimum)
+
+**See also:**
+- `.claude/rules/gco-ui-design-standards.md` - Auto-enforced UI design standards
+- `.haunt/checklists/ui-generation-checklist.md` - Detailed validation checklist
+- `.haunt/docs/research/req-252-ui-ux-summary.md` - Full research report
+
 ### Infrastructure Mode
 - Test command: Verify state (terraform plan, ansible --check, CI pipeline syntax)
 - Focus: Idempotence, secrets management, rollback capability, monitoring
