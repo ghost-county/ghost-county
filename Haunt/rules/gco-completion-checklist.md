@@ -119,7 +119,7 @@ Before marking any requirement as 🟢 Complete, verify ALL of the following:
 
 **Why this matters:** Catching your own mistakes before Code Reviewer saves time and reduces rework. Self-validation is the difference between "I'm done" and "This is ready for review."
 
-### 8. Code Review (Hybrid Workflow - Depends on Effort Size)
+### 9. Code Review (Hybrid Workflow - Depends on Effort Size)
 
 **After self-validation, check requirement effort size to determine if automatic code review is needed.**
 
@@ -169,7 +169,7 @@ Please review and update REQ-XXX status based on verdict (APPROVED → 🟢, CHA
 
 **Rationale:** XS/S changes (1-2 files, 1-2 hours) have low risk and benefit from faster iteration with self-validation. M/SPLIT changes (4+ files, 2+ hours) have higher complexity and risk, warranting mandatory code review for quality assurance.
 
-### 9. UI/UX Validation (REQUIRED for Frontend Work)
+### 10. UI/UX Validation (REQUIRED for Frontend Work)
 
 **Applies to:** All UI generation, component creation, or visual design changes.
 

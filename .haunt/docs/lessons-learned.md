@@ -533,3 +533,219 @@ def process_payment(amount, retries=3):
 
 ---
 
+
+## AI Code Anti-Patterns (From REQ-255 Research)
+
+Common mistakes in AI-generated code based on 2025 industry research.
+
+### Missing Error Handling (62% Occurrence)
+
+**Pattern:** I/O operations without try/except, no input validation.
+
+**Example:**
+```python
+# WRONG - No error handling
+def fetch_user(user_id):
+    response = requests.get(f"/api/users/{user_id}")
+    return response.json()
+
+# RIGHT - Comprehensive error handling
+def fetch_user(user_id):
+    if not user_id:
+        raise ValueError("user_id is required")
+    
+    try:
+        response = requests.get(f"/api/users/{user_id}", timeout=5)
+        response.raise_for_status()
+        return response.json()
+    except requests.Timeout:
+        logger.error(f"Timeout fetching user {user_id}")
+        raise ServiceUnavailable("User service timeout")
+    except requests.HTTPError as e:
+        logger.error(f"HTTP error: {e}")
+        raise
+```
+
+**Source:** Veracode GenAI Code Security Report 2025 - 62% of AI code contains design flaws
+
+**Prevention:** Iterative Refinement Protocol Pass 2 requires error handling for all I/O operations.
+
+---
+
+### SQL Injection Vulnerabilities (30-40% Occurrence)
+
+**Pattern:** String concatenation in SQL queries.
+
+**Example:**
+```python
+# WRONG - SQL injection risk
+query = f"SELECT * FROM users WHERE username = '{username}'"
+db.execute(query)
+
+# RIGHT - Parameterized query
+query = "SELECT * FROM users WHERE username = ?"
+db.execute(query, (username,))
+```
+
+**Source:** Veracode 2025 - AI code 1.91x more likely to have insecure object references
+
+**Prevention:** Security checklist (Step 6) requires parameterized queries.
+
+---
+
+### N+1 Query Problems (25-35% Occurrence)
+
+**Pattern:** Loading related data in loops instead of using JOINs.
+
+**Example:**
+```python
+# WRONG - N+1 queries
+users = User.query.all()  # Query 1
+for user in users:
+    user.posts = Post.query.filter_by(user_id=user.id).all()  # N queries!
+
+# RIGHT - Single query with JOIN
+users = User.query.options(joinedload(User.posts)).all()
+```
+
+**Source:** Kluster AI Code Quality Gap research
+
+**Prevention:** Code Reviewer performance checklist flags N+1 patterns.
+
+---
+
+### Hardcoded Secrets (40-45% Occurrence)
+
+**Pattern:** API keys, passwords, database URLs in source code.
+
+**Example:**
+```python
+# WRONG - Hardcoded credentials
+API_KEY = "sk-1234567890abcdef"
+DATABASE_URL = "postgresql://user:pass@localhost/db"
+
+# RIGHT - Environment variables
+import os
+API_KEY = os.environ.get("API_KEY")
+if not API_KEY:
+    raise EnvironmentError("API_KEY environment variable not set")
+```
+
+**Source:** SMAC Strategy - AI trained on insecure GitHub examples
+
+**Prevention:** Security checklist flags hardcoded secrets, Code Reviewer rejects.
+
+---
+
+### Missing Edge Case Validation (60-75% Occurrence)
+
+**Pattern:** No handling for null, empty, boundary values.
+
+**Example:**
+```javascript
+// WRONG - No edge case handling
+function calculateDiscount(price, percentage) {
+    return price * (percentage / 100);
+}
+
+// RIGHT - Comprehensive validation
+function calculateDiscount(price, percentage) {
+    if (typeof price !== 'number' || typeof percentage !== 'number') {
+        throw new TypeError('price and percentage must be numbers');
+    }
+    if (price < 0) {
+        throw new RangeError('price must be non-negative');
+    }
+    if (percentage < 0 || percentage > 100) {
+        throw new RangeError('percentage must be 0-100');
+    }
+    return price * (percentage / 100);
+}
+```
+
+**Source:** The QA Corner - AI training data overrepresents common scenarios
+
+**Prevention:** Iterative Refinement Protocol Pass 3 requires edge case tests.
+
+---
+
+### Catch-All Exception Handlers (40-50% Occurrence)
+
+**Pattern:** `except Exception` or bare `except` swallowing all errors.
+
+**Example:**
+```python
+# WRONG - Swallows all errors including programmer mistakes
+try:
+    result = risky_operation()
+except:
+    result = None
+
+# RIGHT - Catch specific exceptions
+try:
+    result = risky_operation()
+except (NetworkError, TimeoutError) as e:
+    logger.error(f"Operation failed: {e}")
+    raise ServiceUnavailable("External service unreachable")
+```
+
+**Source:** CodeRabbit Report 2025 - AI code has 1.7x more bugs
+
+**Prevention:** Code Reviewer flags catch-all handlers as HIGH severity.
+
+---
+
+### Missing Logging/Observability (70-80% Occurrence)
+
+**Pattern:** No logging, metrics, or tracing in production code.
+
+**Example:**
+```python
+# WRONG - No observability
+def process_payment(payment_data):
+    result = payment_api.charge(payment_data['amount'])
+    return result
+
+# RIGHT - Comprehensive logging
+import logging
+logger = logging.getLogger(__name__)
+
+def process_payment(payment_data, correlation_id=None):
+    logger.info(
+        "Processing payment",
+        extra={
+            "amount": payment_data['amount'],
+            "user_id": payment_data['user_id'],
+            "correlation_id": correlation_id
+        }
+    )
+    
+    try:
+        result = payment_api.charge(payment_data['amount'])
+        logger.info(
+            "Payment successful",
+            extra={"transaction_id": result.id, "correlation_id": correlation_id}
+        )
+        return result
+    except PaymentError as e:
+        logger.error(
+            "Payment failed",
+            extra={"error": str(e), "correlation_id": correlation_id},
+            exc_info=True
+        )
+        raise
+```
+
+**Source:** VentureBeat - AI coding agents not production-ready
+
+**Prevention:** Iterative Refinement Protocol Pass 3-4 requires logging for errors and state transitions.
+
+---
+
+**Discovered:** REQ-255 (2025-12-25) - Comprehensive research on AI coding shortcomings
+
+**Prevention:** See `.haunt/docs/research/req-255-ai-coding-best-practices.md` for full research with 25 sources
+
+**Related:** Iterative Code Refinement Protocol systematically addresses these anti-patterns across passes.
+
+---
