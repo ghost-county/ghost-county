@@ -15,6 +15,72 @@ The Seance is Ghost County's primary workflow orchestration layer - a ritual tha
 - **Existing Projects:** Incremental workflow for single enhancement/bug/issue
 - **Trigger Phrases:** "start a seance", "hold a seance", "time for a seance", "let's seance"
 
+## Project Detection Logic
+
+The Seance workflow now uses **three-state detection** to correctly identify project context:
+
+### 1. New Project
+**Triggers full idea-to-roadmap workflow**
+
+**Detection criteria:**
+- `.haunt/` directory does not exist, OR
+- `.haunt/` exists but roadmap.md is empty (no REQ-XXX items), AND
+- Directory has ≤3 source files (minimal/empty directory)
+
+**User experience:**
+- "🕯️ No .haunt/ detected. Beginning full séance ritual..." (no .haunt/)
+- "🕯️ Fresh installation detected (empty roadmap). Beginning full séance ritual..." (empty roadmap, minimal files)
+
+**Workflow:** Complete JTBD/Kano/RICE analysis for new project vision
+
+### 2. Existing Codebase
+**Triggers full idea-to-roadmap workflow for new features**
+
+**Detection criteria:**
+- `.haunt/` exists
+- roadmap.md is empty (no REQ-XXX items)
+- Directory has >3 source files (existing codebase detected)
+
+**User experience:**
+- "🕯️ Existing codebase detected. Beginning full séance for new features..."
+
+**Workflow:** Complete JTBD/Kano/RICE analysis, but context is "add features to existing product"
+
+### 3. Active Project
+**Triggers incremental workflow (add to existing roadmap)**
+
+**Detection criteria:**
+- `.haunt/` exists
+- roadmap.md contains actual requirements (pattern: `### [⚪🟡🟢🔴] REQ-\d+`)
+
+**User experience:**
+- "🕯️ Existing project detected. Beginning incremental séance..."
+
+**Workflow:** Brief analysis, add new items to existing roadmap
+
+### Source File Detection
+
+**Files counted as "source files":**
+- Extensions: `.py`, `.js`, `.ts`, `.tsx`, `.jsx`, `.go`, `.java`, `.rb`, `.php`, `.rs`, `.c`, `.cpp`, `.h`, `.sh`, `.ps1`, `.sql`
+
+**Files/directories ignored:**
+- Setup directories: `.git`, `.claude`, `.haunt`, `node_modules`, `__pycache__`, `.venv`, `venv`
+- Config files: `package.json`, `README.md`, `.gitignore`, `LICENSE`
+
+**Threshold:** >3 source files indicates existing codebase
+
+### Why This Matters
+
+**Before (bug):**
+- Fresh HAUNT install → creates empty roadmap.md
+- Séance sees roadmap.md exists → assumes "existing project"
+- Skips full JTBD/Kano/RICE analysis inappropriately
+
+**After (fix):**
+- Fresh HAUNT install → detects empty roadmap + minimal files → "new_project"
+- Runs full idea-to-roadmap workflow correctly
+- Existing codebase with empty roadmap → still gets full workflow (correct for adding features to existing product)
+
 ## Six Operating Modes + Planning Depth
 
 The Seance workflow has six modes (three context-aware and three phase-specific), with three planning depth levels that modify how deeply requirements are analyzed:
@@ -656,9 +722,76 @@ After successful reinstall, provide clear restart guidance:
 
 ```python
 import os
+import re
 
 args = arguments.strip()
-has_haunt = os.path.exists(".haunt/")
+
+# Step 1A: Detect project state (three-state classification)
+def detect_project_state():
+    """
+    Detect project state with three classifications:
+    - "new_project": Empty/minimal dir with empty roadmap (HAUNT just installed)
+    - "existing_codebase": Has source files but roadmap is empty (needs features)
+    - "active_project": Roadmap contains actual requirements (add to existing work)
+
+    Returns tuple: (state: str, has_haunt: bool, has_requirements: bool)
+    """
+    has_haunt = os.path.exists(".haunt/")
+
+    # If no .haunt/ directory, it's a new project (will be created)
+    if not has_haunt:
+        return ("new_project", False, False)
+
+    # Check if roadmap exists and has actual requirements
+    roadmap_path = ".haunt/plans/roadmap.md"
+    has_requirements = False
+
+    if os.path.exists(roadmap_path):
+        try:
+            with open(roadmap_path, 'r') as f:
+                content = f.read()
+                # Search for actual requirement patterns (### ⚪ REQ-, ### 🟡 REQ-, etc.)
+                req_pattern = r'### [⚪🟡🟢🔴] REQ-\d+'
+                has_requirements = bool(re.search(req_pattern, content))
+        except Exception:
+            has_requirements = False
+
+    # If has requirements, it's an active project
+    if has_requirements:
+        return ("active_project", True, True)
+
+    # Roadmap empty - check if directory has meaningful source files
+    has_source_files = count_source_files() > 3  # More than just setup files
+
+    if has_source_files:
+        return ("existing_codebase", True, False)
+    else:
+        return ("new_project", True, False)
+
+def count_source_files():
+    """
+    Count meaningful source files (not setup/config).
+    Returns count of files that suggest an existing codebase.
+    """
+    setup_patterns = {'.git', '.claude', '.haunt', 'node_modules', '__pycache__', '.venv', 'venv'}
+    config_files = {'package.json', 'README.md', '.gitignore', 'LICENSE'}
+
+    count = 0
+    for root, dirs, files in os.walk('.'):
+        # Skip setup directories
+        dirs[:] = [d for d in dirs if d not in setup_patterns]
+
+        # Count non-config source files
+        for file in files:
+            if file not in config_files:
+                # Check for source file extensions
+                if any(file.endswith(ext) for ext in ['.py', '.js', '.ts', '.tsx', '.jsx', '.go', '.java', '.rb', '.php', '.rs', '.c', '.cpp', '.h', '.sh', '.ps1', '.sql']):
+                    count += 1
+
+    return count
+
+# Detect project state
+project_state, has_haunt, has_requirements = detect_project_state()
 
 # Extract planning depth modifiers first
 planning_depth = "standard"  # default
@@ -680,7 +813,8 @@ elif args in ["--reap", "--archive"]:
     mode = 6
 elif args:
     mode = 1  # Immediate workflow with prompt
-    workflow_type = "full" if not has_haunt else "incremental"
+    # Use project_state to determine workflow type
+    workflow_type = "full" if project_state in ["new_project", "existing_codebase"] else "incremental"
 elif has_haunt:
     mode = 2  # Choice prompt (add new vs work roadmap)
 else:
@@ -690,8 +824,10 @@ else:
 **Communicate mode to user:**
 
 **Mode 1 (With Prompt):**
-- New Project: "🕯️ No .haunt/ detected. Beginning full séance ritual..."
-- Existing Project: "🕯️ Existing project detected. Beginning incremental séance..."
+- New Project (no .haunt/): "🕯️ No .haunt/ detected. Beginning full séance ritual..."
+- New Project (empty roadmap): "🕯️ Fresh installation detected (empty roadmap). Beginning full séance ritual..."
+- Existing Codebase (has source files, empty roadmap): "🕯️ Existing codebase detected. Beginning full séance for new features..."
+- Active Project (has requirements): "🕯️ Existing project detected. Beginning incremental séance..."
 **Mode 2 (Choice Prompt with Interactive UI):**
 
 Use the `AskUserQuestion` tool to present selectable options:
@@ -745,17 +881,25 @@ This provides:
 ```
 Spawn gco-project-manager with:
 - User's original prompt/idea
-- Instruction: "New project - execute full idea-to-roadmap workflow" OR "Existing project - add to roadmap"
+- Instruction based on project_state:
+  - "new_project" → "New project - execute full idea-to-roadmap workflow"
+  - "existing_codebase" → "Existing codebase - execute full idea-to-roadmap workflow for new features"
+  - "active_project" → "Existing project - add to roadmap"
 - Planning depth: standard
+- Project state: {project_state} (for debugging visibility)
 ```
 
 **If planning_depth == "deep":**
 ```
 Spawn gco-project-manager with:
 - User's original prompt/idea
-- Instruction: "New project - execute full idea-to-roadmap workflow" OR "Existing project - add to roadmap"
+- Instruction based on project_state:
+  - "new_project" → "New project - execute full idea-to-roadmap workflow"
+  - "existing_codebase" → "Existing codebase - execute full idea-to-roadmap workflow for new features"
+  - "active_project" → "Existing project - add to roadmap"
 - Planning depth: deep (extended Phase 2 analysis)
 - Create strategic analysis document: .haunt/plans/REQ-XXX-strategic-analysis.md
+- Project state: {project_state} (for debugging visibility)
 ```
 
 **Mode 2 (Choice Prompt):** Handle user choice
