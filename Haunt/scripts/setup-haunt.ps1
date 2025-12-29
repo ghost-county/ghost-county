@@ -1419,17 +1419,20 @@ function Install-FrontendPlugin {
         return
     }
 
-    # Check if plugin is already installed
+    # Check if plugin is already installed by checking installed_plugins.json
     $pluginInstalled = $false
-    try {
-        $plugins = claude plugin list 2>&1 | Out-String
-        if ($plugins -match "frontend-design") {
-            Write-Success "frontend-design plugin already installed"
-            $pluginInstalled = $true
+    $pluginsFile = Join-Path $env:USERPROFILE ".claude\plugins\installed_plugins.json"
+    if (Test-Path $pluginsFile) {
+        try {
+            $pluginsContent = Get-Content $pluginsFile -Raw
+            if ($pluginsContent -match '"frontend-design@') {
+                Write-Success "frontend-design plugin already installed"
+                $pluginInstalled = $true
+            }
         }
-    }
-    catch {
-        # Ignore errors - plugin list may fail if no plugins installed
+        catch {
+            # Ignore errors reading the file
+        }
     }
 
     # If already installed, skip prompt

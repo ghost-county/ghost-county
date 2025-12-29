@@ -762,11 +762,15 @@ setup_frontend_plugin() {
         return 0
     fi
 
-    # Check if plugin is already installed
+    # Check if plugin is already installed by checking installed_plugins.json
     local plugin_installed=false
-    if claude plugin list 2>/dev/null | grep -q "frontend-design"; then
-        success "frontend-design plugin already installed"
-        plugin_installed=true
+    local plugins_file="${HOME}/.claude/plugins/installed_plugins.json"
+    if [[ -f "$plugins_file" ]]; then
+        # Check if frontend-design appears in any plugin key (handles different marketplace variants)
+        if grep -q '"frontend-design@' "$plugins_file" 2>/dev/null; then
+            success "frontend-design plugin already installed"
+            plugin_installed=true
+        fi
     fi
 
     # If already installed, skip prompt
