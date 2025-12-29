@@ -273,7 +273,7 @@ Strategic frameworks provide business context:
 - **Kano Model:** Feature classification (basic/performance/delight)
 - **RICE Scoring:** Prioritization based on reach, impact, confidence, effort
 
-### Phase 3: Reaping 🌾 (Roadmap Creation)
+### Phase 3: Roadmap Creation 📋
 **Input:** Analysis document
 **Output:** Updated roadmap with sized, assigned requirements
 

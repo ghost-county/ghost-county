@@ -1,17 +1,17 @@
 # Conduct Séance (Workflow Orchestration)
 
-Hold a séance to guide ideas through the complete Ghost County workflow: the three-part ritual of scrying (planning), summoning (execution), and reaping (archival).
+Hold a séance to guide ideas through the complete Ghost County workflow: the three-part ritual of scrying (planning), summoning (execution), and banishing (archival).
 
 ## The Three-Part Ritual
 
 ```
 🔮 Phase 1: Scrying   (Planning)   → /seance --scry    or --plan
 👻 Phase 2: Summoning (Execution)  → /seance --summon  or --execute
-🌾 Phase 3: Reaping   (Archival)   → /seance --reap    or --archive
+⚰️ Phase 3: Banishing (Archival)   → /seance --banish  or --archive
 ```
 
 **Mystical vs Normie:**
-- **Mystical:** `--scry`, `--summon`, `--reap` (embrace the occult vibes)
+- **Mystical:** `--scry`, `--summon`, `--banish` (embrace the occult vibes)
 - **Normie:** `--plan`, `--execute`, `--archive` (keep it practical)
 
 ## Scale-Adaptive Planning
@@ -81,12 +81,12 @@ In a repository without `.haunt/`:
 **Purpose:** Spawn agents for all ⚪ and 🟡 roadmap items
 **Output:** Parallel agent execution working until 🟢 Complete
 
-### Mode 6: Explicit Reaping (Archival)
+### Mode 6: Explicit Banishing (Archival)
 ```bash
-/seance --reap
+/seance --banish
 /seance --archive
 ```
-**Purpose:** Archive completed work and clean roadmap
+**Purpose:** Archive completed work and clean roadmap (runs `/banish --all`)
 **Output:** Clean roadmap + archived history in `.haunt/completed/`
 
 ### Mode 7: Quick Planning (--quick)
@@ -140,8 +140,8 @@ elif args.startswith("--scry ") or args.startswith("--plan "):
     prompt = args.split(None, 1)[1] if len(args.split(None, 1)) > 1 else ""
 elif args in ["--summon", "--execute"]:
     mode = 5  # Explicit summoning
-elif args in ["--reap", "--archive"]:
-    mode = 6  # Explicit reaping
+elif args in ["--banish", "--archive"]:
+    mode = 6  # Explicit banishing
 elif args:
     mode = 1  # With prompt - immediate workflow
 elif has_haunt:
@@ -183,7 +183,7 @@ $ "Add OAuth login"
 $ yes
 > 👻 The spirits rise...
 > [Execution happens...]
-> 🌾 Reaping the harvest...
+> ⚰️ Banishing completed work...
 > [Archival happens automatically...]
 > ✅ OAuth login complete
 ```
@@ -202,9 +202,9 @@ $ /seance --summon
 > ✅ All requirements complete
 
 # Later: Just cleanup
-$ /seance --reap
-> 🌾 Reaping the harvest...
-> ✅ 5 requirements archived
+$ /seance --banish
+> ⚰️ Banishing completed work...
+> ✅ 5 spirits sent to rest
 ```
 
 ### Quick Full Ritual (With Prompt)
@@ -215,7 +215,7 @@ $ /seance "Fix login bug and add tests"
 > Ready to summon? [yes]
 > 👻 The spirits rise...
 > [Work happens...]
-> 🌾 Reaping the harvest...
+> ⚰️ Banishing completed work...
 > ✅ Complete
 ```
 
@@ -252,5 +252,5 @@ $ /seance --deep "Redesign authentication system"
 - **`Haunt/docs/SEANCE-EXPLAINED.md`** - Complete documentation and philosophy
 - **`Haunt/docs/assets/seance-infographic.html`** - Visual guide
 - **`/summon <agent>`** - Directly spawn a specific agent
-- **`/banish --all`** - Quick archive (alias for `/seance --reap`)
+- **`/banish --all`** - Quick archive (same as `/seance --banish`)
 - **`/haunting`** - View current active work

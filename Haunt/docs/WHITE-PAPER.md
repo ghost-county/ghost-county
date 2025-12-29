@@ -575,7 +575,7 @@ The Séance is Haunt's complete idea-to-shipped workflow - a guided ritual that 
 ```
 🔮 Scrying   (Planning)   → /seance --scry    or --plan
 👻 Summoning (Execution)  → /seance --summon  or --execute
-🌾 Reaping   (Archival)   → /seance --reap    or --archive
+⚰️ Banishing (Archival)   → /seance --banish  or --archive
 ```
 
 **Quick Example:**
@@ -585,7 +585,7 @@ $ /seance "Add OAuth login support"
 
 🔮 Scrying... (creates formal requirements, strategic analysis, roadmap)
 👻 Summoning... (spawns agents, implements features, runs tests)
-🌾 Reaping... (archives completed work, cleans roadmap)
+⚰️ Banishing... (archives completed work, cleans roadmap)
 
 ✅ OAuth login shipped, tested, committed, documented, archived
 ```

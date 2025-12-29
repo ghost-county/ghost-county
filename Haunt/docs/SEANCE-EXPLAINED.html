@@ -133,7 +133,7 @@ Three-Part Ritual</a></li>
 (Planning)</a></li>
 <li><a href="#phase-2-summoning-execution" id="toc-phase-2-summoning-execution">👻 Phase 2: Summoning
 (Execution)</a></li>
-<li><a href="#phase-3-reaping-archival" id="toc-phase-3-reaping-archival">🌾 Phase 3: Reaping
+<li><a href="#phase-3-banishing-archival" id="toc-phase-3-banishing-archival">⚰️ Phase 3: Banishing
 (Archival)</a></li>
 <li><a href="#complete-workflow-example" id="toc-complete-workflow-example">Complete Workflow Example</a></li>
 <li><a href="#why-this-matters" id="toc-why-this-matters">Why This
@@ -165,8 +165,8 @@ concept to completed, archived work with zero manual coordination. It’s
 the full SDLC in one command.</p>
 <h2 id="the-three-part-ritual">The Three-Part Ritual</h2>
 <p>``` 🔮 Phase 1: Scrying (Planning) → /seance –scry or –plan 👻 Phase
-2: Summoning (Execution) → /seance –summon or –execute 🌾 Phase 3:
-Reaping (Archival) → /seance –reap or –archive ```</p>
+2: Summoning (Execution) → /seance –summon or –execute ⚰️ Phase 3:
+Banishing (Archival) → /seance –banish or –archive ```</p>
 <p>Each phase can be run independently or as part of the complete
 ritual.</p>
 <hr />
@@ -182,10 +182,10 @@ do</strong> → Custom input</p>
 scrying with your idea, then offers to summon.</p>
 <h3 id="explicit-phases">Explicit Phases</h3>
 <p>```bash /seance –scry # or –plan (just planning) /seance –summon # or
-–execute (just execution) /seance –reap # or –archive (just archival)
+–execute (just execution) /seance –banish # or –archive (just archival)
 ```</p>
 <p><strong>Mystical vs Normie:</strong> - <strong>Mystical:</strong>
-`–scry`, `–summon`, `–reap` (embrace the occult vibes) -
+`–scry`, `–summon`, `–banish` (embrace the occult vibes) -
 <strong>Normie:</strong> `–plan`, `–execute`, `–archive` (keep it
 practical)</p>
 <hr />
@@ -328,12 +328,11 @@ allow)</li>
 <li>For batch execution of multiple requirements</li>
 </ul>
 <hr />
-<h2 id="phase-3-reaping-archival">🌾 Phase 3: Reaping (Archival)</h2>
+<h2 id="phase-3-banishing-archival">⚰️ Phase 3: Banishing (Archival)</h2>
 <p><strong>Purpose:</strong> Archive completed work and clean the
 roadmap.</p>
 <h3 id="what-happens-2">What Happens</h3>
-<p>After agents complete their work, the séance automatically reaps the
-harvest:</p>
+<p>After agents complete their work, the séance automatically banishes completed work:</p>
 <ol type="1">
 <li><p><strong>Verification</strong> (7-Point Checklist)</p>
 <p>Before archiving any 🟢 Complete requirement, verification
@@ -413,15 +412,15 @@ REQ-091…</p>
 <p>Agent gco-dev-backend completed REQ-090 ✓ Agent gco-dev-frontend
 completed REQ-091 ✓</p>
 <p>All requirements complete. ```</p>
-<h3 id="step-3-reaping">Step 3: Reaping</h3>
+<h3 id="step-3-banishing">Step 3: Banishing</h3>
 <p><strong>Automatic after summoning completes</strong> (or `/seance
-–reap`)</p>
-<p><strong>What happens:</strong> ``` 🌾 Reaping the harvest…</p>
+–banish`)</p>
+<p><strong>What happens:</strong> ``` ⚰️ Banishing completed work…</p>
 <p>Verifying completion… ✓ All tasks checked off for REQ-087, REQ-088,
 REQ-089, REQ-090, REQ-091 ✓ All completion criteria met ✓ All tests
 passing ✓ All commits created</p>
 <p>Archiving to .haunt/completed/roadmap-archive.md…</p>
-<p>🌙 The harvest is complete.</p>
+<p>⚰️ The spirits have been banished.</p>
 <p>Completed and Archived: - 🟢 REQ-087: Implement OAuth provider
 integration - 🟢 REQ-088: Add login redirect flow - 🟢 REQ-089: Secure
 token storage - 🟢 REQ-090: Add logout endpoint - 🟢 REQ-091: Update UI
@@ -458,22 +457,22 @@ Phases)</h3>
 limiting to API” # Creates roadmap, doesn’t execute ```</p>
 <p><strong>Just execution:</strong> ```bash /seance –summon # Executes
 existing roadmap items ```</p>
-<p><strong>Just cleanup:</strong> ```bash /seance –reap # Archives
+<p><strong>Just cleanup:</strong> ```bash /seance –banish # Archives
 completed work ```</p>
 <h3 id="full-ritual-all-phases">Full Ritual (All Phases)</h3>
 <p>```bash # Interactive mode /seance &gt; [A] Add something new &gt;
-[Enter idea: “Add rate limiting”] &gt; [Scrying happens…] &gt; “Ready to
-summon?” → yes &gt; [Summoning happens…] &gt; [Reaping happens
+[Enter idea: “Add rate limiting”] &gt; [Scrying happens…] &gt; "Ready to
+summon?" → yes &gt; [Summoning happens…] &gt; [Banishing happens
 automatically…] ```</p>
 <h3 id="batch-execution">Batch Execution</h3>
 <p>```bash # Create roadmap for multiple features /seance –scry “Feature
 A” # (adds REQ-101, REQ-102, REQ-103)</p>
-<p>/seance –scry “Feature B” # (adds REQ-104, REQ-105)</p>
+<p>/seance –scry "Feature B" # (adds REQ-104, REQ-105)</p>
 <h1 id="execute-everything-in-parallel">Execute everything in
 parallel</h1>
 <p>/seance –summon # (spawns 5 agents working in parallel)</p>
 <h1 id="clean-up-when-done">Clean up when done</h1>
-<p>/seance –reap ```</p>
+<p>/seance –banish ```</p>
 <h3 id="roadmap-sharding-large-projects">Roadmap Sharding (Large
 Projects)</h3>
 <p>For projects with many requirements, roadmaps can be <strong>sharded
@@ -514,7 +513,7 @@ project)</li>
 <li>Test files (TDD workflow)</li>
 <li>Git commits (with REQ-XXX references)</li>
 </ul>
-<h3 id="during-reaping">During Reaping</h3>
+<h3 id="during-banishing">During Banishing</h3>
 <ul>
 <li>`.haunt/completed/roadmap-archive.md` - Archived requirements</li>
 <li>Completion reports (summary of what shipped)</li>
@@ -524,7 +523,7 @@ project)</li>
 <h3 id="scry-before-you-summon">1. Scry Before You Summon</h3>
 <p>Don’t skip planning. Even simple features benefit from formal
 requirements and strategic thinking.</p>
-<h3 id="reap-regularly">2. Reap Regularly</h3>
+<h3 id="banish-regularly">2. Banish Regularly</h3>
 <p>Clean roadmap weekly or after major batches complete. Keeps roadmap
 under 500 lines for performance.</p>
 <h3 id="trust-the-process">3. Trust the Process</h3>
@@ -537,7 +536,7 @@ guide you.</p>
 <h3 id="use-explicit-phases-for-control">5. Use Explicit Phases for
 Control</h3>
 <p>When you know exactly what you need, use `–scry`, `–summon`, or
-`–reap` directly.</p>
+`–banish` directly.</p>
 <hr />
 <h2 id="troubleshooting">Troubleshooting</h2>
 <h3 id="no-requirements-found-to-summon">“No requirements found to
@@ -546,11 +545,11 @@ summon”</h3>
 <li>Run `/seance –scry` first to create a roadmap</li>
 <li>Or check `.haunt/plans/roadmap.md` has ⚪ or 🟡 items</li>
 </ul>
-<h3 id="reaping-found-incomplete-tasks">“Reaping found incomplete
-tasks”</h3>
+<h3 id="banishing-found-incomplete-tasks">"Banishing found incomplete
+tasks"</h3>
 <ul>
 <li>Some requirements marked 🟢 but tasks not checked off</li>
-<li>Agent didn’t complete fully - re-summon or fix manually</li>
+<li>Agent didn't complete fully - re-summon or fix manually</li>
 </ul>
 <h3 id="agent-failed-during-summoning">“Agent failed during
 summoning”</h3>
@@ -559,10 +558,10 @@ summoning”</h3>
 <li>Fix blocker, then re-run `/seance –summon`</li>
 <li>Requirements stay 🟡 until completion</li>
 </ul>
-<h3 id="roadmap-too-large-500-lines">“Roadmap too large (&gt;500
-lines)”</h3>
+<h3 id="roadmap-too-large-500-lines">"Roadmap too large (&gt;500
+lines)"</h3>
 <ul>
-<li>Run `/seance –reap` to archive completed work</li>
+<li>Run `/seance –banish` to archive completed work</li>
 <li>Consider splitting into multiple roadmap files by feature area</li>
 </ul>
 <hr />
@@ -574,7 +573,7 @@ coordination.</strong></p>
 ideas, bug reports, feature requests) into order (shipped, tested,
 documented features).</p>
 <p>By separating the workflow into three explicit phases (scrying,
-summoning, reaping), you gain both <strong>control</strong> (run phases
+summoning, banishing), you gain both <strong>control</strong> (run phases
 independently) and <strong>automation</strong> (let the full ritual
 handle everything).</p>
 <p>Choose your vibe (mystical or practical), but trust the process. The
@@ -585,7 +584,7 @@ spirits know the way. 🕯️</p>
 <li><strong>`/summon <agent>`</strong> - Directly spawn a specific agent
 (no séance needed)</li>
 <li><strong>`/banish –all`</strong> - Quick archive command (alias for
-`/seance –reap`)</li>
+`/seance –banish`)</li>
 <li><strong>`Haunt/skills/gco-orchestrator/SKILL.md`</strong> - Technical
 implementation details</li>
 <li><strong>`Haunt/skills/gco-project-manager/SKILL.md`</strong> -

@@ -9,7 +9,7 @@ The **séance** is Ghost County's complete idea-to-shipped workflow - a guided r
 \`\`\`
 🔮 Phase 1: Scrying   (Planning)   → /seance --scry    or --plan
 👻 Phase 2: Summoning (Execution)  → /seance --summon  or --execute
-🌾 Phase 3: Reaping   (Archival)   → /seance --reap    or --archive
+⚰️ Phase 3: Banishing (Archival)   → /seance --banish  or --archive
 \`\`\`
 
 Each phase can be run independently or as part of the complete ritual.
@@ -38,11 +38,11 @@ Immediately starts scrying with your idea, then offers to summon.
 \`\`\`bash
 /seance --scry      # or --plan (just planning)
 /seance --summon    # or --execute (just execution)
-/seance --reap      # or --archive (just archival)
+/seance --banish    # or --archive (just archival)
 \`\`\`
 
 **Mystical vs Normie:**
-- **Mystical:** \`--scry\`, \`--summon\`, \`--reap\` (embrace the occult vibes)
+- **Mystical:** \`--scry\`, \`--summon\`, \`--banish\` (embrace the occult vibes)
 - **Normie:** \`--plan\`, \`--execute\`, \`--archive\` (keep it practical)
 
 ---
@@ -160,13 +160,13 @@ The séance reads your roadmap and orchestrates an agent swarm:
 
 ---
 
-## 🌾 Phase 3: Reaping (Archival)
+## ⚰️ Phase 3: Banishing (Archival)
 
 **Purpose:** Archive completed work and clean the roadmap.
 
 ### What Happens
 
-After agents complete their work, the séance automatically reaps the harvest:
+After agents complete their work, the séance automatically banishes completed spirits:
 
 1. **Verification** (7-Point Checklist)
 
@@ -270,13 +270,13 @@ Agent gco-dev-frontend completed REQ-091 ✓
 All requirements complete.
 \`\`\`
 
-### Step 3: Reaping
+### Step 3: Banishing
 
-**Automatic after summoning completes** (or \`/seance --reap\`)
+**Automatic after summoning completes** (or \`/seance --banish\`)
 
 **What happens:**
 \`\`\`
-🌾 Reaping the harvest...
+⚰️ Banishing completed work...
 
 Verifying completion...
 ✓ All tasks checked off for REQ-087, REQ-088, REQ-089, REQ-090, REQ-091
@@ -286,7 +286,7 @@ Verifying completion...
 
 Archiving to .haunt/completed/roadmap-archive.md...
 
-🌙 The harvest is complete.
+⚰️ The spirits rest.
 
 Completed and Archived:
 - 🟢 REQ-087: Implement OAuth provider integration
@@ -343,7 +343,7 @@ OAuth login feature complete ✓
 
 **Just cleanup:**
 \`\`\`bash
-/seance --reap
+/seance --banish
 # Archives completed work
 \`\`\`
 
@@ -357,7 +357,7 @@ OAuth login feature complete ✓
 > [Scrying happens...]
 > "Ready to summon?" → yes
 > [Summoning happens...]
-> [Reaping happens automatically...]
+> [Banishing happens automatically...]
 \`\`\`
 
 ### Batch Execution
@@ -375,7 +375,7 @@ OAuth login feature complete ✓
 # (spawns 5 agents working in parallel)
 
 # Clean up when done
-/seance --reap
+/seance --banish
 \`\`\`
 
 ### Roadmap Sharding (Large Projects)
@@ -426,7 +426,7 @@ For projects with many requirements, roadmaps can be **sharded into batch files*
 - Test files (TDD workflow)
 - Git commits (with REQ-XXX references)
 
-### During Reaping
+### During Banishing
 - \`.haunt/completed/roadmap-archive.md\` - Archived requirements
 - Completion reports (summary of what shipped)
 
@@ -437,7 +437,7 @@ For projects with many requirements, roadmaps can be **sharded into batch files*
 ### 1. Scry Before You Summon
 Don't skip planning. Even simple features benefit from formal requirements and strategic thinking.
 
-### 2. Reap Regularly
+### 2. Banish Regularly
 Clean roadmap weekly or after major batches complete. Keeps roadmap under 500 lines for performance.
 
 ### 3. Trust the Process
@@ -447,7 +447,7 @@ The séance handles coordination. You don't need to micromanage agents or track 
 When unsure, use \`/seance\` (no args) and let the interactive prompts guide you.
 
 ### 5. Use Explicit Phases for Control
-When you know exactly what you need, use \`--scry\`, \`--summon\`, or \`--reap\` directly.
+When you know exactly what you need, use \`--scry\`, \`--summon\`, or \`--banish\` directly.
 
 ---
 
@@ -457,7 +457,7 @@ When you know exactly what you need, use \`--scry\`, \`--summon\`, or \`--reap\`
 - Run \`/seance --scry\` first to create a roadmap
 - Or check \`.haunt/plans/roadmap.md\` has ⚪ or 🟡 items
 
-### "Reaping found incomplete tasks"
+### "Banishing found incomplete tasks"
 - Some requirements marked 🟢 but tasks not checked off
 - Agent didn't complete fully - re-summon or fix manually
 
@@ -467,7 +467,7 @@ When you know exactly what you need, use \`--scry\`, \`--summon\`, or \`--reap\`
 - Requirements stay 🟡 until completion
 
 ### "Roadmap too large (>500 lines)"
-- Run \`/seance --reap\` to archive completed work
+- Run \`/seance --banish\` to archive completed work
 - Consider splitting into multiple roadmap files by feature area
 
 ---
@@ -478,7 +478,7 @@ The séance embodies Ghost County's core principle: **autonomous agents working 
 
 It's not just a command - it's a ritual that transforms chaos (vague ideas, bug reports, feature requests) into order (shipped, tested, documented features).
 
-By separating the workflow into three explicit phases (scrying, summoning, reaping), you gain both **control** (run phases independently) and **automation** (let the full ritual handle everything).
+By separating the workflow into three explicit phases (scrying, summoning, banishing), you gain both **control** (run phases independently) and **automation** (let the full ritual handle everything).
 
 Choose your vibe (mystical or practical), but trust the process. The spirits know the way. 🕯️
 
@@ -487,7 +487,7 @@ Choose your vibe (mystical or practical), but trust the process. The spirits kno
 ## See Also
 
 - **\`/summon <agent>\`** - Directly spawn a specific agent (no séance needed)
-- **\`/banish --all\`** - Quick archive command (alias for \`/seance --reap\`)
+- **\`/banish --all\`** - Quick archive command (same as \`/seance --banish\`)
 - **\`Haunt/skills/gco-orchestrator/SKILL.md\`** - Technical implementation details
 - **\`Haunt/skills/gco-project-manager/SKILL.md\`** - Planning workflow details
 - **\`.haunt/plans/roadmap.md\`** - Your active roadmap

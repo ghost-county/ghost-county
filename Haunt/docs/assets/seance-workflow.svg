@@ -66,9 +66,9 @@
   <!-- Arrow to Phase 3 -->
   <path d="M 400 600 L 400 640" class="arrow"/>
 
-  <!-- Phase 3: Reaping -->
+  <!-- Phase 3: Roadmap Creation -->
   <rect x="250" y="640" width="300" height="120" fill="#2ecc71" stroke="#27ae60" stroke-width="3" rx="10"/>
-  <text x="400" y="665" text-anchor="middle" class="phase-title">Phase 3: Reaping 🌾</text>
+  <text x="400" y="665" text-anchor="middle" class="phase-title">Phase 3: Roadmap 📋</text>
   <text x="400" y="683" text-anchor="middle" class="phase-subtitle">Roadmap Creation</text>
   <text x="270" y="705" class="phase-subtitle">• Decompose into tasks</text>
   <text x="270" y="723" class="phase-subtitle">• Size requirements (XS/S/M)</text>

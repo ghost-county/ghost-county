@@ -209,7 +209,7 @@ Ready to execute? Run `/seance --summon`
 5. Group remaining items by batch
 6. Spawn appropriate agents for all unblocked items in parallel
 7. Wait for agents to complete (or run in background)
-8. **Automatically trigger Mode 6 (--reap) after completion**
+8. **Automatically trigger Mode 6 (--banish) after completion**
 
 **Output:**
 - Spawned agents working on requirements
@@ -237,7 +237,7 @@ Summoning gco-dev-frontend for REQ-044...
 [Agents work autonomously...]
 [All agents complete...]
 
-🌾 Automatically reaping the harvest...
+⚰️ Automatically banishing completed work...
 [Mode 6 archival happens...]
 ```
 
@@ -246,11 +246,11 @@ Summoning gco-dev-frontend for REQ-044...
 - If no open items: "All requirements complete. Roadmap is clear!"
 - If all items blocked: "All requirements blocked by dependencies. Resolve blockers first."
 
-### Mode 6: Explicit Reaping (--reap / --archive)
+### Mode 6: Explicit Banishing (--banish / --archive)
 
-**Triggered by:** `/seance --reap` or `/seance --archive`
+**Triggered by:** `/seance --banish` or `/seance --archive`
 
-**Purpose:** Run only the archival phase - clean up completed work.
+**Purpose:** Run only the archival phase - clean up completed work (runs `/banish --all`).
 
 **Flow:**
 1. Read `.haunt/plans/roadmap.md`
@@ -278,13 +278,13 @@ Summoning gco-dev-frontend for REQ-044...
 - After summoning completes
 - Weekly/sprint-end cleanup ritual
 - When roadmap has many 🟢 items (>10)
-- Manual cleanup when automatic reaping didn't run
+- Manual cleanup when automatic banishing didn't run
 
 **Example:**
 ```
-User: /seance --reap
+User: /seance --banish
 Agent:
-🌾 Reaping the harvest...
+⚰️ Banishing completed work...
 
 Verifying completion...
 ✓ REQ-087: All 5 tasks checked
@@ -294,7 +294,7 @@ Verifying completion...
 
 Archiving 3 requirements to .haunt/completed/roadmap-archive.md...
 
-🌙 The harvest is complete.
+⚰️ The spirits rest.
 
 Completed and Archived:
 - 🟢 REQ-087: Implement OAuth provider integration
@@ -310,7 +310,7 @@ Active roadmap cleaned.
 **Verification Rules:**
 - All tasks must be `- [x]` (checked)
 - If any tasks unchecked, skip archival and report
-- User can fix and re-run `/seance --reap`
+- User can fix and re-run `/seance --banish`
 
 **Error Handling:**
 - If no 🟢 items: "No completed requirements to archive."
@@ -809,7 +809,7 @@ elif args.startswith("--scry ") or args.startswith("--plan "):
     mode = 4
 elif args in ["--summon", "--execute"]:
     mode = 5
-elif args in ["--reap", "--archive"]:
+elif args in ["--banish", "--archive"]:
     mode = 6
 elif args:
     mode = 1  # Immediate workflow with prompt
