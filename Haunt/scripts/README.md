@@ -60,6 +60,10 @@ curl -fsSL https://raw.githubusercontent.com/ghost-county/ghost-county/main/Haun
 # Install with options
 curl -fsSL https://raw.githubusercontent.com/ghost-county/ghost-county/main/Haunt/scripts/setup-haunt.sh | bash -s -- --scope=project --cleanup
 
+# Global-only install with cleanup (removes project gco-* files, cleans stale, installs to ~/.claude/ only)
+rm -rf .claude/agents/gco-*.md .claude/rules/gco-*.md .claude/skills/gco-* .claude/commands/gco-*.md 2>/dev/null; \
+  curl -fsSL https://raw.githubusercontent.com/ghost-county/ghost-county/main/Haunt/scripts/setup-haunt.sh | bash -s -- --scope=global --clean --cleanup
+
 # Use GitHub API to bypass CDN cache (if you need latest immediately)
 curl -fsSL -H "Accept: application/vnd.github.v3.raw" \
   "https://api.github.com/repos/ghost-county/ghost-county/contents/Haunt/scripts/setup-haunt.sh" | bash

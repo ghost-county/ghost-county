@@ -219,6 +219,8 @@ GLOBAL_SKILLS_DIR="${HOME}/.claude/skills"
 GLOBAL_SKILLS_BACKUP_DIR="${HOME}/.claude/skills.backup"
 GLOBAL_COMMANDS_DIR="${HOME}/.claude/commands"
 GLOBAL_COMMANDS_BACKUP_DIR="${HOME}/.claude/commands.backup"
+GLOBAL_RULES_DIR="${HOME}/.claude/rules"
+GLOBAL_RULES_BACKUP_DIR="${HOME}/.claude/rules.backup"
 GLOBAL_SETTINGS_FILE="${HOME}/.claude/settings.json"
 PROJECT_AGENTS_INSTALL_DIR="$(pwd)/.claude/agents"
 PROJECT_AGENTS_BACKUP_DIR="$(pwd)/.claude/agents.backup"
@@ -226,6 +228,8 @@ PROJECT_SKILLS_INSTALL_DIR="$(pwd)/.claude/skills"
 PROJECT_SKILLS_BACKUP_DIR="$(pwd)/.claude/skills.backup"
 PROJECT_COMMANDS_INSTALL_DIR="$(pwd)/.claude/commands"
 PROJECT_COMMANDS_BACKUP_DIR="$(pwd)/.claude/commands.backup"
+PROJECT_RULES_INSTALL_DIR="$(pwd)/.claude/rules"
+PROJECT_RULES_BACKUP_DIR="$(pwd)/.claude/rules.backup"
 PROJECT_SETTINGS_FILE="$(pwd)/.claude/settings.json"
 
 # Actual installation directories (will be set in parse_arguments)
@@ -252,6 +256,7 @@ WITH_PATTERN_DETECTION=true  # Enabled by default
 NO_PATTERN_DETECTION=false
 CLEANUP_AFTER=true  # For remote execution: delete cloned repo after setup
 YES_TO_ALL=false  # Skip prompts and auto-install all dependencies
+CLEAN_BEFORE_INSTALL=false  # Remove stale files before installation
 
 # Remote execution support
 REMOTE_CLONE_DIR=""  # Will be set if we clone the repo
@@ -304,6 +309,7 @@ ${BOLD}OPTIONS:${NC}
     ${BOLD}--no-mcp${NC}            Skip MCP server channeling
     ${BOLD}--no-rituals${NC}        Skip binding of ritual scripts (morning-review, evening-handoff, weekly-refactor)
     ${BOLD}--no-pattern-detection${NC}  Skip conjuring of pattern detection tools (hunt-patterns, weekly-refactor)
+    ${BOLD}--clean, --repair${NC}   Remove stale files before installation (files in dest not in source)
     ${BOLD}--cleanup${NC}           Delete cloned repo after setup (for remote installation)
     ${BOLD}--verbose${NC}           Show detailed output during execution
 
@@ -318,6 +324,9 @@ ${BOLD}REMOTE INSTALLATION:${NC}
 
     # Install with options
     curl -fsSL https://raw.githubusercontent.com/ghost-county/ghost-county/main/Haunt/scripts/setup-haunt.sh | bash -s -- --scope=project --cleanup
+
+    # Global-only install with cleanup (removes project gco-* files, cleans stale, installs to ~/.claude/ only)
+    rm -rf .claude/agents/gco-*.md .claude/rules/gco-*.md .claude/skills/gco-* .claude/commands/gco-*.md 2>/dev/null; curl -fsSL https://raw.githubusercontent.com/ghost-county/ghost-county/main/Haunt/scripts/setup-haunt.sh | bash -s -- --scope=global --clean --cleanup
 
 ${BOLD}EXAMPLES:${NC}
     # Manifest full haunt (default: project-local to .claude/)
@@ -352,6 +361,12 @@ ${BOLD}EXAMPLES:${NC}
 
     # Update agents without backup
     bash scripts/setup-haunt.sh --agents-only --no-backup
+
+    # Clean stale files before fresh install
+    bash scripts/setup-haunt.sh --clean
+
+    # Preview what stale files would be cleaned (dry run)
+    bash scripts/setup-haunt.sh --clean --dry-run
 
 ${BOLD}EXIT CODES:${NC}
     0    Success
@@ -457,6 +472,10 @@ parse_arguments() {
                 CLEANUP_AFTER=true
                 shift
                 ;;
+            --clean|--repair)
+                CLEAN_BEFORE_INSTALL=true
+                shift
+                ;;
             --verbose|-v)
                 VERBOSE=true
                 shift
@@ -507,6 +526,164 @@ parse_arguments() {
         SKILLS_BACKUP_DIR="both"
         MCP_SETTINGS_FILE="both"
     fi
+}
+
+# ============================================================================
+# STALE FILE DETECTION AND CLEANUP
+# ============================================================================
+
+# Temporary file for tracking stale items (bash 3.2 compatible)
+STALE_FILES_LIST=""
+STALE_REMOVED_COUNT=0
+
+# Get list of source files (what SHOULD exist)
+get_source_agents() {
+    local source_dir="${PROJECT_ROOT}/agents"
+    [[ -d "$source_dir" ]] && find "$source_dir" -maxdepth 1 -name "gco-*.md" -type f -exec basename {} \; 2>/dev/null | sort
+}
+
+get_source_rules() {
+    local source_dir="${PROJECT_ROOT}/rules"
+    [[ -d "$source_dir" ]] && find "$source_dir" -maxdepth 1 -name "gco-*.md" -type f -exec basename {} \; 2>/dev/null | sort
+}
+
+get_source_skills() {
+    local source_dir="${PROJECT_ROOT}/skills"
+    [[ -d "$source_dir" ]] && find "$source_dir" -maxdepth 1 -name "gco-*" -type d -exec basename {} \; 2>/dev/null | sort
+}
+
+get_source_commands() {
+    local source_dir="${PROJECT_ROOT}/commands"
+    [[ -d "$source_dir" ]] && find "$source_dir" -maxdepth 1 -name "gco-*.md" -type f -exec basename {} \; 2>/dev/null | sort
+}
+
+# Find stale files in a deployed directory
+find_stale_files() {
+    local deployed_dir="$1"
+    local asset_type="$2"  # agents, rules, commands
+    local pattern="$3"
+
+    [[ ! -d "$deployed_dir" ]] && return
+
+    # Get list of source files for comparison
+    local source_list=$(mktemp)
+    case "$asset_type" in
+        agents)   get_source_agents > "$source_list" ;;
+        rules)    get_source_rules > "$source_list" ;;
+        commands) get_source_commands > "$source_list" ;;
+    esac
+
+    # Find deployed files that don't exist in source
+    find "$deployed_dir" -maxdepth 1 -name "$pattern" -type f 2>/dev/null | while read -r file; do
+        local basename=$(basename "$file")
+        if ! grep -qx "$basename" "$source_list" 2>/dev/null; then
+            echo "$file" >> "$STALE_FILES_LIST"
+            warning "Stale: $file"
+        fi
+    done
+
+    rm -f "$source_list"
+}
+
+# Find stale skill directories
+find_stale_skills() {
+    local deployed_dir="$1"
+
+    [[ ! -d "$deployed_dir" ]] && return
+
+    local source_list=$(mktemp)
+    get_source_skills > "$source_list"
+
+    find "$deployed_dir" -maxdepth 1 -name "gco-*" -type d 2>/dev/null | while read -r dir; do
+        local basename=$(basename "$dir")
+        if ! grep -qx "$basename" "$source_list" 2>/dev/null; then
+            echo "$dir" >> "$STALE_FILES_LIST"
+            warning "Stale: $dir/"
+        fi
+    done
+
+    rm -f "$source_list"
+}
+
+# Scan for all stale files based on scope
+scan_for_stale() {
+    section "Scanning for Stale Spirits"
+
+    # Initialize temp file
+    STALE_FILES_LIST=$(mktemp)
+    trap "rm -f $STALE_FILES_LIST" EXIT
+
+    if [[ "$SCOPE" == "global" || "$SCOPE" == "both" ]]; then
+        echo -e "${BOLD}Global (~/.claude/):${NC}"
+        find_stale_files "$GLOBAL_AGENTS_DIR" "agents" "gco-*.md"
+        find_stale_files "$GLOBAL_RULES_DIR" "rules" "gco-*.md"
+        find_stale_skills "$GLOBAL_SKILLS_DIR"
+        find_stale_files "$GLOBAL_COMMANDS_DIR" "commands" "gco-*.md"
+        echo ""
+    fi
+
+    if [[ "$SCOPE" == "project" || "$SCOPE" == "both" ]]; then
+        echo -e "${BOLD}Project (.claude/):${NC}"
+        find_stale_files "$PROJECT_AGENTS_INSTALL_DIR" "agents" "gco-*.md"
+        find_stale_files "$PROJECT_RULES_INSTALL_DIR" "rules" "gco-*.md"
+        find_stale_skills "$PROJECT_SKILLS_INSTALL_DIR"
+        find_stale_files "$PROJECT_COMMANDS_INSTALL_DIR" "commands" "gco-*.md"
+        echo ""
+    fi
+
+    local stale_count=$(wc -l < "$STALE_FILES_LIST" | tr -d ' ')
+    if [[ "$stale_count" -eq 0 ]]; then
+        success "No stale files detected - installation is clean!"
+        return 1
+    else
+        warning "Found ${stale_count} stale file(s)/directory(ies)"
+        return 0
+    fi
+}
+
+# Remove stale items
+remove_stale_items() {
+    local stale_count=$(wc -l < "$STALE_FILES_LIST" | tr -d ' ')
+
+    if [[ "$stale_count" -eq 0 ]]; then
+        info "No stale items to remove"
+        return 0
+    fi
+
+    info "Removing ${stale_count} stale item(s)..."
+
+    while read -r item; do
+        if [[ "$DRY_RUN" == true ]]; then
+            info "[DRY RUN] Would remove: $item"
+        else
+            if [[ -d "$item" ]]; then
+                rm -rf "$item" && success "Removed: $item/" || warning "Failed: $item/"
+            else
+                rm -f "$item" && success "Removed: $item" || warning "Failed: $item"
+            fi
+            STALE_REMOVED_COUNT=$((STALE_REMOVED_COUNT + 1))
+        fi
+    done < "$STALE_FILES_LIST"
+}
+
+# Main cleanup function (called when --clean flag is used)
+cleanup_stale_files() {
+    if [[ "$CLEAN_BEFORE_INSTALL" != true ]]; then
+        return 0
+    fi
+
+    section "Pre-Installation Cleanup"
+    info "Detecting stale files (exist in deployment but not in source)..."
+
+    if scan_for_stale; then
+        # Found stale files
+        remove_stale_items
+        if [[ "$STALE_REMOVED_COUNT" -gt 0 ]]; then
+            success "Cleaned up ${STALE_REMOVED_COUNT} stale item(s)"
+        fi
+    fi
+
+    echo ""
 }
 
 # ============================================================================
@@ -3795,6 +3972,9 @@ main() {
 
     # Check prerequisites (always)
     check_prerequisites
+
+    # Cleanup stale files if --clean flag was used
+    cleanup_stale_files
 
     # Phase 1.5: Frontend plugin (optional)
     if [[ "$AGENTS_ONLY" == false && "$SKILLS_ONLY" == false ]]; then
