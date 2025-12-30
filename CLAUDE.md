@@ -19,7 +19,7 @@ This is a knowledge base and framework repository for **Haunt** - a methodology 
 
 Current work items for spawned agents. PM maintains this section from `.haunt/plans/roadmap.md`.
 
-See `~/.claude/rules/gco-status-updates.md` for update protocol (global rules location).
+See `~/.claude/rules/gco-roadmap-format.md` for status update protocol (global rules location).
 
 ### Current Items
 

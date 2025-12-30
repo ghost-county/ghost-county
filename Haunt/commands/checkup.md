@@ -22,14 +22,14 @@ The checkup performs six verification phases:
 - Rules are properly formatted
 
 **Expected Rules:**
-- `gco-assignment-lookup.md`
+- `gco-session-startup.md`
 - `gco-commit-conventions.md`
 - `gco-completion-checklist.md`
 - `gco-file-conventions.md`
 - `gco-framework-changes.md`
 - `gco-roadmap-format.md`
 - `gco-session-startup.md`
-- `gco-status-updates.md`
+- `gco-roadmap-format.md`
 
 **Verification:**
 ```bash
@@ -381,7 +381,7 @@ Example verbose output addition:
 VERBOSE DIAGNOSTICS:
 
 Rules found:
-  ~/.claude/rules/gco-assignment-lookup.md
+  ~/.claude/rules/gco-session-startup.md
   ~/.claude/rules/gco-commit-conventions.md
   ~/.claude/rules/gco-completion-checklist.md
   ... (5 more)

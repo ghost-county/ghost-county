@@ -203,7 +203,7 @@ Agents use: .haunt/bindings/gco-commit-conventions.md (priority 1)
 
 ### DON'T
 
-- Override foundational rules like `gco-assignment-lookup` or `gco-file-conventions`
+- Override foundational rules like `gco-session-startup` or `gco-file-conventions`
 - Create bindings without understanding what they replace
 - Use `--force` without reviewing validation warnings
 - Forget to communicate binding changes to your team
@@ -315,10 +315,10 @@ git commit -m "Add team commit conventions"
 | `gco-commit-conventions` | ✅ Yes | Use different ticket system |
 | `gco-roadmap-format` | ✅ Yes | Team-specific requirement template |
 | `gco-session-startup` | ⚠️ Carefully | Skip tests for prototyping |
-| `gco-status-updates` | ✅ Yes | Different status workflow |
+| `gco-roadmap-format` | ✅ Yes | Different status workflow |
 | `gco-completion-checklist` | ✅ Yes | Custom definition of done |
 | `gco-ui-testing-protocol` | ✅ Yes | Different test framework |
-| `gco-assignment-lookup` | ❌ No | Core agent coordination |
+| `gco-session-startup` | ❌ No | Core agent coordination |
 | `gco-file-conventions` | ❌ No | Directory structure assumptions |
 | `gco-framework-changes` | ❌ No | Haunt source management |
 

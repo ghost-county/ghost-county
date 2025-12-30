@@ -33,8 +33,24 @@ Every requirement MUST follow:
 |------|---------|-------------|
 | ⚪ | Not Started | Work not begun |
 | 🟡 | In Progress | Agent actively working |
-| 🟢 | Complete | All criteria met |
+| 🟢 | Complete | All criteria met, ready to archive |
 | 🔴 | Blocked | Dependency unmet |
+
+## Status Update Protocol
+
+**Worker Agents (Dev, Research, Code Review):**
+- Update `.haunt/plans/roadmap.md` directly
+- Starting work: ⚪ → 🟡
+- Blocking issue: 🟡 → 🔴 (update "Blocked by:" field)
+- Task complete: `- [ ]` → `- [x]` (keep 🟡 until ALL done)
+- Requirement complete: 🟡 → 🟢
+- Do NOT update CLAUDE.md Active Work (PM only)
+
+**Project Manager Only:**
+- ⚪ → 🟡: Update roadmap + add to CLAUDE.md Active Work
+- 🟡 → 🟢: Verify complete, remove from Active Work, archive to `.haunt/completed/`
+
+**Roadmap is authoritative** - Full details live in `.haunt/plans/roadmap.md`
 
 ## Sizing Rules (One Sitting Rule)
 

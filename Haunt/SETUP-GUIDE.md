@@ -1232,7 +1232,7 @@ flowchart TD
 3. **Assignment lookup hierarchy** - Four-step priority: Direct → Active Work → Roadmap → Ask PM
 4. **Never assume work** - If no assignment found, explicitly ask Project Manager
 
-The complete protocol is defined in `.claude/rules/gco-assignment-lookup.md` and enforced automatically at session start.
+The complete protocol is defined in `.claude/rules/gco-session-startup.md` and enforced automatically at session start.
 
 ### Recommended Reading Order
 

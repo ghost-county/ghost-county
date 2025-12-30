@@ -102,7 +102,7 @@ Add an interactive prompt during setup asking if the user wants to install Playw
 
 ## Batch: Command Improvements
 
-### 🟡 REQ-243: Fix Windows setup not installing slash commands
+### 🟢 REQ-243: Fix Windows setup not installing slash commands
 
 **Type:** Bug Fix
 **Reported:** 2024-12-24
@@ -155,8 +155,13 @@ The Windows PowerShell setup script (`setup-haunt.ps1`) is not installing slash 
 - Eliminate rule duplication between global and project
 - Convert context-heavy rules to on-demand skills
 - Train agents to use targeted file reads
+- Consolidate overlapping rules (quick wins)
 
-**Total Effort:** ~5 hours (3 requirements)
+**Total Effort:** ~8.5 hours (4 requirements)
+- REQ-259: Remove Project Rule Duplication 🟢
+- REQ-260: Convert Heavy Rules to Skills 🟢
+- REQ-261: Add Targeted Read Training 🟢
+- REQ-264: Consolidate Overlapping Rules ⚪ (~700-800 tokens)
 
 ### 🟢 REQ-259: Remove Project Rule Duplication
 
@@ -281,6 +286,44 @@ Agents currently read full files (e.g., 1,647 line roadmap) when they only need 
 **Agent:** Dev-Infrastructure
 **Completion:** Agents trained to use grep/targeted reads, verified in test session
 **Blocked by:** REQ-260
+
+### 🟢 REQ-264: Consolidate Overlapping Rules (~700 tokens savings)
+
+**Type:** Enhancement
+**Reported:** 2025-12-30
+**Completed:** 2025-12-30
+**Source:** Context optimization analysis (.haunt/docs/research/context-optimization-analysis.md)
+
+**Description:**
+Quick wins from token analysis: merge duplicate content and convert reference material to slim references. Three consolidation tasks that together save ~700-800 tokens.
+
+**Implementation Notes:**
+- Merged gco-status-updates into gco-roadmap-format (added Status Update Protocol section)
+- Created gco-file-conventions skill with full tables, reduced rule from 109→36 lines
+- Merged gco-assignment-lookup into gco-session-startup (unified session startup protocol)
+- Updated 15+ documentation files with new rule references
+- Deployed with --clean to remove stale files (10→8 rules)
+
+**Tasks:**
+- [x] **Task 1: Merge gco-status-updates → gco-roadmap-format** (~300 tokens)
+- [x] **Task 2: Convert gco-file-conventions to slim reference** (~400 tokens)
+- [x] **Task 3: Merge gco-assignment-lookup → gco-session-startup** (~100 tokens)
+- [x] Update any agent references to merged/deleted rules
+- [x] Verify no regression in agent behavior
+
+**Files:**
+- `Haunt/rules/gco-roadmap-format.md` (modified - added status updates)
+- `Haunt/rules/gco-status-updates.md` (deleted)
+- `Haunt/skills/gco-file-conventions/SKILL.md` (created)
+- `Haunt/rules/gco-file-conventions.md` (modified - slim reference)
+- `Haunt/rules/gco-session-startup.md` (modified - merged assignment lookup)
+- `Haunt/rules/gco-assignment-lookup.md` (deleted)
+
+**Effort:** M (3.5 hours total)
+**Complexity:** MODERATE
+**Agent:** Dev-Infrastructure
+**Completion:** All rule merges complete, skills created, setup script deployed changes, token usage reduced by 700-800 tokens
+**Blocked by:** None
 
 ---
 

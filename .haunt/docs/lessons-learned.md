@@ -64,7 +64,7 @@ Errors we've made and solutions that prevent recurrence.
 **Root Cause:** Unclear distinction between rule (invariant enforcement) vs skill (on-demand methodology).
 
 **Solution:**
-- **Rules:** Short, invariant enforcement (gco-assignment-lookup, gco-status-updates, gco-completion-checklist)
+- **Rules:** Short, invariant enforcement (gco-session-startup, gco-completion-checklist)
 - **Skills:** Detailed methodology, context-specific guidance (gco-session-startup, gco-tdd-workflow, gco-playwright-tests)
 - If content exceeds 200 lines, make it a skill (on-demand), not a rule (auto-loaded)
 
@@ -284,7 +284,7 @@ Status: In Progress
 
 **Rationale:** Prevents sync issues between CLAUDE.md and roadmap. PM maintains single source of truth.
 
-**Related:** See `gco-status-updates` rule.
+**Related:** See `gco-roadmap-format` rule (Status Update Protocol section).
 
 ---
 

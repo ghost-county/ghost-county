@@ -277,7 +277,7 @@ Active Rule Bindings
 Project Bindings (.haunt/bindings/):
   gco-commit-conventions.md
   gco-roadmap-format.md
-  gco-status-updates.md
+  gco-roadmap-format.md
 
 User Bindings (~/.haunt/bindings/):
   gco-session-startup.md

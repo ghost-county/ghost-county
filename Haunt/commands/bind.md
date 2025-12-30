@@ -106,14 +106,14 @@ Common rules to customize:
 | `gco-commit-conventions` | Use Jira/Linear tickets instead of REQ-XXX |
 | `gco-roadmap-format` | Different requirement template |
 | `gco-session-startup` | Skip test validation for prototypes |
-| `gco-status-updates` | Custom status workflow |
+| `gco-roadmap-format` | Custom status workflow |
 | `gco-completion-checklist` | Different completion criteria |
 
 ## What Should NOT Be Overridden
 
 Some rules are foundational and overriding them breaks agent coordination:
 
-- `gco-assignment-lookup` - Core agent assignment protocol
+- `gco-session-startup` - Core agent assignment protocol
 - `gco-file-conventions` - Directory structure assumptions
 - `gco-framework-changes` - Haunt source management
 

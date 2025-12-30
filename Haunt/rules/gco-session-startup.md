@@ -1,14 +1,29 @@
-# Session Startup: Targeted File Access
+# Session Startup Protocol
 
-## Principle
+## Assignment Lookup (Steps 1-4)
 
-**Use targeted tools (grep, head) instead of full file reads when you only need specific information.**
+When starting a session or looking for work, follow this sequence IN ORDER:
 
-## Assignment Lookup Protocol
+### Step 1: Check for Direct Assignment
 
-When finding your assignment during session startup:
+Did the user explicitly assign you work in their message?
+- "Implement REQ-109"
+- "Fix the authentication bug"
+- "You are a Dev-Infrastructure agent. Implement REQ-109."
 
-### Priority 3: Check Roadmap (Use Targeted Read)
+**YES** → Proceed immediately
+**NO** → Continue to Step 2
+
+### Step 2: Check Active Work Section
+
+Read CLAUDE.md Active Work section (already in context):
+- Items with "Agent:" field matching your agent type
+- Status 🟡 In Progress assigned to you
+
+**If found:** Proceed with that work
+**If empty/no match:** Continue to Step 3
+
+### Step 3: Check Roadmap (Use Targeted Read)
 
 **WRONG:**
 ```bash
@@ -17,57 +32,49 @@ Read(.haunt/plans/roadmap.md)  # Reads 1,647 lines
 
 **RIGHT:**
 ```bash
-# If looking for specific requirement:
-grep -A 30 "REQ-XXX" .haunt/plans/roadmap.md  # ~30 lines
+# Find your agent type's assignments:
+grep -B 5 "Agent: Dev-Backend" .haunt/plans/roadmap.md
 
-# If looking for your agent type's assignments:
-grep -B 5 "Agent: Dev-Backend" .haunt/plans/roadmap.md  # Shows assignments + context
+# Find unstarted items:
+grep "^###.*⚪" .haunt/plans/roadmap.md
 
-# If checking for ⚪ Not Started items:
-grep "^###.*⚪" .haunt/plans/roadmap.md  # Lists all unstarted requirements
+# Extract specific requirement:
+grep -A 30 "REQ-XXX" .haunt/plans/roadmap.md
 ```
 
-## Requirement Details Extraction
+**If found:** Update status to 🟡, proceed with work
+**If nothing found:** Continue to Step 4
 
-**When you have a REQ-XXX assignment, extract only that requirement:**
+### Step 4: Ask Project Manager
 
-```bash
-# Extract specific requirement (saves 1,600+ lines)
-grep -A 30 "REQ-261" .haunt/plans/roadmap.md
+Only reach this step if Steps 1-3 found nothing.
+**Then:** STOP and ask "No assignment found. What should I work on?"
 
-# Get tasks section:
-grep -A 15 "Tasks:" .haunt/plans/roadmap.md | grep -A 15 "REQ-261"
+## Targeted File Access
 
-# Check completion criteria:
-grep -A 5 "Completion:" .haunt/plans/roadmap.md | grep -A 5 "REQ-261"
-```
-
-## Configuration Access
-
-**When checking environment or configuration:**
-
-```bash
-# WRONG: Read entire .env
-Read(.env)  # 84 lines
-
-# RIGHT: Extract specific variables
-grep -E "DATABASE_URL|API_KEY|NODE_ENV" .env  # ~3 lines
-```
-
-## When to Use Full Read
-
-Use `Read()` tool when:
-- File is small (<100 lines)
-- Need complete overview (new file, major refactor)
-- Need to understand entire structure
-
-## Token Savings
+**Principle:** Use grep/head instead of full file reads when you only need specific info.
 
 | Scenario | Full Read | Targeted Read | Savings |
 |----------|-----------|---------------|---------|
 | Find assignment in roadmap | 1,647 lines | 30 lines | 98% |
 | Check REQ status | 1,647 lines | 30 lines | 98% |
 | Get config values | 84 lines | 5 lines | 94% |
-| Preview source file | 500 lines | 50 lines | 90% |
 
-**Impact:** Targeted reads during session startup can save 1,500-1,600 tokens per session.
+**When to use full Read():**
+- File is small (<100 lines)
+- Need complete overview (new file, major refactor)
+- Need to understand entire structure
+
+## Assignment Identification
+
+Before starting work, you MUST be able to answer:
+- What requirement am I working on? (REQ-XXX)
+- What are the completion criteria?
+- Are there any blockers?
+
+## Non-Negotiable
+
+- NEVER ask PM for work if assignment exists in Steps 1-3
+- NEVER skip steps in the sequence
+- NEVER start work without identifying REQ-XXX
+- NEVER read full roadmap when targeted grep works

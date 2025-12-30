@@ -41,7 +41,7 @@ Remove project-specific or user-global rule overrides created with `/bind`. Agen
 /unbind gco-session-startup --scope=both --backup
 
 # Force remove without confirmation
-/unbind gco-status-updates --force
+/unbind gco-roadmap-format --force
 ```
 
 ## How It Works

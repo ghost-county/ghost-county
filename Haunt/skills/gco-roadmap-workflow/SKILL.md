@@ -8,9 +8,8 @@ description: Complex workflow coordination for batch organization, multi-agent s
 Complex coordination workflows for multi-requirement batches and agent coordination.
 
 **For basic protocols, see:**
-- `.claude/rules/gco-session-startup.md` - Session startup checklist
-- `.claude/rules/gco-roadmap-format.md` - Requirement format and status icons
-- `.claude/rules/gco-status-updates.md` - Who updates what
+- `.claude/rules/gco-session-startup.md` - Assignment lookup and targeted file access
+- `.claude/rules/gco-roadmap-format.md` - Requirement format, status icons, and update protocol
 - `.claude/rules/gco-completion-checklist.md` - Verification before marking complete
 
 ## Batch Organization and Coordination
