@@ -4,14 +4,16 @@
 
 ---
 
-## Current Focus: BMAD-Inspired Enhancements
-
-**Goal:** Implement 5 strategic framework enhancements (token efficiency, workflow flexibility, coordination visibility) while maintaining lightweight philosophy.
+## Current Focus: Framework Improvements
 
 **Active Work:**
-- 🟢 REQ-259: Remove Project Rule Duplication (Dev-Infrastructure, S) - COMPLETE
-- 🟢 REQ-260: Convert Heavy Rules to Skills (Dev-Infrastructure, M) - COMPLETE (1,642→252 lines, 84.6% reduction)
-- ⚪ REQ-261: Add Targeted Read Training to Agents (Dev-Infrastructure, S) - Ready to start
+- None (all current work complete!)
+
+**Recently Completed:**
+- 🟢 REQ-265: Add Delegation Protocol to Orchestrator Skill (Dev-Infrastructure, S)
+- 🟢 REQ-259: Remove Project Rule Duplication (Dev-Infrastructure, S)
+- 🟢 REQ-260: Convert Heavy Rules to Skills (Dev-Infrastructure, M) - 84.6% reduction
+- 🟢 REQ-261: Add Targeted Read Training to Agents (Dev-Infrastructure, S)
 
 **Recently Completed:**
 - REQ-228, REQ-229, REQ-230 (Visual workflow diagrams - archived 2025-12-28)
@@ -286,6 +288,48 @@ Agents currently read full files (e.g., 1,647 line roadmap) when they only need 
 **Agent:** Dev-Infrastructure
 **Completion:** Agents trained to use grep/targeted reads, verified in test session
 **Blocked by:** REQ-260
+
+### 🟢 REQ-265: Add Delegation Protocol to Orchestrator Skill
+
+**Type:** Bug Fix
+**Reported:** 2025-12-30
+**Completed:** 2025-12-30
+**Source:** User report - orchestrator doing work instead of spawning agents
+
+**Description:**
+Orchestrator skill (1,523 lines) lacks guidance on WHEN to spawn agents vs execute directly. This causes orchestrators to do research (WebSearch/WebFetch) and implementation (writing code) themselves instead of delegating to specialists.
+
+**Root Cause:** (from `.haunt/docs/research/orchestrator-spawning-analysis.md`)
+- No "Delegation Protocol" section in orchestrator skill
+- No explicit anti-patterns showing what NOT to do
+- Tool availability tempts direct execution
+
+**Tasks:**
+- [x] Add "Delegation Protocol" section to `Haunt/skills/gco-orchestrator/SKILL.md`
+- [x] Add spawning decision tree (when to spawn vs execute)
+- [x] Add anti-pattern examples (orchestrator doing research, writing code)
+- [x] Create `Haunt/rules/gco-orchestration.md` rule for delegation boundaries
+- [x] Deploy with `bash Haunt/scripts/setup-haunt.sh`
+
+**Implementation Notes:**
+- Added comprehensive "Delegation Protocol" section at top of orchestrator skill (before "When to Use")
+- Includes 3-step decision tree for spawn vs execute
+- Documented 3 anti-patterns with WRONG vs RIGHT examples (research, implementation, analysis)
+- Created slim `gco-orchestration.md` rule for quick enforcement
+- Token efficiency note: Spawning specialists MORE efficient than generalist trial-and-error
+- Success criteria: Never use WebSearch/WebFetch directly, never write code, never do multi-file analysis
+
+**Files:**
+- `Haunt/skills/gco-orchestrator/SKILL.md` (modified - added 180 lines of delegation guidance)
+- `Haunt/rules/gco-orchestration.md` (created - 60 lines)
+
+**Effort:** S (2 hours)
+**Complexity:** SIMPLE
+**Agent:** Dev-Infrastructure
+**Completion:** Orchestrators spawn agents for specialized work, delegation protocol documented
+**Blocked by:** None
+
+---
 
 ### 🟢 REQ-264: Consolidate Overlapping Rules (~700 tokens savings)
 
