@@ -82,7 +82,11 @@ param(
     [switch]$SkipPrereqs,
     [switch]$NoBackup,
     [switch]$NoMcp,
+    [switch]$WithPlaywright,
+    [switch]$NoPlaywright,
     [switch]$Cleanup,
+    [switch]$Quiet,
+    [switch]$Verbose,
     [switch]$Yes,
     [switch]$Help
 )
@@ -125,39 +129,60 @@ $SourceRulesDir = Join-Path (Split-Path $ScriptDir -Parent) "rules"
 
 # Remote execution tracking
 $RemoteCloneDir = $null
+
+# Quiet mode (default: true, override with -Verbose)
+if (-not $Verbose) {
+    $script:Quiet = $true
+} else {
+    $script:Quiet = $false
+}
 $RunningFromRemote = $false
 
 # ============================================================================
-# OUTPUT FUNCTIONS
-# ============================================================================
-
 function Write-Success {
     param([string]$Message)
-    Write-Host "[OK] " -ForegroundColor Green -NoNewline
-    Write-Host $Message
+    if (-not $script:Quiet) {
+        Write-Host "[OK] " -ForegroundColor Green -NoNewline
+        Write-Host $Message
+    }
 }
 
 function Write-Info {
     param([string]$Message)
-    Write-Host "[i] " -ForegroundColor Cyan -NoNewline
-    Write-Host $Message
+    if (-not $script:Quiet) {
+        Write-Host "[i] " -ForegroundColor Cyan -NoNewline
+        Write-Host $Message
+    }
 }
 
 function Write-Warn {
     param([string]$Message)
+    # Always visible (even in quiet mode)
     Write-Host "[!] " -ForegroundColor Yellow -NoNewline
     Write-Host $Message
 }
 
 function Write-Err {
     param([string]$Message)
+    # Always visible (even in quiet mode)
     Write-Host "[X] " -ForegroundColor Red -NoNewline
     Write-Host $Message
 }
 
 function Write-Section {
     param([string]$Title)
-    Write-Host ""
+    if ($script:Quiet) {
+        # Quiet mode: single-line header
+        Write-Host "  $Title" -ForegroundColor Magenta
+    } else {
+        # Verbose mode: fancy banner
+        Write-Host ""
+        Write-Host ("=" * 50) -ForegroundColor Magenta
+        Write-Host "  $Title" -ForegroundColor Magenta
+        Write-Host ("=" * 50) -ForegroundColor Magenta
+        Write-Host ""
+    }
+}
     Write-Host ("=" * 50) -ForegroundColor Magenta
     Write-Host "  $Title" -ForegroundColor Magenta
     Write-Host ("=" * 50) -ForegroundColor Magenta

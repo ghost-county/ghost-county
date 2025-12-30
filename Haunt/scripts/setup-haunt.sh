@@ -31,29 +31,47 @@ readonly MAGENTA='\033[1;35m'
 readonly BOLD='\033[1m'
 readonly NC='\033[0m' # No Color
 
+# Quiet mode (default: true, use --verbose to see all output)
+QUIET=true
+
 # Output functions
+log() {
+    # Only print if QUIET is false (i.e., verbose mode)
+    if [[ "$QUIET" != true ]]; then
+        echo -e "$@"
+    fi
+}
+
 success() {
-    echo -e "${GREEN}✓${NC} $1"
+    log "${GREEN}✓${NC} $1"
 }
 
 info() {
-    echo -e "${BLUE}ℹ${NC} $1"
+    log "${BLUE}ℹ${NC} $1"
 }
 
 warning() {
+    # Always visible (even in quiet mode)
     echo -e "${YELLOW}⚠${NC} $1"
 }
 
 error() {
+    # Always visible (even in quiet mode)
     echo -e "${RED}✗${NC} $1" >&2
 }
 
 section() {
-    echo ""
-    echo -e "${BOLD}${MAGENTA}═══════════════════════════════════════════${NC}"
-    echo -e "${BOLD}${PURPLE}  👻 $1${NC}"
-    echo -e "${BOLD}${MAGENTA}═══════════════════════════════════════════${NC}"
-    echo ""
+    if [[ "$QUIET" == true ]]; then
+        # Quiet mode: single-line header
+        echo -e "${BOLD}${PURPLE}👻 $1${NC}"
+    else
+        # Verbose mode: fancy banner
+        echo ""
+        echo -e "${BOLD}${MAGENTA}═══════════════════════════════════════════${NC}"
+        echo -e "${BOLD}${PURPLE}  👻 $1${NC}"
+        echo -e "${BOLD}${MAGENTA}═══════════════════════════════════════════${NC}"
+        echo ""
+    fi
 }
 
 # ============================================================================
@@ -250,6 +268,7 @@ VERBOSE=false
 SKIP_PREREQS=false
 NO_BACKUP=false
 NO_MCP=false
+WITH_PLAYWRIGHT=""  # Empty = prompt, "true" = install, "false" = skip
 WITH_RITUALS=true  # Enabled by default
 NO_RITUALS=false
 WITH_PATTERN_DETECTION=true  # Enabled by default
@@ -282,6 +301,7 @@ ${BOLD}DESCRIPTION:${NC}
     • Haunt methodology skills from Haunt/skills/
     • Verifies spiritual infrastructure (MCP servers)
     • Manifests required directory structure (.haunt/)
+    • Runs in quiet mode by default (use --verbose for detailed output)
     • Ensures idempotent execution (safe to run multiple times)
 
 ${BOLD}OPTIONS:${NC}
@@ -307,11 +327,14 @@ ${BOLD}OPTIONS:${NC}
     ${BOLD}--skip-prereqs${NC}      Skip prerequisite divination
     ${BOLD}--no-backup${NC}         Skip backup of existing spirits
     ${BOLD}--no-mcp${NC}            Skip MCP server channeling
+    ${BOLD}--with-playwright${NC}   Install Playwright MCP without prompting (auto-yes)
+    ${BOLD}--no-playwright${NC}     Skip Playwright MCP installation (auto-no)
     ${BOLD}--no-rituals${NC}        Skip binding of ritual scripts (morning-review, evening-handoff, weekly-refactor)
     ${BOLD}--no-pattern-detection${NC}  Skip conjuring of pattern detection tools (hunt-patterns, weekly-refactor)
     ${BOLD}--clean, --repair${NC}   Remove stale files before installation (files in dest not in source)
     ${BOLD}--cleanup${NC}           Delete cloned repo after setup (for remote installation)
-    ${BOLD}--verbose${NC}           Show detailed output during execution
+    ${BOLD}--quiet, -q${NC}        Quiet mode (default) - only show errors, warnings, and section headers
+    ${BOLD}--verbose, -v${NC}      Verbose mode - show detailed output during execution (overrides --quiet)
 
 ${BOLD}REMOTE INSTALLATION:${NC}
     This script can be run directly from the internet:
@@ -458,6 +481,14 @@ parse_arguments() {
                 NO_MCP=true
                 shift
                 ;;
+            --with-playwright)
+                WITH_PLAYWRIGHT="true"
+                shift
+                ;;
+            --no-playwright)
+                WITH_PLAYWRIGHT="false"
+                shift
+                ;;
             --no-rituals)
                 WITH_RITUALS=false
                 NO_RITUALS=true
@@ -465,7 +496,7 @@ parse_arguments() {
                 ;;
             --no-pattern-detection)
                 WITH_PATTERN_DETECTION=false
-                NO_PATTERN_DETECTION=true
+                NO_PATTERN_DETECTION=false
                 shift
                 ;;
             --cleanup)
@@ -476,8 +507,12 @@ parse_arguments() {
                 CLEAN_BEFORE_INSTALL=true
                 shift
                 ;;
+            --quiet|-q)
+                QUIET=true
+                shift
+                ;;
             --verbose|-v)
-                VERBOSE=true
+                QUIET=false
                 shift
                 ;;
             *)
@@ -4014,6 +4049,7 @@ main() {
     # Phase 5: MCP server configuration
     if [[ "$AGENTS_ONLY" == false ]]; then
         setup_mcp_servers
+        setup_playwright_mcp
     fi
 
     # Phase 5b: Infrastructure verification

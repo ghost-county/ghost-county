@@ -20,6 +20,86 @@
 
 ---
 
+## Batch: Setup Script Improvements
+
+### 🟢 REQ-262: Add Quiet Mode as Default with Verbose Override
+
+**Type:** Enhancement
+**Reported:** 2025-12-30
+**Source:** User feedback - setup output too verbose
+
+**Description:**
+The setup script outputs many success/info messages that clutter the terminal. Make quiet mode the default and only show:
+- Section headers (minimal)
+- Errors and warnings
+- Final summary
+
+Add `--verbose` to restore full output for debugging.
+
+**Tasks:**
+- [x] Add `QUIET=true` as default (rename from VERBOSE logic)
+- [x] Create `log()` function that only prints when `QUIET=false`
+- [x] Update `success()`, `info()` to use `log()` wrapper
+- [x] Keep `error()`, `warning()` always visible
+- [x] Keep section headers but make them single-line
+- [x] Add `--quiet` / `-q` flag (explicit, for documentation)
+- [x] Update `--verbose` / `-v` to set `QUIET=false`
+- [x] Test both modes work correctly
+- [x] Update --help text
+- [x] Update PowerShell script to match behavior
+
+**Files:**
+- `Haunt/scripts/setup-haunt.sh` (modified)
+- `Haunt/scripts/setup-haunt.ps1` (modified - matched behavior)
+
+**Effort:** S
+**Complexity:** SIMPLE
+**Agent:** Dev-Infrastructure
+**Completion:** Setup runs quietly by default, `--verbose` shows all output
+**Blocked by:** None
+### ⚪ REQ-263: Add Optional Playwright MCP Installation Prompt
+
+**Type:** Enhancement
+**Reported:** 2025-12-30
+**Source:** User request - Playwright should be project-level, not global
+
+**Description:**
+Add an interactive prompt during setup asking if the user wants to install Playwright MCP for UI/E2E testing. If yes, add it to project-level `.mcp.json`. If no, skip it. This keeps Playwright tokens (20k) out of non-frontend projects.
+
+**Tasks:**
+- [ ] Add prompt after MCP section: "Install Playwright MCP for UI testing? [y/N]"
+- [ ] If yes: Create/update `.mcp.json` with Playwright config
+- [ ] If no: Skip silently (default behavior)
+- [ ] Add `--with-playwright` flag to skip prompt and install
+- [ ] Add `--no-playwright` flag to skip prompt and skip install
+- [ ] Handle existing `.mcp.json` (merge, don't overwrite)
+- [ ] Test on fresh project and existing project
+- [ ] Update --help text
+
+**Playwright MCP Config:**
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    }
+  }
+}
+```
+
+**Files:**
+- `Haunt/scripts/setup-haunt.sh` (modify)
+- `Haunt/scripts/setup-haunt.ps1` (modify - match behavior)
+
+**Effort:** S
+**Complexity:** SIMPLE
+**Agent:** Dev-Infrastructure
+**Completion:** Setup prompts for Playwright, correctly adds to project `.mcp.json` if accepted
+**Blocked by:** None
+
+---
+
 ## Batch: Command Improvements
 
 ### 🟡 REQ-243: Fix Windows setup not installing slash commands
