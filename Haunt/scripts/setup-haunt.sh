@@ -1441,30 +1441,20 @@ setup_rules_to_directory() {
 }
 
 setup_rules() {
-    section "Phase 2b: Binding Rules (Scope: ${SCOPE})"
+    section "Phase 2b: Binding Rules (GLOBAL ONLY - no project duplication)"
 
-    # Define target directories based on scope
+    # Define global rules directory
     local global_rules_dir="${HOME}/.claude/rules"
-    local project_rules_dir="$(pwd)/.claude/rules"
 
-    # Install based on scope
-    if [[ "$SCOPE" == "global" ]]; then
-        setup_rules_to_directory "$global_rules_dir" "global"
-        success "Global rules setup complete"
-    elif [[ "$SCOPE" == "project" ]]; then
-        setup_rules_to_directory "$project_rules_dir" "project"
-        success "Project rules setup complete"
-    elif [[ "$SCOPE" == "both" ]]; then
-        info "Binding rules to both global and project scopes..."
-        echo ""
-        info "=== Binding rules to GLOBAL scope ==="
-        setup_rules_to_directory "$global_rules_dir" "global"
-        echo ""
-        info "=== Binding rules to PROJECT scope ==="
-        setup_rules_to_directory "$project_rules_dir" "project"
-        echo ""
-        success "Rules setup complete for both scopes"
-    fi
+    # Rules are ONLY installed globally to avoid duplication
+    # Claude Code automatically loads global rules for all projects
+    info "Binding rules to global scope only..."
+    setup_rules_to_directory "$global_rules_dir" "global"
+    success "Global rules setup complete"
+
+    # Inform user that project-level rules are intentionally skipped
+    info "Note: Rules are only installed globally (not per-project) to reduce context load"
+    info "Location: ${global_rules_dir}"
 }
 
 # ============================================================================

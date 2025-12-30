@@ -8,7 +8,7 @@ This is a knowledge base and framework repository for **Haunt** - a methodology 
 
 - **Haunt/** - v2.0 Lightweight agent framework
   - **Haunt/agents/** - Agent character sheets (30-50 lines each)
-  - **Haunt/rules/** - Invariant enforcement protocols (auto-loaded)
+  - **Haunt/rules/** - Invariant enforcement protocols (deployed to ~/.claude/rules/)
   - **Haunt/skills/** - SDLC methodology skills (on-demand)
   - **Haunt/scripts/** - Setup and validation scripts
 - **Skills/** - Domain-specific Claude Code skills (career, business, finance, etc.)
@@ -19,7 +19,7 @@ This is a knowledge base and framework repository for **Haunt** - a methodology 
 
 Current work items for spawned agents. PM maintains this section from `.haunt/plans/roadmap.md`.
 
-See `.claude/rules/gco-status-updates.md` for update protocol.
+See `~/.claude/rules/gco-status-updates.md` for update protocol (global rules location).
 
 ### Current Items
 
@@ -69,7 +69,7 @@ See `.haunt/plans/roadmap.md` for full details.
 ghost-county/
 ├── Haunt/                     # v2.0 Lightweight agent framework
 │   ├── agents/               # Agent character sheets (30-50 lines each)
-│   ├── rules/                # Invariant enforcement protocols (7 rules)
+│   ├── rules/                # Invariant enforcement protocols (source - deployed to ~/.claude/rules/)
 │   ├── skills/               # SDLC methodology skills (on-demand)
 │   ├── scripts/              # Setup and validation scripts
 │   ├── docs/                 # Detailed framework documentation
@@ -149,7 +149,7 @@ Agents use models specified in their character sheets:
 
 **Rationale:** High-leverage activities (requirements, research, implementation, review) require high-capability models. The cost difference is negligible compared to the cost of poor decisions or wasted dev time.
 
-See `.claude/rules/gco-model-selection.md` for detailed guidance.
+See `~/.claude/rules/gco-model-selection.md` for detailed guidance (global rules location).
 
 
 
@@ -180,7 +180,7 @@ description: When to trigger this skill and what it does.
 
 ## Requirements Format
 
-See `.claude/rules/gco-roadmap-format.md` for requirement structure and status icons.
+See `~/.claude/rules/gco-roadmap-format.md` for requirement structure and status icons (global rules location).
 
 Key: ⚪ Not Started | 🟡 In Progress | 🟢 Complete | 🔴 Blocked
 

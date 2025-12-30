@@ -1080,21 +1080,16 @@ function Install-RulesToDirectory {
 }
 
 function Install-Rules {
-    Write-Section "Phase 4: Binding Enforcement Rules"
+    Write-Section "Phase 4: Binding Enforcement Rules (GLOBAL ONLY)"
 
-    switch ($Scope) {
-        'global' {
-            Install-RulesToDirectory -TargetDir $GlobalRulesDir -ScopeName "global"
-        }
-        'project' {
-            Install-RulesToDirectory -TargetDir $ProjectRulesDir -ScopeName "project"
-        }
-        'both' {
-            Install-RulesToDirectory -TargetDir $GlobalRulesDir -ScopeName "global"
-            Write-Host ""
-            Install-RulesToDirectory -TargetDir $ProjectRulesDir -ScopeName "project"
-        }
-    }
+    # Rules are ONLY installed globally to avoid duplication
+    # Claude Code automatically loads global rules for all projects
+    Write-Info "Binding rules to global scope only (no project duplication)..."
+    Install-RulesToDirectory -TargetDir $GlobalRulesDir -ScopeName "global"
+
+    Write-Host ""
+    Write-Info "Note: Rules are only installed globally (not per-project) to reduce context load"
+    Write-Info "Location: $GlobalRulesDir"
 }
 
 # ============================================================================

@@ -9,7 +9,9 @@
 **Goal:** Implement 5 strategic framework enhancements (token efficiency, workflow flexibility, coordination visibility) while maintaining lightweight philosophy.
 
 **Active Work:**
-- None (all requirements ⚪ Not Started, ready for assignment)
+- 🟢 REQ-259: Remove Project Rule Duplication (Dev-Infrastructure, S) - COMPLETE
+- ⚪ REQ-260: Convert Heavy Rules to Skills (Dev-Infrastructure, M) - Ready to start (was blocked by REQ-259)
+- ⚪ REQ-261: Add Targeted Read Training to Agents (Dev-Infrastructure, S) - Blocked by REQ-260
 
 **Recently Completed:**
 - REQ-228, REQ-229, REQ-230 (Visual workflow diagrams - archived 2025-12-28)
@@ -61,6 +63,135 @@ The Windows PowerShell setup script (`setup-haunt.ps1`) is not installing slash 
 **Agent:** Dev-Infrastructure
 **Completion:** Windows setup correctly installs slash commands, verified by user testing
 **Blocked by:** None
+
+---
+
+## Batch: Token Efficiency Optimization
+
+**Context:** Analysis revealed ~20,000 tokens loaded into every conversation due to duplicated rules (global + project), heavy rules that should be skills, and agents reading full files instead of using targeted grep. This batch implements a 70% reduction in baseline context load.
+
+**Goals:**
+- Reduce baseline context from ~20,000 tokens to ~6,000 tokens per conversation
+- Eliminate rule duplication between global and project
+- Convert context-heavy rules to on-demand skills
+- Train agents to use targeted file reads
+
+**Total Effort:** ~5 hours (3 requirements)
+
+### 🟢 REQ-259: Remove Project Rule Duplication
+
+**Type:** Enhancement
+**Reported:** 2025-12-30
+**Source:** Token efficiency analysis
+**Completed:** 2025-12-30
+
+**Description:**
+Rules are currently duplicated between `~/.claude/rules/` (global) and `.claude/rules/` (project). This doubles context load. Solution: Keep only global rules, update setup script to NOT copy rules to project directories, delete existing project rule copies.
+
+**Tasks:**
+- [x] Audit which rules exist in both locations (9 rules duplicated)
+- [x] Delete `.claude/rules/` from ghost-county project
+- [x] Update `setup-haunt.sh` to skip project rules copy
+- [x] Update `setup-haunt.ps1` to skip project rules copy
+- [x] Verify agents still load global rules correctly (confirmed in current session)
+- [x] Update CLAUDE.md to reference global rules location
+
+**Implementation Notes:**
+- Deleted `.claude/rules/` directory from ghost-county project (kept parent `.claude/` for other assets)
+- Modified `setup-haunt.sh` to only install rules globally, not per-project
+- Modified `setup-haunt.ps1` to match bash script behavior
+- Updated CLAUDE.md to clarify rules are deployed to `~/.claude/rules/` (global location)
+- Verified current session successfully loads global rules without project duplication
+- Token savings: ~50% reduction in rules context load (9 rules × ~500 lines each = ~4500 lines eliminated)
+
+**Files:**
+- `.claude/rules/` (deleted directory)
+- `Haunt/scripts/setup-haunt.sh` (modified)
+- `Haunt/scripts/setup-haunt.ps1` (modified)
+- `CLAUDE.md` (modified)
+
+**Effort:** S
+**Complexity:** SIMPLE
+**Agent:** Dev-Infrastructure
+**Completion:** Only global rules exist, no project duplication, ~50% context reduction
+**Blocked by:** None
+
+### ⚪ REQ-260: Convert Heavy Rules to Skills
+
+**Type:** Enhancement
+**Reported:** 2025-12-30
+**Source:** Token efficiency analysis
+
+**Description:**
+Six rules totaling ~2,000 lines are loaded into every conversation but only needed occasionally. Convert these to skills (on-demand) while keeping slim reference versions as rules.
+
+**Rules to Convert:**
+| Rule | Lines | When Needed |
+|------|-------|-------------|
+| `gco-ui-design-standards.md` | 507 | Frontend work only |
+| `gco-ui-testing.md` | 322 | E2E test work only |
+| `gco-completion-checklist.md` | 323 | Before marking 🟢 |
+| `gco-interactive-decisions.md` | 301 | Complex decisions |
+| `gco-roadmap-format.md` | 338 | Creating requirements |
+| `gco-model-selection.md` | 152 | Agent spawning |
+
+**Tasks:**
+- [ ] Create `Haunt/skills/gco-ui-design/SKILL.md` from full rule content
+- [ ] Create `Haunt/skills/gco-completion/SKILL.md` from full rule content
+- [ ] Create slim rule versions (~20 lines each) that say "invoke skill for full guidance"
+- [ ] Replace heavy rules in `Haunt/rules/` with slim versions
+- [ ] Update agent character sheets to invoke skills when needed
+- [ ] Run setup script to deploy slim rules globally
+- [ ] Verify skills are accessible and invoke correctly
+
+**Files:**
+- `Haunt/skills/gco-ui-design/SKILL.md` (create)
+- `Haunt/skills/gco-completion/SKILL.md` (create)
+- `Haunt/rules/gco-ui-design-standards.md` (replace with slim)
+- `Haunt/rules/gco-ui-testing.md` (replace with slim)
+- `Haunt/rules/gco-completion-checklist.md` (replace with slim)
+- `Haunt/rules/gco-interactive-decisions.md` (replace with slim)
+- `Haunt/rules/gco-roadmap-format.md` (replace with slim)
+- `Haunt/rules/gco-model-selection.md` (replace with slim)
+
+**Effort:** M
+**Complexity:** MODERATE
+**Agent:** Dev-Infrastructure
+**Completion:** Heavy rules converted to skills, slim rules ~600 lines total, ~77% rule context reduction
+**Blocked by:** REQ-259
+
+### ⚪ REQ-261: Add Targeted Read Training to Agents
+
+**Type:** Enhancement
+**Reported:** 2025-12-30
+**Source:** Token efficiency analysis
+
+**Description:**
+Agents currently read full files (e.g., 1,647 line roadmap) when they only need specific sections. Add training to agent character sheets and session startup to use targeted reads:
+- `grep -A 30 "REQ-XXX"` instead of `Read(roadmap.md)`
+- `grep -E "PATTERN" file` instead of `Read(file)`
+- Use `head -50` or `Read(file, limit=50)` for file previews
+
+**Tasks:**
+- [ ] Update `Haunt/agents/gco-dev.md` with targeted read guidance
+- [ ] Update `Haunt/agents/gco-research.md` with targeted read guidance
+- [ ] Update `Haunt/agents/gco-project-manager.md` with targeted read guidance
+- [ ] Update `Haunt/rules/gco-session-startup.md` with targeted read protocol
+- [ ] Add examples of good vs bad file access patterns
+- [ ] Run setup script to deploy updated agents
+- [ ] Test that agents use targeted reads in practice
+
+**Files:**
+- `Haunt/agents/gco-dev.md` (modify)
+- `Haunt/agents/gco-research.md` (modify)
+- `Haunt/agents/gco-project-manager.md` (modify)
+- `Haunt/rules/gco-session-startup.md` (modify)
+
+**Effort:** S
+**Complexity:** SIMPLE
+**Agent:** Dev-Infrastructure
+**Completion:** Agents trained to use grep/targeted reads, verified in test session
+**Blocked by:** REQ-260
 
 ---
 
