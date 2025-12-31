@@ -291,7 +291,7 @@ Enhance the `gco-completion-checklist.md` rule with Ralph-inspired explicit veri
 
 ---
 
-### ⚪ REQ-280: Create haunt-verify.sh Completion Verification Script
+### 🟢 REQ-280: Create haunt-verify.sh Completion Verification Script
 
 **Type:** Enhancement
 **Reported:** 2025-12-31
@@ -308,16 +308,16 @@ Verification types:
 - Task checkboxes (parse requirement for unchecked tasks)
 
 **Tasks:**
-- [ ] Create `Haunt/scripts/haunt-verify.sh` with JSON output
-- [ ] Implement `haunt-verify REQ-XXX` command (full verification)
-- [ ] Add test result verification (detect test framework, parse output)
-- [ ] Add coverage verification (parse coverage report if available)
-- [ ] Add lint verification (run project linter, check exit code)
-- [ ] Add task checkbox verification (parse requirement, count checked/unchecked)
-- [ ] Add file existence verification (check files listed in requirement exist)
-- [ ] Return structured JSON with pass/fail per criterion
-- [ ] Add usage help text (`--help` flag)
-- [ ] Test with sample requirements
+- [x] Create `Haunt/scripts/haunt-verify.sh` with JSON output
+- [x] Implement `haunt-verify REQ-XXX` command (full verification)
+- [x] Add test result verification (detect test framework, parse output)
+- [x] Add coverage verification (parse coverage report if available)
+- [x] Add lint verification (run project linter, check exit code)
+- [x] Add task checkbox verification (parse requirement, count checked/unchecked)
+- [x] Add file existence verification (check files listed in requirement exist)
+- [x] Return structured JSON with pass/fail per criterion
+- [x] Add usage help text (`--help` flag)
+- [x] Test with sample requirements
 
 **Files:**
 - `Haunt/scripts/haunt-verify.sh` (create)
