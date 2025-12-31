@@ -48,3 +48,8 @@ The skill contains:
 - NEVER skip E2E tests "because it's simple"
 - NEVER commit failing E2E tests
 - ALWAYS test user behavior, not implementation details
+
+## See Also
+
+- `gco-react-standards.md` - React architecture and security patterns
+- `gco-ui-design-standards.md` - Accessibility, spacing, states

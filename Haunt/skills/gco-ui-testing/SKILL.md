@@ -316,6 +316,48 @@ bash Haunt/scripts/verify-e2e-tests.sh REQ-XXX frontend
 
 E2E tests are not optional. They are **professional accountability**. Untested UI is **incomplete work**, not "done except for tests."
 
+## MSW (Mock Service Worker) Integration
+
+### When to Use
+
+Mock API calls in component tests (Vitest), E2E tests (Playwright), and Storybook stories.
+
+### Setup Pattern
+
+**Required files:**
+- `src/mocks/handlers.ts` - REST/GraphQL handlers
+- `src/mocks/server.ts` - Node: `setupServer(...handlers)`
+- `src/mocks/browser.ts` - Browser: `setupWorker(...handlers)`
+
+### Handler Organization
+
+```
+src/mocks/handlers/
+  ├── user.ts
+  ├── products.ts
+  └── index.ts
+```
+
+### Test Integration
+
+```typescript
+// setupTests.ts
+import { server } from './mocks/server'
+beforeAll(() => server.listen({ onUnhandledRequest: 'error' }))
+afterEach(() => server.resetHandlers())  // CRITICAL
+afterAll(() => server.close())
+
+// Per-test override
+server.use(http.get('/api/user', () => HttpResponse.error()))
+```
+
+### Non-Negotiable
+
+- ALWAYS reset handlers in `afterEach`
+- ALWAYS use `onUnhandledRequest: 'error'`
+- ALWAYS organize handlers by domain
+- NEVER define handlers inline in every test
+
 ## See Also
 
 - `Haunt/skills/gco-playwright-tests/SKILL.md` - Detailed test patterns and examples

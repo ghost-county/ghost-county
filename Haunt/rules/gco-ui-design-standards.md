@@ -38,3 +38,8 @@ The skill contains:
 - NEVER output UI without checking contrast ratios
 - NEVER define only default state (all 5 states required)
 - NEVER use arbitrary spacing (8px grid is mandatory)
+
+## See Also
+
+- `gco-react-standards.md` - React architecture and security patterns
+- `gco-ui-testing.md` - Playwright E2E testing requirements

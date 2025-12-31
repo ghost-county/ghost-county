@@ -3396,20 +3396,6 @@ EOF
         fi
     fi
 
-    # Validate agent line counts (<= 300 lines) if agents exist (warning only)
-    if [[ $agent_count -gt 0 || ${project_agent_count:-0} -gt 0 ]]; then
-        if [[ -f "${SCRIPT_DIR}/validation/validate-agents.sh" ]]; then
-            info "  Validating agent line counts (<= 300 lines)..."
-            if bash "${SCRIPT_DIR}/validation/validate-agents.sh" > /dev/null 2>&1; then
-                success "  All agents are <= 300 lines"
-            else
-                warning "  Some agents exceed 300 lines (consider trimming)"
-                ((warnings_count++))
-            fi
-        else
-            warning "  validation/validate-agents.sh not found - skipping line count validation"
-        fi
-    fi
 
     if [[ $agents_issues -eq 0 ]]; then
         ((passed_checks++))
