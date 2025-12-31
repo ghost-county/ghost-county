@@ -83,7 +83,7 @@ Create wrapper script for `.haunt/docs/lessons-learned.md` (752 lines) to provid
 
 ---
 
-### 🟡 REQ-276: Implement haunt-story.sh Wrapper
+### 🟢 REQ-276: Implement haunt-story.sh Wrapper
 
 **Type:** Enhancement
 **Reported:** 2025-12-31
@@ -170,14 +170,15 @@ Create general-purpose file reading wrapper with multiple access modes (head, ta
 Create wrapper script for `.haunt/completed/roadmap-archive.md` (grows to 1,000+ lines). Agents rarely need full archive but occasionally need to reference completed requirements. Provides targeted lookup instead of full file reads.
 
 **Tasks:**
-- [ ] Create `Haunt/scripts/haunt-archive.sh` with JSON output
-- [ ] Implement `haunt-archive search REQ-XXX` command (find specific requirement)
-- [ ] Implement `haunt-archive list [--since=DATE]` command (list completions)
-- [ ] Implement `haunt-archive get REQ-XXX` command (full completion details)
-- [ ] Add date filtering support for list command
-- [ ] Add error handling for missing requirements
-- [ ] Add usage help text (`--help` flag)
-- [ ] Test with actual archive file (verify requirement extraction)
+- [x] Create `Haunt/scripts/haunt-archive.sh` with JSON output
+- [x] Implement `haunt-archive search REQ-XXX` command (find specific requirement)
+- [x] Implement `haunt-archive list [--since=DATE]` command (list completions)
+- [x] Implement `haunt-archive get REQ-XXX` command (full completion details)
+- [x] Implement `haunt-archive stats` command (summary statistics)
+- [x] Add date filtering support for list command
+- [x] Add error handling for missing requirements
+- [x] Add usage help text (`--help` flag)
+- [x] Test with actual archive file (verify requirement extraction)
 
 **Files:**
 - `Haunt/scripts/haunt-archive.sh` (create)
