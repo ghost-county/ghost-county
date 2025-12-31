@@ -518,7 +518,7 @@ Create wrapper for test and build execution that returns structured results. Det
 
 ---
 
-### {🟡} REQ-272: Phase Gates for TDD Workflow
+### {🟢} REQ-272: Phase Gates for TDD Workflow
 
 **Type:** Enhancement
 **Reported:** 2025-12-30
