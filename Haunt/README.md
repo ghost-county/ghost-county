@@ -42,7 +42,6 @@ bash Haunt/scripts/setup-haunt.sh --verify
 - Copies agent character sheets to `~/.claude/agents/`
 - Installs rules to `~/.claude/rules/` (auto-loaded every session)
 - Deploys skills to `~/.claude/skills/` (on-demand)
-- Creates project structure (`.haunt/plans/`, `.haunt/completed/`, etc.)
 
 ### Your First Project
 
@@ -325,15 +324,12 @@ Haunt/
 ### Do I need to install MCP servers?
 **Optional.** Haunt works without MCP, but Context7 (docs lookup) and Playwright (E2E tests) enhance capabilities.
 
-### Can I use Haunt with existing projects?
-**Yes.** Run `bash Haunt/scripts/setup-haunt.sh --project-only` in any project.
-
-### How do I customize an agent for my project?
-Copy to `./.claude/agents/` (project-specific) and modify. Project agents override global agents.
+### How do I customize an agent?
+Edit the agent file in `~/.claude/agents/`. Changes apply to all projects using that agent.
 
 ### What if I want to remove Haunt?
 ```bash
-claude /exorcism  # Removes all Haunt artifacts from current project
+rm -rf ~/.claude/agents/gco-* ~/.claude/rules/gco-* ~/.claude/skills/gco-*
 ```
 
 ### Can I use both v1.0 and v2.0?
