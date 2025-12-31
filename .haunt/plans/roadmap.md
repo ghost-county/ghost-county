@@ -392,7 +392,7 @@ Quick wins from token analysis: merge duplicate content and convert reference ma
 
 **Research Document:** `.haunt/docs/research/determinism-research.md`
 
-### {🟡} REQ-269: Lightweight Metrics Framework
+### {🟢} REQ-269: Lightweight Metrics Framework
 
 **Type:** Enhancement
 **Reported:** 2025-12-30
