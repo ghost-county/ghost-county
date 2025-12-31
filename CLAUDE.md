@@ -25,7 +25,12 @@ See `~/.claude/rules/gco-roadmap-format.md` for status update protocol (global r
 
 **Active Work:** None (all current work complete!)
 
-**Backlog (7 requirements):**
+**Backlog (10 requirements):**
+
+Skill Token Optimization (>600 lines):
+⚪ REQ-283: Refactor gco-requirements-analysis (824 lines → <500, M)
+⚪ REQ-284: Refactor gco-code-patterns (658 lines → <500, S)
+⚪ REQ-285: Refactor gco-task-decomposition (600 lines → <500, S)
 
 Visual Documentation:
 ⚪ REQ-228: Create Séance Workflow Infographic (S)
@@ -40,7 +45,7 @@ GitHub Integration:
 ⚪ REQ-205: GitHub Issues Integration (Research-Analyst → Dev-Infrastructure)
 ⚪ REQ-206: Create /bind Command (Dev-Infrastructure)
 
-**Recently Archived (2025-12-31):** REQ-279-281 (Agent Iteration & Verification), REQ-275-278 (Wrapper Scripts), REQ-274 (Roadmap Lookup)
+**Recently Archived (2025-12-31):** REQ-282 (gco-orchestrator refactored), REQ-279-281 (Agent Iteration), REQ-275-278 (Wrapper Scripts)
 
 See `.haunt/plans/roadmap.md` for full details.
 
