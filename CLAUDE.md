@@ -40,7 +40,7 @@ GitHub Integration:
 ⚪ REQ-205: GitHub Issues Integration (Research-Analyst → Dev-Infrastructure)
 ⚪ REQ-206: Create /bind Command (Dev-Infrastructure)
 
-**Recently Banished (2025-12-30):** 12 obsolete/duplicate requirements removed. Token efficiency wrappers (`haunt-roadmap`, `haunt-git`, `haunt-run`) solved the problems these were meant to address.
+**Recently Archived (2025-12-31):** REQ-279-281 (Agent Iteration & Verification), REQ-275-278 (Wrapper Scripts), REQ-274 (Roadmap Lookup)
 
 See `.haunt/plans/roadmap.md` for full details.
 
