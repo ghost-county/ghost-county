@@ -23,20 +23,29 @@ Read CLAUDE.md Active Work section (already in context):
 **If found:** Proceed with that work
 **If empty/no match:** Continue to Step 3
 
-### Step 3: Check Roadmap (Use Targeted Read)
+### Step 3: Check Roadmap (Use Structured Wrapper)
 
 **WRONG:**
 ```bash
 Read(.haunt/plans/roadmap.md)  # Reads 1,647 lines
 ```
 
-**RIGHT:**
+**RIGHT (Structured JSON):**
+```bash
+# Find your agent type's assignments (returns JSON):
+bash Haunt/scripts/haunt-roadmap.sh list --agent=Dev-Backend
+
+# Find unstarted items (returns JSON):
+bash Haunt/scripts/haunt-roadmap.sh list --status=⚪
+
+# Extract specific requirement (returns JSON):
+bash Haunt/scripts/haunt-roadmap.sh get REQ-XXX
+```
+
+**ALTERNATIVE (Direct grep if wrapper unavailable):**
 ```bash
 # Find your agent type's assignments:
 grep -B 5 "Agent: Dev-Backend" .haunt/plans/roadmap.md
-
-# Find unstarted items:
-grep "^###.*⚪" .haunt/plans/roadmap.md
 
 # Extract specific requirement:
 grep -A 30 "REQ-XXX" .haunt/plans/roadmap.md

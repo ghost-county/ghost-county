@@ -59,7 +59,7 @@ Phase 3 - High Impact (3 requirements, ~14 hours):
 
 ## Backlog: Token Efficiency
 
-### ⚪ REQ-274: Structured Roadmap Lookup Wrapper
+### 🟢 REQ-274: Structured Roadmap Lookup Wrapper
 
 **Type:** Enhancement
 **Reported:** 2025-12-30
@@ -92,13 +92,13 @@ haunt-roadmap my-work              # Show requirements assigned to caller's agen
 ```
 
 **Tasks:**
-- [ ] Create `Haunt/scripts/haunt-roadmap.sh` wrapper
-- [ ] Implement `get REQ-XXX` subcommand (grep + parse to JSON)
-- [ ] Implement `list` with status/agent filters
-- [ ] Implement `my-work` for quick agent lookup
-- [ ] Handle requirement not found gracefully
-- [ ] Update `gco-session-startup.md` to reference wrapper
-- [ ] Test with current roadmap format
+- [x] Create `Haunt/scripts/haunt-roadmap.sh` wrapper
+- [x] Implement `get REQ-XXX` subcommand (grep + parse to JSON)
+- [x] Implement `list` with status/agent filters
+- [x] Implement `my-work` for quick agent lookup
+- [x] Handle requirement not found gracefully
+- [x] Update `gco-session-startup.md` to reference wrapper
+- [x] Test with current roadmap format
 
 **Files:**
 - `Haunt/scripts/haunt-roadmap.sh` (create)
