@@ -23,43 +23,24 @@ See `~/.claude/rules/gco-roadmap-format.md` for status update protocol (global r
 
 ### Current Items
 
-**BMAD-Inspired Enhancements (3 Phases, 13 Requirements)**
+**Active Work:** None (all current work complete!)
 
-Phase 1 - Quick Wins (5 requirements, ~10 hours):
-⚪ REQ-228: Create Séance Workflow Infographic (Agent: Dev-Infrastructure, S)
-⚪ REQ-229: Create Agent Coordination Diagram (Agent: Dev-Infrastructure, S)
-⚪ REQ-230: Create Session Startup Protocol Diagram (Agent: Dev-Infrastructure, S)
-⚪ REQ-231: Implement /haunt status --batch Command (Agent: Dev-Infrastructure, M)
-⚪ REQ-232: Add Effort Estimation to Batch Status (Agent: Dev-Infrastructure, S, blocked by REQ-231)
+**Backlog (7 requirements):**
 
-Phase 2 - Medium Effort (5 requirements, ~22 hours):
-⚪ REQ-225: Add /seance --quick Mode (Agent: Dev-Infrastructure, S)
-⚪ REQ-226: Add /seance --deep Mode (Agent: Dev-Infrastructure, M)
-⚪ REQ-227: Update Séance Skill with Mode Selection (Agent: Dev-Infrastructure, S, blocked by REQ-225/226)
-⚪ REQ-223: Create /story Command (Agent: Dev-Infrastructure, M)
-⚪ REQ-224: Update Dev Agent Startup to Load Story Files (Agent: Dev-Infrastructure, S, blocked by REQ-223)
+Visual Documentation:
+⚪ REQ-228: Create Séance Workflow Infographic (S)
+⚪ REQ-229: Create Agent Coordination Diagram (S)
+⚪ REQ-230: Create Session Startup Protocol Diagram (S)
 
-Phase 3 - High Impact (3 requirements, ~14 hours):
-⚪ REQ-220: Implement Batch-Specific Roadmap Sharding (Agent: Dev-Infrastructure, M)
-⚪ REQ-221: Update Session Startup to Load Active Batch Only (Agent: Dev-Infrastructure, S, blocked by REQ-220)
-⚪ REQ-222: Archive Completed Batches Automatically (Agent: Dev-Infrastructure, M, blocked by REQ-220)
+CLI Improvements:
+⚪ REQ-231: Implement /haunt status --batch Command (M)
+⚪ REQ-232: Add Effort Estimation to Batch Status (S, blocked by REQ-231)
 
-**Also on roadmap:**
+GitHub Integration:
 ⚪ REQ-205: GitHub Issues Integration (Research-Analyst → Dev-Infrastructure)
 ⚪ REQ-206: Create /bind Command (Dev-Infrastructure)
-🟢 REQ-243: Fix Windows slash commands bug (S) - COMPLETE
-🟢 REQ-244: Frontend-design plugin installation (M) - COMPLETE
-🟢 REQ-245: Interactive dependency prompts - COMPLETE (M)
 
-**Token Efficiency Optimizations:**
-🟢 REQ-246: Edit Retry Detection (S) - COMPLETE - saves 100K tokens/task
-🟢 REQ-247: File Caching Awareness (S) - COMPLETE - saves 38K tokens/task
-⚪ REQ-248: Story Files for M-Sized Features (M, RICE: 63)
-⚪ REQ-251: Add Haunt Reinstall Prompt to Seance (M)
-⚪ REQ-249: Roadmap Sharding (M) - LOW PRIORITY
-⚪ REQ-250: Adaptive Workflow Modes (M) - LOW PRIORITY
-
-**Impact:** Phase 1 optimizations deployed! Future agents should use 70% fewer tokens.
+**Recently Banished (2025-12-30):** 12 obsolete/duplicate requirements removed. Token efficiency wrappers (`haunt-roadmap`, `haunt-git`, `haunt-run`) solved the problems these were meant to address.
 
 See `.haunt/plans/roadmap.md` for full details.
 
