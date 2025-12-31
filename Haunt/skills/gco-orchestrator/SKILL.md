@@ -9,6 +9,24 @@ The Seance is Ghost County's primary workflow orchestration layer - a ritual tha
 
 **Framework Update Check:** Every seance begins by checking if the Haunt framework has been updated. If a new version is available, you'll be prompted to reinstall before continuing.
 
+## DELEGATION GATE (Before ANY Action)
+
+⛔ **CRITICAL CHECKPOINT:** Before executing any action, verify you're not about to do specialized work.
+
+**Am I about to do specialized work?**
+- [ ] WebSearch/WebFetch → ⛔ STOP: Spawn gco-research-analyst
+- [ ] Multi-file analysis (>10 files) → ⛔ STOP: Spawn gco-research-analyst
+- [ ] Requirements analysis (JTBD/Kano/RICE) → ⛔ STOP: Spawn gco-project-manager
+- [ ] Write code/tests → ⛔ STOP: Spawn gco-dev-*
+- [ ] Code review → ⛔ STOP: Spawn gco-code-reviewer
+
+**If ALL boxes are unchecked:** Proceed (this is coordination work)
+**If ANY box is checked:** STOP and spawn the indicated agent
+
+⛔ **PROHIBITION:** Orchestrators NEVER execute WebSearch, WebFetch, or multi-file Read operations directly. These are research activities requiring specialist agents.
+
+---
+
 ## Delegation Protocol
 
 **Core Principle:** Orchestrators coordinate workflows but DO NOT execute specialized work.
@@ -178,6 +196,27 @@ Orchestrators SHOULD execute directly when:
 
 These are lightweight coordination tasks that don't benefit from spawning.
 
+### Self-Check: Am I About to Call WebSearch/WebFetch?
+
+**Before EVERY WebSearch or WebFetch call:**
+
+1. ⛔ **STOP** - Do NOT proceed with the call
+2. Ask yourself: "Am I an orchestrator or a research agent?"
+3. If orchestrator: Spawn gco-research-analyst instead
+4. If research agent: Proceed with research
+
+**Example (WRONG):**
+```python
+# Orchestrator trying to do research
+results = WebSearch("best Node.js auth libraries")
+```
+
+**Example (RIGHT):**
+```python
+# Orchestrator spawning research agent
+Spawn gco-research-analyst with prompt: "Research best Node.js auth libraries"
+```
+
 ### Success Criteria
 
 You're following delegation protocol correctly when:
@@ -187,6 +226,7 @@ You're following delegation protocol correctly when:
 3. **You never do multi-file analysis** → Always spawn Research agent
 4. **You spawn PM for planning phases** → Not just for complex features
 5. **Your token usage is low** → Coordination overhead only, not execution work
+6. **You run delegation gate checks** → At start and before each phase transition
 
 ## When to Use
 
@@ -784,6 +824,8 @@ REQ-XXX Tasks now include:
 
 ### Step 0: Check Haunt Framework Version (Run First)
 
+⛔ **DELEGATION GATE CHECKPOINT:** Before continuing, verify you're not about to do specialized work. Review the checklist at the top of this skill.
+
 Before starting the seance workflow, check if the Haunt framework needs updating:
 
 ```python
@@ -1178,6 +1220,8 @@ print(f"   Effort: {effort} (~30 min)" if effort == "XS" else f"   Effort: {effo
 
 ### Step 3: Planning Phase
 
+⛔ **DELEGATION GATE CHECKPOINT:** Am I about to do requirements analysis? → STOP: Spawn gco-project-manager (already doing this correctly).
+
 The Project Manager executes its workflow:
 
 **Full Mode (4 Phases):**
@@ -1268,6 +1312,8 @@ Confirm roadmap location:
 > "Your roadmap is ready at `.haunt/plans/roadmap.md`. You can summon spirits later with `/summon <agent>` or begin implementation yourself."
 
 ### Step 6: Garden and Archive (After Agents Complete Work)
+
+⛔ **DELEGATION GATE CHECKPOINT:** Gardening is coordination work (reading roadmap, archiving). Safe to proceed.
 
 **When spawned agents finish their work**, automatically perform roadmap gardening:
 

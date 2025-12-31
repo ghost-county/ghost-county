@@ -381,6 +381,231 @@ Quick wins from token analysis: merge duplicate content and convert reference ma
 
 ---
 
+## Batch: Determinism & Measurement
+
+**Context:** Research from [vexjoy.com article](https://vexjoy.com/posts/everything-that-can-be-deterministic-should-be-my-claude-code-setup/) on deterministic agent patterns. Core insight: "The LLM is varying its execution when it should only vary its decisions." Reduce variance in environment interaction, enable measurement of what actually helps.
+
+**Philosophy:**
+- Measurement: Zero agent overhead (derived from existing artifacts)
+- Wrappers: Structured output for environment interaction (agent decides, wrapper executes deterministically)
+- Phase Gates: Enforce workflow steps without preventing creativity in implementation
+
+**Research Document:** `.haunt/docs/research/determinism-research.md`
+
+### {🟡} REQ-269: Lightweight Metrics Framework
+
+**Type:** Enhancement
+**Reported:** 2025-12-30
+**Source:** Research - need to measure "what actually helps"
+
+**Description:**
+Create a metrics extraction system that derives measurements from existing artifacts with ZERO agent overhead. Agents don't log anything extra—metrics are extracted post-hoc from git history, roadmap status changes, and archived completions.
+
+**Metrics to Derive:**
+
+| Metric | Source | Calculation |
+|--------|--------|-------------|
+| Cycle Time | Git commits + roadmap | Time from first commit to 🟢 status |
+| Effort Accuracy | Roadmap sizing | Estimated vs actual (XS<1hr, S<2hr, M<4hr) |
+| First-Pass Success | Git history | Commits without "fix", "revert", "oops" in subsequent commits |
+| Completion Rate | Roadmap archive | Requirements completed vs abandoned |
+
+**Tasks:**
+- [ ] Create `haunt-metrics` script that extracts from existing artifacts
+- [ ] Parse git log for requirement commits (REQ-XXX pattern)
+- [ ] Parse roadmap status change timestamps (⚪→🟡→🟢)
+- [ ] Generate summary report (JSON + human-readable)
+- [ ] Add `/haunt metrics` command to invoke script
+- [ ] Document metric definitions
+
+**Non-Goals:**
+- No per-action logging by agents
+- No changes to agent workflows
+- No real-time tracking
+
+**Files:**
+- `Haunt/scripts/haunt-metrics.sh` (create)
+- `Haunt/commands/haunt-metrics.md` (create)
+
+**Effort:** M
+**Complexity:** MODERATE
+**Agent:** Dev-Infrastructure
+**Completion:** `haunt-metrics` extracts cycle time, effort accuracy, first-pass success from git/roadmap; zero agent workflow changes
+**Blocked by:** None
+
+---
+
+### {🟡} REQ-270: Structured Git Operations Wrapper
+
+**Type:** Enhancement
+**Reported:** 2025-12-30
+**Source:** Research - reduce parsing variance in git output
+
+**Description:**
+Create wrapper scripts for common git operations that return structured JSON instead of raw text. When agents receive structured data, they only decide what to do—not how to parse.
+
+**Wrappers to Create:**
+
+| Command | Raw Output Problem | Structured Output |
+|---------|-------------------|-------------------|
+| `git status` | Multi-line text, varies by config | `{branch, staged[], modified[], untracked[], ahead, behind}` |
+| `git diff --stat` | Text table parsing | `{files_changed, insertions, deletions, files[]}` |
+| `git log` | Variable format | `{commits[{hash, author, date, message}]}` |
+
+**Tasks:**
+- [ ] Create `haunt-git` wrapper script with subcommands
+- [ ] Implement `haunt-git status` → JSON output
+- [ ] Implement `haunt-git diff-stat` → JSON output
+- [ ] Implement `haunt-git log` → JSON output (configurable count)
+- [ ] Handle edge cases (detached HEAD, merge conflicts, empty repo)
+- [ ] Add `--raw` flag to pass through to regular git when needed
+- [ ] Document usage in agent rules
+
+**Files:**
+- `Haunt/scripts/haunt-git.sh` (create)
+- `Haunt/rules/gco-session-startup.md` (modify - reference wrapper)
+
+**Effort:** M
+**Complexity:** MODERATE
+**Agent:** Dev-Infrastructure
+**Completion:** Agents can call `haunt-git status` and receive JSON; parsing variance eliminated for git operations
+**Blocked by:** None
+
+---
+
+### {🟡} REQ-271: Structured Build/Test Execution Wrapper
+
+**Type:** Enhancement
+**Reported:** 2025-12-30
+**Source:** Research - reduce parsing variance in test/build output
+
+**Description:**
+Create wrapper for test and build execution that returns structured results. Detects framework automatically (pytest, npm, go) and returns consistent JSON regardless of underlying tool.
+
+**Structured Output:**
+```json
+{
+  "success": true,
+  "framework": "pytest",
+  "passed": 12,
+  "failed": 0,
+  "skipped": 1,
+  "errors": 0,
+  "duration_seconds": 4.2,
+  "failures": [],
+  "coverage_percent": 85.2
+}
+```
+
+**Tasks:**
+- [x] Create `haunt-run` wrapper script
+- [x] Implement `haunt-run test` with auto-detection (pytest, npm test, go test)
+- [x] Implement `haunt-run build` with auto-detection (npm build, go build, make)
+- [x] Implement `haunt-run lint` with auto-detection (eslint, ruff, golangci-lint)
+- [x] Parse each tool's output to consistent JSON schema
+- [x] Handle failures gracefully (return structured error, not crash)
+- [x] Add `--raw` flag for passthrough when needed
+
+**Files:**
+- `Haunt/scripts/haunt-run.sh` (create)
+- `Haunt/rules/gco-completion-checklist.md` (modify - reference wrapper for verification)
+
+**Effort:** M
+**Complexity:** MODERATE
+**Agent:** Dev-Infrastructure
+**Completion:** Agents can call `haunt-run test` and receive JSON with pass/fail/coverage; works for Python, Node, Go projects
+**Blocked by:** None
+
+---
+
+### {🟡} REQ-272: Phase Gates for TDD Workflow
+
+**Type:** Enhancement
+**Reported:** 2025-12-30
+**Source:** Research - enforce workflow steps without limiting creativity
+
+**Description:**
+Add explicit phase gates to TDD workflow skill. Gates are hard stops with checkboxes that must be satisfied before proceeding. This makes workflow deterministic (enforced sequence) while keeping implementation creative.
+
+**Phase Gate Structure:**
+```markdown
+### RED Phase: Write Failing Test
+
+[Guidance...]
+
+**GATE (complete ALL before proceeding):**
+- [ ] Test file exists
+- [ ] Test runs and FAILS (not error, not skip)
+- [ ] Failure message describes expected behavior
+
+⛔ **STOP:** Do NOT proceed to GREEN until all gates pass.
+```
+
+**Tasks:**
+- [ ] Add phase gates to `gco-tdd-workflow` skill (RED → GREEN → REFACTOR)
+- [ ] Add phase gates to `gco-witching-hour` skill (REPRODUCE → ISOLATE → IDENTIFY → VERIFY)
+- [ ] Add phase gates to `gco-code-review` skill (if applicable)
+- [ ] Use consistent gate format (checkboxes + STOP prohibition)
+- [ ] Update agent character sheets to reference phase gates
+
+**Files:**
+- `Haunt/skills/gco-tdd-workflow/SKILL.md` (modify)
+- `Haunt/skills/gco-witching-hour/SKILL.md` (modify)
+
+**Effort:** S
+**Complexity:** SIMPLE
+**Agent:** Dev-Infrastructure
+**Completion:** TDD and debugging skills have explicit phase gates with checkboxes; agents cannot skip workflow steps
+**Blocked by:** None
+
+---
+
+### {🟢} REQ-273: Phase Gates for Séance Orchestration
+
+**Type:** Enhancement
+**Reported:** 2025-12-30
+**Source:** User observation - orchestrator did research directly instead of spawning agent
+
+**Description:**
+Add explicit phase gates to the séance/orchestrator workflow that enforce delegation before execution. Current delegation protocol is soft guidance; this adds hard STOP gates that prevent the orchestrator from doing specialized work directly.
+
+**Phase Gate Structure:**
+```markdown
+## DELEGATION GATE (Before ANY Action)
+
+Before executing, verify:
+
+**Am I about to do specialized work?**
+- [ ] WebSearch/WebFetch → ⛔ STOP: Spawn gco-research-analyst
+- [ ] Multi-file analysis → ⛔ STOP: Spawn gco-research-analyst
+- [ ] Requirements analysis → ⛔ STOP: Spawn gco-project-manager
+- [ ] Write code/tests → ⛔ STOP: Spawn gco-dev-*
+- [ ] Code review → ⛔ STOP: Spawn gco-code-reviewer
+
+**If ALL boxes are unchecked:** Proceed (this is coordination work)
+**If ANY box is checked:** STOP and spawn the indicated agent
+
+⛔ **PROHIBITION:** Orchestrators NEVER execute WebSearch, WebFetch, or multi-file Read operations directly. These are research activities requiring specialist agents.
+```
+
+**Tasks:**
+- [x] Add delegation gate section to `gco-orchestrator` skill
+- [x] Add gate checkpoint at séance start (before mode detection is fine, but before any research)
+- [x] Add gate checkpoint before each phase transition (Scrying → Summoning → Banishing)
+- [x] Create clear STOP language with agent routing
+- [x] Add self-check: "Am I about to call WebSearch/WebFetch? → STOP"
+
+**Files:**
+- `Haunt/skills/gco-orchestrator/SKILL.md` (modify)
+
+**Effort:** S
+**Complexity:** SIMPLE
+**Agent:** Dev-Infrastructure
+**Completion:** Séance skill has explicit delegation gates; orchestrator cannot proceed with research/implementation without spawning agents
+**Blocked by:** None
+
+---
+
 ## Batch: Coding Standards Integration
 
 **Context:** Research on external style guides (Bulletproof React, Python Hitchhiker's Guide) identified gaps in Haunt's coding standards. Created slim rules for React and Python standards.
