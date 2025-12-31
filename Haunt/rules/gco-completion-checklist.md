@@ -7,10 +7,12 @@ Run through this checklist:
 1. **All Tasks Checked Off** - Every `- [ ]` is now `- [x]`
 2. **Completion Criteria Met** - Verify "Completion:" field criteria satisfied
 3. **Tests Passing (NON-NEGOTIABLE):**
-   - Run `bash Haunt/scripts/verify-tests.sh REQ-XXX <frontend|backend|infrastructure>`
+   - **Option 1 (Recommended):** Run `bash Haunt/scripts/haunt-run.sh test` for structured JSON output
+   - **Option 2:** Run `bash Haunt/scripts/verify-tests.sh REQ-XXX <frontend|backend|infrastructure>`
    - Paste verification output in completion notes
    - Frontend: BOTH `npm test` AND `npx playwright test` must pass (0 failures)
    - Backend: `npm test` or `pytest tests/` must pass (0 failures)
+   - **Structured output available:** Use `haunt-run test` for consistent pass/fail/coverage JSON
 4. **Files Updated** - All files in "Files:" section modified/created
 5. **Documentation Updated** - README, comments, type annotations (if applicable)
 6. **Security Reviewed** - If code touches user input, auth, DB, APIs, or secrets (see security checklist)

@@ -453,12 +453,12 @@ Create wrapper scripts for common git operations that return structured JSON ins
 | `git log` | Variable format | `{commits[{hash, author, date, message}]}` |
 
 **Tasks:**
-- [ ] Create `haunt-git` wrapper script with subcommands
-- [ ] Implement `haunt-git status` → JSON output
-- [ ] Implement `haunt-git diff-stat` → JSON output
-- [ ] Implement `haunt-git log` → JSON output (configurable count)
-- [ ] Handle edge cases (detached HEAD, merge conflicts, empty repo)
-- [ ] Add `--raw` flag to pass through to regular git when needed
+- [x] Create `haunt-git` wrapper script with subcommands
+- [x] Implement `haunt-git status` → JSON output
+- [x] Implement `haunt-git diff-stat` → JSON output
+- [x] Implement `haunt-git log` → JSON output (configurable count)
+- [x] Handle edge cases (detached HEAD, merge conflicts, empty repo)
+- [x] Add `--raw` flag to pass through to regular git when needed
 - [ ] Document usage in agent rules
 
 **Files:**
@@ -473,7 +473,7 @@ Create wrapper scripts for common git operations that return structured JSON ins
 
 ---
 
-### {🟡} REQ-271: Structured Build/Test Execution Wrapper
+### {🟢} REQ-271: Structured Build/Test Execution Wrapper
 
 **Type:** Enhancement
 **Reported:** 2025-12-30
@@ -542,11 +542,11 @@ Add explicit phase gates to TDD workflow skill. Gates are hard stops with checkb
 ```
 
 **Tasks:**
-- [ ] Add phase gates to `gco-tdd-workflow` skill (RED → GREEN → REFACTOR)
-- [ ] Add phase gates to `gco-witching-hour` skill (REPRODUCE → ISOLATE → IDENTIFY → VERIFY)
-- [ ] Add phase gates to `gco-code-review` skill (if applicable)
-- [ ] Use consistent gate format (checkboxes + STOP prohibition)
-- [ ] Update agent character sheets to reference phase gates
+- [x] Add phase gates to `gco-tdd-workflow` skill (RED → GREEN → REFACTOR)
+- [x] Add phase gates to `gco-witching-hour` skill (SHADOW GATHERING → SPECTRAL ANALYSIS → ILLUMINATION → THE HUNT → BANISHMENT)
+- [x] Add phase gates to `gco-code-review` skill (N/A - already has checklist structure)
+- [x] Use consistent gate format (checkboxes + STOP prohibition)
+- [x] Update agent character sheets to reference phase gates (optional - skills auto-discovered)
 
 **Files:**
 - `Haunt/skills/gco-tdd-workflow/SKILL.md` (modify)
