@@ -410,15 +410,14 @@ cmd_stats() {
 
     local total_completed=${#req_ids[@]}
 
-    # Count by effort
-    declare -A effort_counts
-    effort_counts["XS"]=0
-    effort_counts["S"]=0
-    effort_counts["M"]=0
-    effort_counts["L"]=0
+    # Count by effort (Bash 3 compatible - use separate variables)
+    local count_xs=0
+    local count_s=0
+    local count_m=0
+    local count_l=0
 
-    # Count by agent
-    declare -A agent_counts
+    # Track agents (store as pipe-separated "agent:count" pairs)
+    local agent_counts=""
 
     # Track date range
     local earliest_date=""
@@ -434,21 +433,54 @@ cmd_stats() {
             continue
         fi
 
-        # Extract effort
+        # Extract effort - normalize to single letter
         local effort
-        effort=$(echo "$req_json" | grep -o '"effort": "[^"]*"' | cut -d'"' -f4)
-        if [[ -n "$effort" ]] && [[ -n "${effort_counts[$effort]+_}" ]]; then
-            ((effort_counts[$effort]++))
-        fi
+        effort=$(echo "$req_json" | grep -o '"effort": "[^"]*"' | cut -d'"' -f4 | sed 's/ .*//; s/(.*//')
 
-        # Extract agent
+        # Increment effort counters
+        case "$effort" in
+            XS) ((count_xs++)) ;;
+            S) ((count_s++)) ;;
+            M) ((count_m++)) ;;
+            L) ((count_l++)) ;;
+        esac
+
+        # Extract agent and update counts
         local agent
         agent=$(echo "$req_json" | grep -o '"agent": "[^"]*"' | cut -d'"' -f4)
         if [[ -n "$agent" ]]; then
-            if [[ -z "${agent_counts[$agent]+_}" ]]; then
-                agent_counts[$agent]=0
+            # Find existing count for this agent (use | as delimiter to avoid issues with spaces)
+            local found=false
+            local new_counts=""
+
+            if [[ -n "$agent_counts" ]]; then
+                IFS='|' read -ra pairs <<< "$agent_counts"
+                for pair in "${pairs[@]}"; do
+                    if [[ -n "$pair" ]]; then
+                        local agent_name="${pair%%:*}"
+                        local agent_count="${pair##*:}"
+
+                        if [[ "$agent_name" == "$agent" ]]; then
+                            ((agent_count++))
+                            found=true
+                        fi
+
+                        if [[ -n "$new_counts" ]]; then
+                            new_counts="$new_counts|"
+                        fi
+                        new_counts="$new_counts$agent_name:$agent_count"
+                    fi
+                done
             fi
-            ((agent_counts[$agent]++))
+
+            if [[ "$found" == false ]]; then
+                if [[ -n "$new_counts" ]]; then
+                    new_counts="$new_counts|"
+                fi
+                new_counts="$new_counts$agent:1"
+            fi
+
+            agent_counts="$new_counts"
         fi
 
         # Track dates
@@ -465,23 +497,26 @@ cmd_stats() {
     done
 
     # Build by_effort JSON
-    local effort_json=""
-    for effort in XS S M L; do
-        if [[ -n "$effort_json" ]]; then
-            effort_json="$effort_json, "
-        fi
-        effort_json="$effort_json\"$effort\": ${effort_counts[$effort]}"
-    done
+    local effort_json="\"XS\": $count_xs, \"S\": $count_s, \"M\": $count_m, \"L\": $count_l"
 
     # Build by_agent JSON
     local agent_json=""
-    for agent in "${!agent_counts[@]}"; do
-        if [[ -n "$agent_json" ]]; then
-            agent_json="$agent_json, "
-        fi
-        local agent_escaped=$(escape_json "$agent")
-        agent_json="$agent_json\"$agent_escaped\": ${agent_counts[$agent]}"
-    done
+    if [[ -n "$agent_counts" ]]; then
+        IFS='|' read -ra pairs <<< "$agent_counts"
+        for pair in "${pairs[@]}"; do
+            if [[ -n "$pair" ]]; then
+                local agent_name="${pair%%:*}"
+                local agent_count="${pair##*:}"
+
+                if [[ -n "$agent_json" ]]; then
+                    agent_json="$agent_json, "
+                fi
+
+                local agent_escaped=$(escape_json "$agent_name")
+                agent_json="$agent_json\"$agent_escaped\": $agent_count"
+            fi
+        done
+    fi
 
     # Build date_range JSON
     local date_range_json=""

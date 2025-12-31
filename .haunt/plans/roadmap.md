@@ -160,7 +160,7 @@ Create general-purpose file reading wrapper with multiple access modes (head, ta
 
 ---
 
-### 🟡 REQ-278: Implement haunt-archive.sh Wrapper
+### 🟢 REQ-278: Implement haunt-archive.sh Wrapper
 
 **Type:** Enhancement
 **Reported:** 2025-12-31
