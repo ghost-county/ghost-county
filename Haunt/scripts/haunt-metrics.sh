@@ -171,7 +171,7 @@ get_req_metadata() {
         fi
     fi
 
-    # Search in archive if not in active roadmap (increased to 40 lines)
+    # Search in main archive if not in active roadmap (increased to 40 lines)
     # Archive format: ### 🟢 REQ-XXX: Title
     if [ -f "$ARCHIVE" ]; then
         local metadata=$(grep -A 40 "### .* $req:" "$ARCHIVE" 2>/dev/null)
@@ -181,14 +181,37 @@ get_req_metadata() {
         fi
     fi
 
+    # Search in bulk archive files (different format: list items, not headers)
+    # Bulk archive format: - 🟢 REQ-XXX: Title (date)
+    if [ -d "$PROJECT_ROOT/.haunt/completed" ]; then
+        for archive_file in "$PROJECT_ROOT/.haunt/completed"/*.md; do
+            if [ -f "$archive_file" ]; then
+                # Check if requirement is mentioned in bulk archive (list format)
+                # Use -- to prevent emoji being interpreted as option
+                if grep -q -- "$req:" "$archive_file" 2>/dev/null; then
+                    # Found in bulk archive - create minimal metadata for completed status
+                    echo "### 🟢 $req: (Archived in bulk)"
+                    echo "**Effort:** UNKNOWN"
+                    return 0
+                fi
+            fi
+        done
+    fi
+
     return 1
 }
 
 # Extract effort estimate from metadata
 get_effort_estimate() {
     local metadata="$1"
-    # Match **Effort:** at any position in line (not just start)
-    echo "$metadata" | grep "\*\*Effort:\*\*" | grep -oE '(XS|S|M|SPLIT)' || echo "UNKNOWN"
+    # Match **Effort:** field and capture ONLY the first size value
+    # Use sed to extract the value after **Effort:** and before any other text
+    local result=$(echo "$metadata" | grep "\*\*Effort:\*\*" | sed -n 's/.*\*\*Effort:\*\* *\([A-Z]*\).*/\1/p' | head -1)
+    if [ -z "$result" ]; then
+        echo "UNKNOWN"
+    else
+        echo "$result"
+    fi
 }
 
 # Extract status from metadata (⚪, 🟡, 🟢, 🔴)

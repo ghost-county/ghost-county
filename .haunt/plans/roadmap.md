@@ -581,7 +581,7 @@ gco-roadmap-planning is 554 lines (11% over 500-line target). Extract examples a
 
 > New tooling for measuring agent performance and detecting regressions.
 
-### 🟡 REQ-311: Fix haunt-metrics.sh Parsing Bugs
+### 🟢 REQ-311: Fix haunt-metrics.sh Parsing Bugs
 
 **Type:** Bug Fix
 **Reported:** 2026-01-02
@@ -595,11 +595,11 @@ haunt-metrics.sh has parsing issues:
 
 **Tasks:**
 
-- [ ] Fix effort estimate regex to capture single value
-- [ ] Improve archive file search pattern
-- [ ] Handle recently archived requirements gracefully
-- [ ] Add unit tests for parsing functions
-- [ ] Test with current git history
+- [x] Fix effort estimate regex to capture single value
+- [x] Improve archive file search pattern
+- [x] Handle recently archived requirements gracefully
+- [x] Add unit tests for parsing functions
+- [x] Test with current git history
 
 **Files:**
 
