@@ -45,7 +45,7 @@ GitHub Integration:
 ⚪ REQ-205: GitHub Issues Integration (Research-Analyst → Dev-Infrastructure)
 ⚪ REQ-206: Create /bind Command (Dev-Infrastructure)
 
-**Recently Archived (2025-12-31):** REQ-282 (gco-orchestrator refactored), REQ-279-281 (Agent Iteration), REQ-275-278 (Wrapper Scripts)
+**Recently Archived (2025-12-31):** REQ-287-290 (/cleanse Command), REQ-282 (gco-orchestrator refactored), REQ-279-281 (Agent Iteration)
 
 See `.haunt/plans/roadmap.md` for full details.
 
