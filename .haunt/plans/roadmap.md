@@ -481,7 +481,7 @@ Discovered that the existing implementation (REQ-301, REQ-302) already implement
 
 ---
 
-### ⚪ REQ-304: Validation Mode and Diagnostics
+### 🟢 REQ-304: Validation Mode and Diagnostics
 
 **Type:** Enhancement
 **Reported:** 2026-01-02
@@ -492,13 +492,13 @@ Add `--validate` flag to check all secret tags are resolvable WITHOUT exporting 
 
 **Tasks:**
 
-- [ ] Add `--validate` flag to shell script
-- [ ] Add `validate_only=True` parameter to Python function
-- [ ] Check all tags are resolvable (don't export)
-- [ ] Report missing secrets with clear error messages
-- [ ] Log successful validation (count and names)
-- [ ] Add `--debug` flag for verbose diagnostics
-- [ ] Write tests for validation mode
+- [x] Add `--validate` flag to shell script
+- [x] Add `validate_only=True` parameter to Python function
+- [x] Check all tags are resolvable (don't export)
+- [x] Report missing secrets with clear error messages
+- [x] Log successful validation (count and names)
+- [x] Add `--debug` flag for verbose diagnostics
+- [x] Write tests for validation mode
 
 **Files:**
 

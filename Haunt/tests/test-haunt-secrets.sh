@@ -727,6 +727,7 @@ EOF
     local temp_bin=$(mktemp -d)
     cat > "$temp_bin/op" <<'EOF'
 #!/usr/bin/env bash
+# $1 = "read", $2 = "op://vault/item/field"
 if [[ "$2" =~ missing-key ]]; then
     echo "ERROR: Item not found" >&2
     exit 1
@@ -738,10 +739,12 @@ EOF
     export PATH="$temp_bin:$PATH"
     export OP_SERVICE_ACCOUNT_TOKEN="test-token"
 
-    # Run validation mode
+    # Run validation mode (use set +e to prevent errexit on intentional failure)
     local temp_log=$(mktemp)
-    load_secrets "$temp_env" "true" "false" 2> "$temp_log" || true
+    set +e
+    load_secrets "$temp_env" "true" "false" 2> "$temp_log"
     local exit_code=$?
+    set -e
     local output=$(cat "$temp_log")
     rm -f "$temp_log"
 
@@ -754,7 +757,7 @@ EOF
 
     rm -f "$temp_env"
     rm -rf "$temp_bin"
-    unset OP_SERVICE_ACCOUNT_TOKEN
+    unset OP_SERVICE_ACCOUNT_TOKEN KEY1 KEY2
 }
 
 # Test: Validation mode with debug output
