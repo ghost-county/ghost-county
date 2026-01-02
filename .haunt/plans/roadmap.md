@@ -119,7 +119,7 @@ gco-code-patterns is 658 lines (32% over limit). Used by code reviewer agent for
 
 ---
 
-### ⚪ REQ-285: Refactor gco-task-decomposition Skill
+### 🟢 REQ-285: Refactor gco-task-decomposition Skill
 
 **Type:** Enhancement
 **Reported:** 2025-12-31
@@ -130,12 +130,12 @@ gco-task-decomposition is 600 lines (exactly at threshold). Used for breaking SP
 
 **Tasks:**
 
-- [ ] Analyze skill structure
-- [ ] Create `references/` directory
-- [ ] Extract decomposition examples to reference file
-- [ ] Extract DAG visualization guidance to reference file
-- [ ] Slim SKILL.md to ~400 lines
-- [ ] Add consultation gates
+- [x] Analyze skill structure
+- [x] Create `references/` directory
+- [x] Extract decomposition examples to reference file
+- [x] Extract DAG visualization guidance to reference file
+- [x] Slim SKILL.md to ~400 lines
+- [x] Add consultation gates
 
 **Files:**
 
@@ -150,6 +150,13 @@ gco-task-decomposition is 600 lines (exactly at threshold). Used for breaking SP
 - SKILL.md under 500 lines
 - Decomposition examples in reference files
 - Task decomposition workflow functions correctly
+
+**Implementation Notes:**
+- Reduced SKILL.md from 600 → 278 lines (53% reduction)
+- Created `references/dag-patterns.md` (238 lines) with ASCII/Mermaid visualization patterns
+- Created `references/examples.md` (446 lines) with full REQ-050 decomposition example
+- Added 3 consultation gates pointing to reference files
+- Deployed to `~/.claude/skills/gco-task-decomposition/`
 
 **Blocked by:** None
 

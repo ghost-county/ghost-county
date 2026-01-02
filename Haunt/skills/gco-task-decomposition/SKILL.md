@@ -30,6 +30,17 @@ Every decomposed piece MUST be completable in one uninterrupted work session:
 - >300 lines of changes
 - >6 tasks in the task list
 
+## Reference Index
+
+When you need detailed guidance, consult these references:
+
+| When You Need | Read This |
+|---------------|-----------|
+| Decomposition example (full REQ-050) | `references/examples.md` |
+| DAG visualization patterns | `references/dag-patterns.md` |
+| ASCII vs Mermaid format guidance | `references/dag-patterns.md` |
+| Parallelization pattern examples | `references/examples.md` |
+
 ## Decomposition Process
 
 ### Step 1: Analyze the Requirement
@@ -73,32 +84,11 @@ Find the natural seams where the requirement can be split:
 
 ### Step 3: Map Dependencies
 
-Create a Directed Acyclic Graph (DAG) of task dependencies:
+Create a Directed Acyclic Graph (DAG) of task dependencies.
 
-```
-## Dependency DAG
+⛔ **CONSULTATION GATE:** Before creating DAG, READ `references/dag-patterns.md` for visualization formats and examples.
 
-          +---------------+
-          | REQ-XXX-A     |
-          | (Foundation)  |
-          +-------+-------+
-                  |
-        +---------+---------+
-        |                   |
-+-------v-------+   +-------v-------+
-| REQ-XXX-B     |   | REQ-XXX-C     |
-| (Backend API) |   | (Data Models) |
-+-------+-------+   +-------+-------+
-        |                   |
-        +---------+---------+
-                  |
-          +-------v-------+
-          | REQ-XXX-D     |
-          | (Frontend)    |
-          +---------------+
-```
-
-**ASCII DAG Notation:**
+**Basic ASCII DAG Notation:**
 
 ```
 A -> B, C     (A blocks both B and C)
@@ -106,7 +96,7 @@ B -> D        (B blocks D)
 C -> D        (C blocks D)
 ```
 
-This translates to:
+This translates to roadmap format:
 - `REQ-XXX-B: Blocked by: REQ-XXX-A`
 - `REQ-XXX-C: Blocked by: REQ-XXX-A`
 - `REQ-XXX-D: Blocked by: REQ-XXX-B, REQ-XXX-C`
@@ -225,93 +215,6 @@ Format decomposed requirements for the roadmap:
 **Blocked by:** REQ-XXX-B, REQ-XXX-C
 ```
 
-## DAG Visualization Guide
-
-### ASCII DAG Format
-
-Use ASCII art for simple dependency visualization:
-
-**Linear Chain:**
-```
-A -> B -> C -> D
-```
-
-**Diamond Pattern (Parallel Middle):**
-```
-      A
-     / \
-    B   C
-     \ /
-      D
-```
-
-**Fan-Out Pattern:**
-```
-      A
-    / | \
-   B  C  D
-```
-
-**Fan-In Pattern:**
-```
-   A  B  C
-    \ | /
-      D
-```
-
-**Complex DAG:**
-```
-         A
-        / \
-       B   C
-      /|   |\
-     D E   F G
-      \|   |/
-       H   I
-        \ /
-         J
-```
-
-### Mermaid DAG Format
-
-For more complex dependencies, use Mermaid syntax:
-
-```mermaid
-graph TD
-    A[REQ-XXX-A: Foundation] --> B[REQ-XXX-B: Backend API]
-    A --> C[REQ-XXX-C: Data Models]
-    B --> D[REQ-XXX-D: Frontend]
-    C --> D
-
-    style A fill:#e8e8e8
-    style B fill:#a8d5ba
-    style C fill:#a8d5ba
-    style D fill:#f9d5e5
-```
-
-**Color Coding:**
-- Gray (`#e8e8e8`): Sequential/blocking
-- Green (`#a8d5ba`): Parallelizable
-- Pink (`#f9d5e5`): Final integration
-
-### Dependency Matrix
-
-For many items, use a matrix:
-
-```markdown
-## Dependency Matrix
-
-|          | A | B | C | D | E |
-|----------|---|---|---|---|---|
-| A        | - |   |   |   |   |
-| B        | X | - |   |   |   |
-| C        | X |   | - |   |   |
-| D        |   | X | X | - |   |
-| E        |   |   |   | X | - |
-
-X = row depends on column
-```
-
 ## Parallelization Recommendations
 
 ### When to Parallelize
@@ -328,39 +231,6 @@ X = row depends on column
 - Interdependent data structures
 - Sequential logic flow
 
-### Parallelization Patterns
-
-**Pattern 1: Domain Parallel**
-```
-          Foundation
-         /    |    \
-   Backend  Frontend  Infra
-         \    |    /
-         Integration
-```
-Each domain works independently after foundation.
-
-**Pattern 2: Layer Parallel**
-```
-     API Design (Contract)
-      /              \
-   Backend          Frontend
-   (implements)     (implements)
-      \              /
-       Integration Test
-```
-API contract enables parallel implementation.
-
-**Pattern 3: Feature Parallel**
-```
-         Core Model
-        /     |    \
-   Create   Read   Update
-        \     |    /
-         E2E Tests
-```
-CRUD operations can be parallelized.
-
 ### Coordination Requirements
 
 When recommending parallel execution:
@@ -370,203 +240,7 @@ When recommending parallel execution:
 3. **Plan integration point** - Where parallel streams merge
 4. **Schedule sync points** - When to verify parallel work aligns
 
-## Example Decomposition
-
-### Original Requirement
-
-```markdown
-### SPLIT REQ-050: Add User Dashboard
-
-**Type:** Enhancement
-**Effort:** SPLIT (estimated 16 hours)
-**Files:** 18 files
-
-**Tasks:**
-- [ ] Create dashboard data models
-- [ ] Build dashboard API endpoints
-- [ ] Implement caching layer
-- [ ] Create dashboard UI components
-- [ ] Add charts and visualizations
-- [ ] Write unit tests
-- [ ] Write E2E tests
-- [ ] Add documentation
-```
-
-### After Decomposition
-
-```markdown
-## Batch 8: User Dashboard (Decomposed from REQ-050)
-
-### ⚪ REQ-050-A: Dashboard Data Models
-
-**Type:** Enhancement
-**Effort:** S (1.5 hours)
-**Files:**
-- `src/models/dashboard.py` (create)
-- `tests/models/test_dashboard.py` (create)
-
-**Tasks:**
-- [ ] Create DashboardMetrics model
-- [ ] Create DashboardWidget model
-- [ ] Write model unit tests
-
-**Agent:** Dev-Backend
-**Completion:** Models created with 100% test coverage
-**Blocked by:** None
-
----
-
-### ⚪ REQ-050-B: Dashboard API Endpoints
-
-**Type:** Enhancement
-**Effort:** M (3 hours)
-**Files:**
-- `src/api/dashboard.py` (create)
-- `tests/api/test_dashboard.py` (create)
-- `src/api/__init__.py` (modify)
-
-**Tasks:**
-- [ ] Create GET /api/dashboard endpoint
-- [ ] Create GET /api/dashboard/widgets endpoint
-- [ ] Add authentication middleware
-- [ ] Write API tests
-
-**Agent:** Dev-Backend
-**Completion:** API returns correct dashboard data for authenticated users
-**Blocked by:** REQ-050-A
-
----
-
-### ⚪ REQ-050-C: Dashboard Caching Layer
-
-**Type:** Enhancement
-**Effort:** S (2 hours)
-**Files:**
-- `src/cache/dashboard.py` (create)
-- `tests/cache/test_dashboard.py` (create)
-
-**Tasks:**
-- [ ] Implement Redis caching for dashboard data
-- [ ] Add cache invalidation on data updates
-- [ ] Write cache tests
-
-**Agent:** Dev-Backend
-**Completion:** Dashboard API responses cached with 5-minute TTL
-**Blocked by:** REQ-050-A
-**Note:** Can run in parallel with REQ-050-B
-
----
-
-### ⚪ REQ-050-D: Dashboard UI Components
-
-**Type:** Enhancement
-**Effort:** M (3.5 hours)
-**Files:**
-- `src/components/Dashboard/index.tsx` (create)
-- `src/components/Dashboard/DashboardCard.tsx` (create)
-- `src/components/Dashboard/DashboardGrid.tsx` (create)
-- `src/components/Dashboard/Dashboard.test.tsx` (create)
-
-**Tasks:**
-- [ ] Create DashboardCard component
-- [ ] Create DashboardGrid layout component
-- [ ] Create main Dashboard page
-- [ ] Write component tests
-
-**Agent:** Dev-Frontend
-**Completion:** Dashboard components render correctly with mock data
-**Blocked by:** REQ-050-B
-
----
-
-### ⚪ REQ-050-E: Dashboard Charts and Visualizations
-
-**Type:** Enhancement
-**Effort:** M (2.5 hours)
-**Files:**
-- `src/components/Dashboard/Charts/LineChart.tsx` (create)
-- `src/components/Dashboard/Charts/BarChart.tsx` (create)
-- `src/components/Dashboard/Charts/Charts.test.tsx` (create)
-
-**Tasks:**
-- [ ] Create LineChart component with D3/Chart.js
-- [ ] Create BarChart component
-- [ ] Add chart animations and interactivity
-- [ ] Write chart tests
-
-**Agent:** Dev-Frontend
-**Completion:** Charts render with sample data and respond to interactions
-**Blocked by:** REQ-050-D
-**Note:** Can run in parallel with REQ-050-F
-
----
-
-### ⚪ REQ-050-F: Dashboard E2E Tests
-
-**Type:** Enhancement
-**Effort:** S (2 hours)
-**Files:**
-- `tests/e2e/dashboard.spec.ts` (create)
-
-**Tasks:**
-- [ ] Write E2E test for dashboard loading
-- [ ] Write E2E test for widget interactions
-- [ ] Write E2E test for chart rendering
-
-**Agent:** Dev-Frontend
-**Completion:** E2E tests pass for all dashboard user flows
-**Blocked by:** REQ-050-D
-**Note:** Can run in parallel with REQ-050-E
-```
-
-### Decomposition Summary
-
-```markdown
-## Decomposition Summary: REQ-050
-
-**Original:** SPLIT (16 hours, 18 files)
-**Decomposed into:** 6 requirements
-
-### Dependency DAG
-
-        REQ-050-A (Foundation)
-             |
-    +--------+--------+
-    |                 |
-REQ-050-B        REQ-050-C
-(API)             (Cache)
-    |                 |
-    +--------+--------+
-             |
-        REQ-050-D (UI)
-             |
-    +--------+--------+
-    |                 |
-REQ-050-E        REQ-050-F
-(Charts)         (E2E Tests)
-
-### Parallelization Opportunities
-
-**Phase 1:** A (Sequential - foundation)
-**Phase 2:** B || C (Parallel - no dependencies)
-**Phase 3:** D (Sequential - waits for API)
-**Phase 4:** E || F (Parallel - no dependencies)
-
-**Parallelization Ratio:** 4/6 tasks parallelizable (67%)
-**Estimated Time Savings:** ~4 hours with parallel execution
-
-### Agent Assignments
-
-- Dev-Backend: A, B, C (6.5 hours)
-- Dev-Frontend: D, E, F (8 hours)
-
-### Execution Order (Optimal)
-
-1. Spawn Dev-Backend for REQ-050-A
-2. When A completes, spawn Dev-Backend for B and C in parallel
-3. When B completes, spawn Dev-Frontend for REQ-050-D
-4. When D completes, spawn Dev-Frontend for E and F in parallel
-```
+⛔ **CONSULTATION GATE:** For complex parallelization patterns (domain, layer, feature), READ `references/examples.md` section "Parallelization Patterns".
 
 ## Quality Checklist
 
@@ -591,6 +265,10 @@ Before finalizing decomposition:
 | **Uneven sizing** | 1 XS, 1 XS, 1 M, 1 L | Rebalance pieces |
 | **No integration piece** | Parallel work never merges | Add final integration task |
 | **Premature parallel** | Parallel before contract defined | Define interfaces first |
+
+## Need a Complete Example?
+
+⛔ **CONSULTATION GATE:** For a full worked example of decomposing REQ-050 (User Dashboard), READ `references/examples.md`.
 
 ## Integration with Other Skills
 
