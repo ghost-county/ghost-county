@@ -635,3 +635,312 @@ class TestFetchSecretExceptions:
         """SecretNotFoundError should be an Exception subclass"""
         from haunt_secrets import SecretNotFoundError
         assert issubclass(SecretNotFoundError, Exception)
+
+
+# ========== LOAD_SECRETS AND GET_SECRETS API TESTS (REQ-302) ==========
+
+class TestLoadSecrets:
+    """Test suite for load_secrets() - modifies os.environ"""
+
+    def test_load_secrets_populates_os_environ(self, monkeypatch):
+        """Should fetch secrets and set them in os.environ"""
+        import subprocess
+        from unittest.mock import Mock
+        import tempfile
+
+        # Create test .env file
+        env_content = """# @secret:op:vault1/item1/field1
+SECRET_VAR=placeholder
+
+PLAINTEXT_VAR=plaintext-value
+"""
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.env') as f:
+            f.write(env_content)
+            f.flush()
+            env_file = f.name
+
+        try:
+            # Mock 1Password CLI
+            monkeypatch.setenv("OP_SERVICE_ACCOUNT_TOKEN", "test-token")
+
+            mock_result = Mock()
+            mock_result.returncode = 0
+            mock_result.stdout = "secret-value-123"
+            mock_result.stderr = ""
+
+            def mock_run(*args, **kwargs):
+                return mock_result
+
+            monkeypatch.setattr(subprocess, "run", mock_run)
+
+            # Import and call load_secrets
+            from haunt_secrets import load_secrets
+
+            load_secrets(env_file)
+
+            # Verify os.environ was modified
+            assert os.environ["SECRET_VAR"] == "secret-value-123"
+            assert os.environ["PLAINTEXT_VAR"] == "plaintext-value"
+        finally:
+            os.unlink(env_file)
+            # Cleanup environ
+            os.environ.pop("SECRET_VAR", None)
+            os.environ.pop("PLAINTEXT_VAR", None)
+
+    def test_load_secrets_includes_plaintext_variables(self, monkeypatch):
+        """Should include plaintext variables from .env file"""
+        import tempfile
+
+        env_content = """PLAINTEXT1=value1
+PLAINTEXT2=value2
+"""
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.env') as f:
+            f.write(env_content)
+            f.flush()
+            env_file = f.name
+
+        try:
+            from haunt_secrets import load_secrets
+
+            load_secrets(env_file)
+
+            assert os.environ["PLAINTEXT1"] == "value1"
+            assert os.environ["PLAINTEXT2"] == "value2"
+        finally:
+            os.unlink(env_file)
+            os.environ.pop("PLAINTEXT1", None)
+            os.environ.pop("PLAINTEXT2", None)
+
+    def test_load_secrets_resolves_multiple_secrets(self, monkeypatch):
+        """Should fetch and set multiple secrets"""
+        import subprocess
+        from unittest.mock import Mock
+        import tempfile
+
+        env_content = """# @secret:op:vault1/item1/field1
+SECRET1=placeholder
+
+# @secret:op:vault2/item2/field2
+SECRET2=placeholder
+"""
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.env') as f:
+            f.write(env_content)
+            f.flush()
+            env_file = f.name
+
+        try:
+            monkeypatch.setenv("OP_SERVICE_ACCOUNT_TOKEN", "test-token")
+
+            # Mock different return values for each call
+            call_count = [0]
+
+            def mock_run(cmd, *args, **kwargs):
+                call_count[0] += 1
+                mock_result = Mock()
+                mock_result.returncode = 0
+                mock_result.stdout = f"secret-value-{call_count[0]}"
+                mock_result.stderr = ""
+                return mock_result
+
+            monkeypatch.setattr(subprocess, "run", mock_run)
+
+            from haunt_secrets import load_secrets
+
+            load_secrets(env_file)
+
+            assert os.environ["SECRET1"] == "secret-value-1"
+            assert os.environ["SECRET2"] == "secret-value-2"
+        finally:
+            os.unlink(env_file)
+            os.environ.pop("SECRET1", None)
+            os.environ.pop("SECRET2", None)
+
+    def test_load_secrets_logs_variable_names_not_values(self, monkeypatch, caplog):
+        """Should log variable names loaded, never the secret values"""
+        import subprocess
+        from unittest.mock import Mock
+        import tempfile
+        import logging
+
+        env_content = """# @secret:op:vault/item/field
+SECRET_VAR=placeholder
+"""
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.env') as f:
+            f.write(env_content)
+            f.flush()
+            env_file = f.name
+
+        try:
+            monkeypatch.setenv("OP_SERVICE_ACCOUNT_TOKEN", "test-token")
+
+            mock_result = Mock()
+            mock_result.returncode = 0
+            mock_result.stdout = "super-secret-value-do-not-log"
+            mock_result.stderr = ""
+
+            monkeypatch.setattr(subprocess, "run", lambda *args, **kwargs: mock_result)
+
+            from haunt_secrets import load_secrets
+
+            with caplog.at_level(logging.INFO):
+                load_secrets(env_file)
+
+            # Verify logs contain variable name
+            log_output = caplog.text
+            assert "SECRET_VAR" in log_output
+
+            # SECURITY: Verify logs DO NOT contain secret value
+            assert "super-secret-value-do-not-log" not in log_output
+        finally:
+            os.unlink(env_file)
+            os.environ.pop("SECRET_VAR", None)
+
+    def test_load_secrets_raises_for_nonexistent_file(self):
+        """Should raise FileNotFoundError for nonexistent .env file"""
+        from haunt_secrets import load_secrets
+
+        with pytest.raises(FileNotFoundError):
+            load_secrets("/nonexistent/.env")
+
+
+class TestGetSecrets:
+    """Test suite for get_secrets() - returns dict without modifying environment"""
+
+    def test_get_secrets_returns_dict_with_resolved_secrets(self, monkeypatch):
+        """Should return dict with secrets resolved from 1Password"""
+        import subprocess
+        from unittest.mock import Mock
+        import tempfile
+
+        env_content = """# @secret:op:vault/item/field
+SECRET_VAR=placeholder
+"""
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.env') as f:
+            f.write(env_content)
+            f.flush()
+            env_file = f.name
+
+        try:
+            monkeypatch.setenv("OP_SERVICE_ACCOUNT_TOKEN", "test-token")
+
+            mock_result = Mock()
+            mock_result.returncode = 0
+            mock_result.stdout = "secret-value-123"
+            mock_result.stderr = ""
+
+            monkeypatch.setattr(subprocess, "run", lambda *args, **kwargs: mock_result)
+
+            from haunt_secrets import get_secrets
+
+            result = get_secrets(env_file)
+
+            assert result == {"SECRET_VAR": "secret-value-123"}
+        finally:
+            os.unlink(env_file)
+
+    def test_get_secrets_includes_plaintext_variables(self, monkeypatch):
+        """Should include plaintext variables in returned dict"""
+        import tempfile
+
+        env_content = """PLAINTEXT1=value1
+PLAINTEXT2=value2
+"""
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.env') as f:
+            f.write(env_content)
+            f.flush()
+            env_file = f.name
+
+        try:
+            from haunt_secrets import get_secrets
+
+            result = get_secrets(env_file)
+
+            assert result == {
+                "PLAINTEXT1": "value1",
+                "PLAINTEXT2": "value2"
+            }
+        finally:
+            os.unlink(env_file)
+
+    def test_get_secrets_combines_secrets_and_plaintext(self, monkeypatch):
+        """Should return dict with both secrets and plaintext variables"""
+        import subprocess
+        from unittest.mock import Mock
+        import tempfile
+
+        env_content = """# @secret:op:vault/item/field
+SECRET_VAR=placeholder
+
+PLAINTEXT_VAR=plaintext-value
+"""
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.env') as f:
+            f.write(env_content)
+            f.flush()
+            env_file = f.name
+
+        try:
+            monkeypatch.setenv("OP_SERVICE_ACCOUNT_TOKEN", "test-token")
+
+            mock_result = Mock()
+            mock_result.returncode = 0
+            mock_result.stdout = "secret-value-123"
+            mock_result.stderr = ""
+
+            monkeypatch.setattr(subprocess, "run", lambda *args, **kwargs: mock_result)
+
+            from haunt_secrets import get_secrets
+
+            result = get_secrets(env_file)
+
+            assert result == {
+                "SECRET_VAR": "secret-value-123",
+                "PLAINTEXT_VAR": "plaintext-value"
+            }
+        finally:
+            os.unlink(env_file)
+
+    def test_get_secrets_does_not_modify_os_environ(self, monkeypatch):
+        """Should NOT modify os.environ (read-only mode)"""
+        import subprocess
+        from unittest.mock import Mock
+        import tempfile
+
+        env_content = """# @secret:op:vault/item/field
+SECRET_VAR=placeholder
+"""
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.env') as f:
+            f.write(env_content)
+            f.flush()
+            env_file = f.name
+
+        try:
+            # Ensure SECRET_VAR is not already in environment
+            os.environ.pop("SECRET_VAR", None)
+
+            monkeypatch.setenv("OP_SERVICE_ACCOUNT_TOKEN", "test-token")
+
+            mock_result = Mock()
+            mock_result.returncode = 0
+            mock_result.stdout = "secret-value-123"
+            mock_result.stderr = ""
+
+            monkeypatch.setattr(subprocess, "run", lambda *args, **kwargs: mock_result)
+
+            from haunt_secrets import get_secrets
+
+            result = get_secrets(env_file)
+
+            # Verify dict has secret
+            assert result["SECRET_VAR"] == "secret-value-123"
+
+            # Verify os.environ was NOT modified
+            assert "SECRET_VAR" not in os.environ
+        finally:
+            os.unlink(env_file)
+
+    def test_get_secrets_raises_for_nonexistent_file(self):
+        """Should raise FileNotFoundError for nonexistent .env file"""
+        from haunt_secrets import get_secrets
+
+        with pytest.raises(FileNotFoundError):
+            get_secrets("/nonexistent/.env")

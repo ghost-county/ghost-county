@@ -283,7 +283,7 @@ Implement bash function that retrieves secrets from 1Password using `op` CLI. Ta
 
 ---
 
-### ⚪ REQ-300: 1Password CLI Wrapper (Python)
+### 🟢 REQ-300: 1Password CLI Wrapper (Python)
 
 **Type:** Enhancement
 **Reported:** 2026-01-02
@@ -294,13 +294,13 @@ Implement Python function that retrieves secrets from 1Password using subprocess
 
 **Tasks:**
 
-- [ ] Create `fetch_secret()` function in haunt_secrets.py
-- [ ] Validate `OP_SERVICE_ACCOUNT_TOKEN` environment variable
-- [ ] Call `op read` via `subprocess.run()` with `capture_output=True`
-- [ ] Parse `op` CLI output and return secret value
-- [ ] Raise `SecretNotFoundError` if vault/item/field missing
-- [ ] Raise `AuthenticationError` if 1Password auth fails
-- [ ] Write pytest integration tests with mocked subprocess
+- [x] Create `fetch_secret()` function in haunt_secrets.py
+- [x] Validate `OP_SERVICE_ACCOUNT_TOKEN` environment variable
+- [x] Call `op read` via `subprocess.run()` with `capture_output=True`
+- [x] Parse `op` CLI output and return secret value
+- [x] Raise `SecretNotFoundError` if vault/item/field missing
+- [x] Raise `AuthenticationError` if 1Password auth fails
+- [x] Write pytest integration tests with mocked subprocess
 
 **Files:**
 
@@ -312,13 +312,13 @@ Implement Python function that retrieves secrets from 1Password using subprocess
 **Agent:** Dev-Infrastructure
 **Completion:**
 
-- `fetch_secret()` retrieves secrets via subprocess
-- Raises `SecretNotFoundError` for missing secrets
-- Raises `AuthenticationError` for auth failures
-- Pytest tests pass with mocked subprocess
-- All error cases covered in tests
+- ✓ `fetch_secret()` retrieves secrets via subprocess - VERIFIED
+- ✓ Raises `SecretNotFoundError` for missing secrets - VERIFIED
+- ✓ Raises `AuthenticationError` for auth failures - VERIFIED
+- ✓ Pytest tests pass with mocked subprocess - VERIFIED (35/35 tests pass)
+- ✓ All error cases covered in tests - VERIFIED
 
-**Blocked by:** REQ-298
+**Blocked by:** REQ-298 ✅
 
 ---
 

@@ -4,14 +4,31 @@ haunt_secrets.py - Tag Parser and 1Password CLI Wrapper for Secret Management
 This module provides functionality to:
 1. Parse 1Password secret references from .env files (REQ-298)
 2. Fetch secrets from 1Password using the `op` CLI (REQ-300)
+3. Load secrets into environment (load_secrets) or return as dict (get_secrets) (REQ-302)
 
 Secret tags use the format: # @secret:op:vault/item/field
 
-Example:
+Example .env file:
     # @secret:op:ghost-county/api-keys/github-token
     GITHUB_TOKEN=placeholder
 
-Returns dict mapping variable names to (vault, item, field) tuples.
+    PLAINTEXT_VAR=some-value
+
+Main API Usage:
+
+    Mode 1: Modify os.environ directly
+    >>> from haunt_secrets import load_secrets
+    >>> load_secrets(".env")
+    >>> token = os.environ["GITHUB_TOKEN"]  # actual secret from 1Password
+
+    Mode 2: Get dict without modifying environment
+    >>> from haunt_secrets import get_secrets
+    >>> secrets = get_secrets(".env")
+    >>> token = secrets["GITHUB_TOKEN"]  # actual secret from 1Password
+
+Lower-level functions:
+- parse_secret_tags(env_file) -> Dict[str, Tuple[str, str, str]]
+- fetch_secret(vault, item, field) -> str
 """
 
 import os
@@ -196,6 +213,142 @@ def parse_secret_tags(env_file: str) -> Dict[str, Tuple[str, str, str]]:
             continue
 
         i += 1
+
+    return result
+
+
+def load_secrets(env_file: str) -> None:
+    """
+    Load secrets from .env file and set them in os.environ.
+
+    This function:
+    1. Parses secret tags from the .env file
+    2. Fetches tagged secrets from 1Password
+    3. Loads plaintext variables from the .env file
+    4. Sets all variables in os.environ
+
+    Args:
+        env_file: Path to .env file
+
+    Returns:
+        None - modifies os.environ directly
+
+    Raises:
+        FileNotFoundError: If env_file doesn't exist
+        SecretTagError: If secret tags are malformed
+        MissingTokenError: If OP_SERVICE_ACCOUNT_TOKEN not set
+        OpNotInstalledError: If op CLI not installed
+        AuthenticationError: If 1Password auth fails
+        SecretNotFoundError: If vault/item/field not found
+
+    Security:
+        - Logs variable names loaded, NEVER secret values
+        - All 1Password communication uses secure op CLI
+
+    Example:
+        >>> load_secrets(".env")
+        >>> token = os.environ["GITHUB_TOKEN"]  # actual secret value
+    """
+    # Parse secret tags
+    secret_tags = parse_secret_tags(env_file)
+
+    # Fetch secrets from 1Password
+    secrets_dict = {}
+    for var_name, (vault, item, field) in secret_tags.items():
+        logger.info(f"Loading secret for {var_name}")
+        secret_value = fetch_secret(vault, item, field)
+        secrets_dict[var_name] = secret_value
+
+    # Parse plaintext variables from .env file
+    plaintext_vars = {}
+    with open(env_file, 'r') as f:
+        for line in f:
+            line = line.strip()
+            # Skip comments, empty lines, and secret tags
+            if not line or line.startswith('#'):
+                continue
+            # Match VAR_NAME=value pattern
+            if '=' in line:
+                var_name, value = line.split('=', 1)
+                var_name = var_name.strip()
+                value = value.strip()
+                # Only add if not a secret (secrets are already fetched)
+                if var_name not in secrets_dict:
+                    plaintext_vars[var_name] = value
+                    logger.info(f"Loading plaintext variable {var_name}")
+
+    # Set all variables in os.environ
+    for var_name, value in secrets_dict.items():
+        os.environ[var_name] = value
+
+    for var_name, value in plaintext_vars.items():
+        os.environ[var_name] = value
+
+    logger.info(f"Loaded {len(secrets_dict)} secrets and {len(plaintext_vars)} plaintext variables")
+
+
+def get_secrets(env_file: str) -> Dict[str, str]:
+    """
+    Get secrets from .env file without modifying os.environ.
+
+    This function:
+    1. Parses secret tags from the .env file
+    2. Fetches tagged secrets from 1Password
+    3. Loads plaintext variables from the .env file
+    4. Returns dict with all variables
+
+    Args:
+        env_file: Path to .env file
+
+    Returns:
+        Dict mapping variable names to values (both secrets and plaintext)
+
+    Raises:
+        FileNotFoundError: If env_file doesn't exist
+        SecretTagError: If secret tags are malformed
+        MissingTokenError: If OP_SERVICE_ACCOUNT_TOKEN not set
+        OpNotInstalledError: If op CLI not installed
+        AuthenticationError: If 1Password auth fails
+        SecretNotFoundError: If vault/item/field not found
+
+    Security:
+        - Logs variable names loaded, NEVER secret values
+        - All 1Password communication uses secure op CLI
+
+    Example:
+        >>> secrets = get_secrets(".env")
+        >>> token = secrets["GITHUB_TOKEN"]  # actual secret value
+    """
+    # Parse secret tags
+    secret_tags = parse_secret_tags(env_file)
+
+    # Fetch secrets from 1Password
+    secrets_dict = {}
+    for var_name, (vault, item, field) in secret_tags.items():
+        logger.info(f"Fetching secret for {var_name}")
+        secret_value = fetch_secret(vault, item, field)
+        secrets_dict[var_name] = secret_value
+
+    # Parse plaintext variables from .env file
+    plaintext_vars = {}
+    with open(env_file, 'r') as f:
+        for line in f:
+            line = line.strip()
+            # Skip comments, empty lines, and secret tags
+            if not line or line.startswith('#'):
+                continue
+            # Match VAR_NAME=value pattern
+            if '=' in line:
+                var_name, value = line.split('=', 1)
+                var_name = var_name.strip()
+                value = value.strip()
+                # Only add if not a secret (secrets are already fetched)
+                if var_name not in secrets_dict:
+                    plaintext_vars[var_name] = value
+
+    # Combine and return
+    result = {**secrets_dict, **plaintext_vars}
+    logger.info(f"Retrieved {len(secrets_dict)} secrets and {len(plaintext_vars)} plaintext variables")
 
     return result
 
