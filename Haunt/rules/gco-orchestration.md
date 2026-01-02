@@ -23,14 +23,68 @@ When user requests work:
 ## When to Spawn (Always Delegate)
 
 **Always spawn for:**
-- External research (WebSearch/WebFetch) → gco-research-analyst
-- Codebase investigation (>10 files) → gco-research-analyst
+- External research (WebSearch/WebFetch) → gco-research
+- Codebase investigation (>10 files) → gco-research
 - Requirements analysis (JTBD, Kano, RICE) → gco-project-manager
 - Implementation (code, tests, config) → gco-dev-*
 - Code review → gco-code-reviewer
 - Deliverable creation (any work producing a file)
 
 **Token efficiency note:** Spawning specialists is MORE efficient than generalist trial-and-error. A research agent completes work in one focused pass; an orchestrator doing research involves multiple false starts and context switching.
+
+## Built-in Subagent Delegation
+
+**Claude Code provides built-in Explore agent** for fast, read-only codebase reconnaissance.
+
+### When to Use Explore (Built-in)
+
+Use Explore **before** spawning Haunt agents when:
+
+1. **Quick codebase orientation needed** (<1 minute investigation)
+   - File structure discovery
+   - Recent changes review (git log, git diff)
+   - Pattern discovery (find similar implementations)
+   - Integration point identification
+
+2. **Read-only recon before heavy spawns**
+   - Explore first (Haiku, fast, read-only)
+   - Then spawn specialist with Explore findings as context
+   - Avoids spawning heavy agent for simple searches
+
+### Explore vs Haunt Agent Decision
+
+| Situation | Use |
+|-----------|-----|
+| Quick file scan | Explore (built-in) |
+| Git history review | Explore (built-in) |
+| Codebase orientation | Explore (built-in) |
+| Deep investigation (>10 files) | gco-research |
+| External research (web/docs) | gco-research |
+| Deliverable production (reports) | gco-research |
+
+### Reconnaissance Pattern
+
+**Before spawning implementation agent:**
+
+```
+1. Orchestrator receives request
+2. Use Explore for codebase recon (if needed)
+3. Spawn appropriate agent with Explore findings
+4. Agent proceeds with full context
+```
+
+**Example:**
+```
+User: "Refactor authentication to JWT"
+
+Orchestrator:
+1. Use Explore: "Find all authentication-related code"
+2. Explore returns: 8 files in src/auth/, session-based auth
+3. Spawn gco-dev-backend with context:
+   "Refactor to JWT. Current: session-based auth in 8 files (src/auth/, middleware/)"
+```
+
+**Benefit:** Dev agent starts with codebase understanding, not blind search.
 
 ## When to Execute Directly (Coordination Only)
 

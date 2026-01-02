@@ -1013,7 +1013,7 @@ ls -la ~/.claude/agents/gco-*.md
 # Should show:
 # gco-dev.md
 # gco-project-manager.md
-# gco-research-analyst.md
+# gco-research.md
 # ... etc
 
 # Verify setup worked

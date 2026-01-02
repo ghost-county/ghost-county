@@ -24,6 +24,93 @@ This document provides detailed examples of hybrid workflows combining Claude Co
 
 ---
 
+## Built-in Subagents Reference
+
+Claude Code provides built-in subagents optimized for specific tasks. Understanding their capabilities and limitations helps orchestrators make efficient delegation decisions.
+
+### Explore Agent
+
+**Built-in Explore Agent:**
+- **Model:** Haiku (fast, cost-effective)
+- **Mode:** Strictly read-only
+- **Tools:** Glob, Grep, Read, limited Bash (ls, git status, git log, git diff)
+- **System Prompt Cost:** ~516 tokens
+- **Best For:** Fast codebase orientation, pattern discovery, git history review
+
+**Decision Tree for Investigation:**
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                 INVESTIGATION NEEDED                     │
+└─────────────────────────────────────────────────────────┘
+                        │
+                        ▼
+        ┌─────────────────────────────────┐
+        │ Quick codebase orientation?      │
+        │ (file structure, git status,     │
+        │  recent changes, basic patterns) │
+        └─────────────────────────────────┘
+                   │           │
+                  YES          NO
+                   │           │
+                   ▼           ▼
+        ┌──────────────┐  ┌─────────────────────────────┐
+        │ Use EXPLORE  │  │ Deeper investigation needed? │
+        │ (Built-in)   │  └─────────────────────────────┘
+        │              │           │           │
+        │ • Haiku      │          YES          NO
+        │ • Read-only  │           │           │
+        │ • Fast       │           ▼           ▼
+        │ • No context │  ┌──────────────┐  ┌──────────────┐
+        │   pollution  │  │ Spawn        │  │ Proceed with │
+        └──────────────┘  │ gco-research │  │ cached info  │
+                          │ -analyst     │  └──────────────┘
+                          │              │
+                          │ • Opus       │
+                          │ • Deep       │
+                          │ • External   │
+                          │   sources    │
+                          └──────────────┘
+```
+
+**When to Use Explore vs gco-research:**
+
+| Use EXPLORE (Built-in) | Use gco-research (Haunt) |
+|------------------------|--------------------------|
+| Quick file structure scan | Deep API/library research |
+| Git history review | External documentation lookup |
+| Existing pattern discovery | Architecture recommendations |
+| Codebase orientation | Comparative analysis (X vs Y) |
+| Recent changes review | Best practices investigation |
+| <1 minute tasks | 10-30 minute investigations |
+| Read-only reconnaissance | Producing deliverables (reports, docs) |
+
+**Explore Limitations:**
+
+- **Strictly read-only:** Cannot write files, create deliverables, or modify code
+- **No external access:** Cannot use WebSearch or WebFetch for external research
+- **Limited Bash:** Only safe read-only commands (ls, git status, git log, git diff)
+- **No deliverable production:** Cannot create analysis documents or research reports
+- **Short-lived context:** Results are for immediate consumption, not persistent
+
+**Best Practices:**
+
+1. **Use for reconnaissance before spawning specialist agents**
+   - Explore scans codebase → Seer decides which specialist to spawn
+   - Provides context for specialist agent spawn prompts
+   - Avoids spawning heavy agents for simple searches
+
+2. **Leverage speed advantage (40-60% faster than full agents)**
+   - Haiku model significantly faster than Opus/Sonnet for simple searches
+   - Minimal system prompt overhead (~516 tokens vs 1000+ for Haunt agents)
+   - Ideal for session startup codebase checks
+
+3. **Don't expect deliverables**
+   - Explore provides findings, not formatted reports
+   - For analysis documents, spawn gco-research after Explore recon
+
+---
+
 ## Pattern 1: Explore → gco-dev (Research then Implement)
 
 ### Use Case

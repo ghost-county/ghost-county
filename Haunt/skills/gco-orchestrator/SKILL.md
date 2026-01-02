@@ -16,8 +16,8 @@ The Seance is Ghost County's primary workflow orchestration layer - a ritual tha
 ⛔ **CRITICAL CHECKPOINT:** Before executing any action, verify you're not about to do specialized work.
 
 **Am I about to do specialized work?**
-- [ ] WebSearch/WebFetch → ⛔ STOP: Spawn gco-research-analyst
-- [ ] Multi-file analysis (>10 files) → ⛔ STOP: Spawn gco-research-analyst
+- [ ] WebSearch/WebFetch → ⛔ STOP: Spawn gco-research
+- [ ] Multi-file analysis (>10 files) → ⛔ STOP: Spawn gco-research
 - [ ] Requirements analysis (JTBD/Kano/RICE) → ⛔ STOP: Spawn gco-project-manager
 - [ ] Write code/tests → ⛔ STOP: Spawn gco-dev-*
 - [ ] Code review → ⛔ STOP: Spawn gco-code-reviewer
@@ -240,8 +240,8 @@ If ANY answer is wrong → STOP and declare phase correctly
 
 ### What Orchestrators DO NOT DO (Spawn Agents Instead)
 
-- **External research:** WebSearch/WebFetch → Spawn gco-research-analyst
-- **Codebase investigation:** Multi-file analysis (>10 files) → Spawn gco-research-analyst
+- **External research:** WebSearch/WebFetch → Spawn gco-research
+- **Codebase investigation:** Multi-file analysis (>10 files) → Spawn gco-research
 - **Requirements analysis:** JTBD, Kano, RICE → Spawn gco-project-manager
 - **Implementation:** Write code, tests, configs → Spawn gco-dev-*
 - **Code review:** Quality gates → Spawn gco-code-reviewer

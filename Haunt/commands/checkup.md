@@ -159,7 +159,7 @@ fi
 - `gco-code-reviewer.md`
 - `gco-project-manager.md`
 - `gco-release-manager.md`
-- Plus variant agents (gco-research-analyst.md, gco-code-reviewer-readonly.md, etc.)
+- Plus variant agents (gco-research.md, gco-code-reviewer-readonly.md, etc.)
 
 **Verification:**
 ```bash

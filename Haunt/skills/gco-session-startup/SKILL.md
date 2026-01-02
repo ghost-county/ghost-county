@@ -204,6 +204,80 @@ cat .haunt/plans/stories/REQ-224-story.md
 # Roadmap tells you WHAT to implement
 ```
 
+## Codebase Reconnaissance with Explore
+
+**When to use built-in Explore agent:** Fast, read-only codebase orientation before starting implementation work.
+
+### Explore Decision Gate
+
+Before starting implementation, ask:
+
+**"Do I need to understand existing code patterns or project structure first?"**
+
+| Situation | Action |
+|-----------|--------|
+| **Refactoring existing code** | Use Explore to scan current implementation |
+| **Integrating with existing features** | Use Explore to find integration points |
+| **Unfamiliar codebase area** | Use Explore for quick orientation |
+| **New feature, clear requirements** | Skip Explore, proceed with implementation |
+| **Simple bug fix with known location** | Skip Explore, proceed with fix |
+
+### Reconnaissance Workflow
+
+**When reconnaissance is needed:**
+
+```bash
+# Session startup sequence
+1. Assignment identified: REQ-XXX
+2. Requirement indicates existing code modification
+3. Use Explore for quick recon (read-only)
+4. Explore returns: file locations, patterns, integration points
+5. Proceed with implementation using Explore findings
+```
+
+**Example: Refactoring existing authentication:**
+
+```
+Assignment: REQ-042 - Refactor authentication to use JWT
+
+Session startup:
+1. Assignment identified from roadmap
+2. Requirement involves refactoring existing code
+3. Use Explore:
+   - "Find all authentication-related code"
+   - Returns: 8 files in src/auth/, middleware/, routes/
+   - Identifies: Session-based auth currently in use
+4. Proceed with JWT implementation informed by Explore findings
+```
+
+### When NOT to Use Explore
+
+**Skip Explore for:**
+- New features with no existing code dependencies
+- Bug fixes in known file locations
+- Documentation-only changes
+- Configuration updates
+- Tests for new functionality
+
+### Explore vs gco-research
+
+| Situation | Use |
+|-----------|-----|
+| Quick codebase scan (<1 min) | Explore (built-in) |
+| File structure discovery | Explore (built-in) |
+| Git history review | Explore (built-in) |
+| Deep API/library research | gco-research (Haunt) |
+| External documentation lookup | gco-research (Haunt) |
+| Architecture recommendations | gco-research (Haunt) |
+
+**Key Distinction:**
+- **Explore:** Read-only codebase reconnaissance (Haiku, fast, ~516 tokens)
+- **gco-research:** Deep investigation with deliverables (Opus, thorough, can write reports)
+
+**See:** `Haunt/docs/INTEGRATION-PATTERNS.md` - Built-in Subagents Reference section for detailed Explore usage patterns.
+
+---
+
 ## Agent Memory Best Practices
 
 ### When to Recall Context

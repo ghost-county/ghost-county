@@ -45,7 +45,6 @@ tools: Glob, Grep, Read, Edit, Write, Bash, TodoWrite, mcp__context7__*, mcp__ag
 |------------|------------------|-------|
 | gco-dev.md | Dev-Backend, Dev-Frontend, Dev-Infrastructure | Single polyglot agent handles all 3 modes |
 | gco-research.md | Research-Analyst, Research-Critic | Single agent handles both modes, has Write access |
-| gco-research-analyst.md | Research-Analyst | Read-only variant, no Write/Edit/Bash |
 | gco-code-reviewer.md | (uses main context) | Typically not spawned as subagent, has Edit/Write |
 | gco-code-reviewer-readonly.md | (uses main context) | Read-only variant, no Edit/Write/Bash/TodoWrite |
 | gco-project-manager.md | Project-Manager-Agent | |
@@ -90,7 +89,6 @@ Tool restrictions prevent accidental modifications and enforce separation of con
 - Research where modification risk must be zero
 
 **Examples:**
-- `gco-research-analyst.md` - Read-only research (no Write tool)
 - `gco-code-reviewer-readonly.md` - Code review without modification capability
 
 **Benefits:**

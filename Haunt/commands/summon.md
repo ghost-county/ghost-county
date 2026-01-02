@@ -73,7 +73,7 @@ Parse the first argument to determine which spirit to summon:
 | `dev`, `dev-backend`, `backend` | Dev-Backend | `gco-dev-backend` | API, services, database |
 | `dev-frontend`, `frontend` | Dev-Frontend | `gco-dev-frontend` | UI, components, client |
 | `dev-infra`, `infrastructure`, `infra` | Dev-Infrastructure | `gco-dev-infrastructure` | IaC, CI/CD, deployment |
-| `research`, `research-analyst`, `analyst` | Research-Analyst | `gco-research-analyst` | Investigation, analysis |
+| `research`, `research-analyst`, `analyst` | Research-Analyst | `gco-research` | Investigation, analysis |
 | `code-reviewer`, `reviewer`, `review` | Code-Reviewer | `gco-code-reviewer` | Code quality, review |
 | `release-manager`, `release`, `rm` | Release-Manager | `gco-release-manager` | Release coordination |
 | `project-manager`, `pm`, `manager` | Project-Manager | `gco-project-manager` | Planning, coordination |

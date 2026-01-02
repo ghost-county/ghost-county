@@ -15,7 +15,7 @@
 - **Requirements analysis:** JTBD, Kano, RICE scoring → Spawn gco-project-manager
 - **Implementation:** Writing code, tests, configs → Spawn gco-dev-*
 - **Code review:** Quality gates, anti-pattern detection → Spawn gco-code-reviewer
-- **Deep analysis:** Architecture reviews, strategic planning → Spawn gco-research-analyst
+- **Deep analysis:** Architecture reviews, strategic planning → Spawn gco-research
 
 ## Decision Tree: When to Spawn vs Execute
 
@@ -57,7 +57,7 @@ Orchestrator:
 User: "/seance Research best Node.js auth libraries"
 
 Orchestrator:
-  Spawning gco-research-analyst for external research...
+  Spawning gco-research for external research...
 
 Research Agent:
   [Executes focused investigation]
@@ -142,7 +142,7 @@ Orchestrator:
 User: "/seance Analyze authentication patterns in codebase"
 
 Orchestrator:
-  Spawning gco-research-analyst for codebase investigation...
+  Spawning gco-research for codebase investigation...
 
 Research Agent:
   [Executes structured analysis]
@@ -181,7 +181,7 @@ These are lightweight coordination tasks that don't benefit from spawning.
 
 1. ⛔ **STOP** - Do NOT proceed with the call
 2. Ask yourself: "Am I an orchestrator or a research agent?"
-3. If orchestrator: Spawn gco-research-analyst instead
+3. If orchestrator: Spawn gco-research instead
 4. If research agent: Proceed with research
 
 **Example (WRONG):**
@@ -193,7 +193,7 @@ results = WebSearch("best Node.js auth libraries")
 **Example (RIGHT):**
 ```python
 # Orchestrator spawning research agent
-Spawn gco-research-analyst with prompt: "Research best Node.js auth libraries"
+Spawn gco-research with prompt: "Research best Node.js auth libraries"
 ```
 
 ---

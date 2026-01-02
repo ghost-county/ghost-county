@@ -10,10 +10,12 @@
 - 🟡 REQ-309, 310, 311, 316, 317 (Dev-Infrastructure - skill/agent refactors + metrics fixes)
 
 **Ready for Implementation:**
-- ⚪ REQ-319: Consolidate Research Agents (XS)
 - ⚪ REQ-320: Core Seer Agent (M) ← Start here
 - ⚪ REQ-321: Seance Integration (S, blocked by REQ-320)
 - ⚪ REQ-322: Full Seer Testing (S, blocked by REQ-320, REQ-321)
+
+**Ready to Archive:**
+- 🟢 REQ-319: Consolidate Research Agents (XS)
 
 **Recently Archived (2026-01-02):**
 - 🟢 REQ-307: Model Selection (Opus for planning/research, Sonnet for implementation)
@@ -129,7 +131,7 @@ Research and design a "Seer" agent that serves as the primary orchestrator for t
 
 ---
 
-### ⚪ REQ-319: Consolidate Research Agents
+### 🟢 REQ-319: Consolidate Research Agents
 
 **Type:** Simplification
 **Reported:** 2026-01-03
@@ -140,18 +142,26 @@ Remove the read-only `gco-research-analyst.md` variant and keep only `gco-resear
 
 **Tasks:**
 
-- [ ] Delete `Haunt/agents/gco-research-analyst.md`
-- [ ] Delete `~/.claude/agents/gco-research-analyst.md` (deployed copy)
-- [ ] Update `Haunt/docs/TOOL-PERMISSIONS.md` - remove gco-research-analyst references
-- [ ] Update any other docs referencing gco-research-analyst
-- [ ] Update `Haunt/scripts/setup-haunt.sh` if it deploys the file
-- [ ] Verify gco-research.md has correct tool permissions (Write access)
+- [x] Delete `Haunt/agents/gco-research-analyst.md`
+- [x] Delete `~/.claude/agents/gco-research-analyst.md` (deployed copy)
+- [x] Update `Haunt/docs/TOOL-PERMISSIONS.md` - remove gco-research-analyst references
+- [x] Update any other docs referencing gco-research-analyst
+- [x] Update `Haunt/scripts/setup-haunt.sh` if it deploys the file (verified: setup copies all .md files from Haunt/agents/, so deletion from source prevents future deployment)
+- [x] Verify gco-research.md has correct tool permissions (Write access - confirmed)
 
 **Files:**
 
-- `Haunt/agents/gco-research-analyst.md` (delete)
-- `Haunt/docs/TOOL-PERMISSIONS.md` (modify)
-- `Haunt/scripts/setup-haunt.sh` (modify if needed)
+- `Haunt/agents/gco-research-analyst.md` (deleted)
+- `Haunt/docs/TOOL-PERMISSIONS.md` (modified)
+- `Haunt/docs/INTEGRATION-PATTERNS.md` (modified)
+- `Haunt/commands/summon.md` (modified)
+- `Haunt/commands/checkup.md` (modified)
+- `Haunt/skills/gco-orchestrator/SKILL.md` (modified)
+- `Haunt/skills/gco-orchestrator/references/delegation-protocol.md` (modified)
+- `Haunt/skills/gco-orchestrator/references/example-flows.md` (modified)
+- `Haunt/skills/gco-session-startup/SKILL.md` (modified)
+- `Haunt/rules/gco-orchestration.md` (modified)
+- `Haunt/SETUP-GUIDE.md` (modified)
 
 **Effort:** XS (30 min)
 **Complexity:** SIMPLE
