@@ -21,7 +21,29 @@
 
 **Use Sonnet (implementation):** Code implementation, code review, release coordination, pattern detection
 
-**Use Haiku:** Read-only exploration ONLY (file searches, structured data extraction) - rarely used
+**Use Haiku (built-in Explore):** Fast codebase reconnaissance ONLY (read-only file searches, git history, pattern discovery)
+
+## Built-in Explore Agent (Haiku)
+
+**When to use built-in Explore instead of spawning agents:**
+
+| Task | Use | Rationale |
+|------|-----|-----------|
+| Quick file structure scan | Explore (Haiku) | Read-only, fast, 516 tokens |
+| Git history review | Explore (Haiku) | No modification needed |
+| Pattern discovery | Explore (Haiku) | Read-only codebase search |
+| Deep investigation (>10 files) | gco-research (Opus) | Deliverable production needed |
+| External docs research | gco-research (Opus) | WebSearch/WebFetch required |
+| Implementation | gco-dev (Sonnet) | Write access required |
+
+**Explore Limitations:**
+- **Read-only:** No Edit/Write tools
+- **No external access:** No WebSearch or WebFetch
+- **No deliverables:** Cannot create analysis documents
+- **Codebase only:** Limited to local files and git
+
+**Best Use Case:**
+Reconnaissance before spawning specialist agents. Explore gathers context (file locations, patterns, integration points), then orchestrator spawns appropriate specialist with findings as context.
 
 ## When to Invoke Full Skill
 
