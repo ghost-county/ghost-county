@@ -171,7 +171,7 @@ Remove the read-only `gco-research-analyst.md` variant and keep only `gco-resear
 
 ---
 
-### ⚪ REQ-320: Implement Core Seer Agent
+### 🟡 REQ-320: Implement Core Seer Agent
 
 **Type:** Implementation
 **Reported:** 2026-01-03
@@ -193,29 +193,41 @@ Finalize the Seer agent character sheet and implement core functionality. The dr
 - [x] Slim down to target ~150-200 lines (currently ~230) - Reduced to 153 lines
 - [x] Verify setup-haunt.sh automatically deploys gco-seer.md (no changes needed)
 - [x] Deploy gco-seer.md to ~/.claude/agents/
-- [ ] Test Task tool spawning with gco-project-manager
-- [ ] Test Task tool spawning with gco-dev (all modes)
-- [ ] Test Task tool spawning with gco-research
-- [ ] Test Task tool spawning with gco-code-reviewer
-- [ ] Verify gco-orchestrator skill integration
-- [ ] Implement and test memory operations (mcp__agent_memory__search and __store)
-- [ ] Test Explore agent integration for recon
+- [x] Create structural tests (test-seer-agent.sh - 21/21 passing)
+- [x] Create functional testing guide (SEER-FUNCTIONAL-TESTING.md)
+- [x] Implement memory operations in agent (mcp__agent_memory__search/store documented)
+- [ ] **MANUAL:** Test Task tool spawning with gco-project-manager (requires live session)
+- [ ] **MANUAL:** Test Task tool spawning with gco-dev (all modes) (requires live session)
+- [ ] **MANUAL:** Test Task tool spawning with gco-research (requires live session)
+- [ ] **MANUAL:** Test Task tool spawning with gco-code-reviewer (requires live session)
+- [ ] **MANUAL:** Verify gco-orchestrator skill integration (requires live session)
+- [ ] **MANUAL:** Test memory operations with MCP server (requires live session)
+- [ ] **MANUAL:** Test Explore agent integration for recon (requires live session)
 
 **Files:**
 
-- `Haunt/agents/gco-seer.md` (modify - finalize from draft)
-- `Haunt/scripts/setup-agentic-sdlc.sh` (modify - add Seer deployment)
+- `Haunt/agents/gco-seer.md` (created - 153 lines, deployed)
+- `.haunt/tests/behavior/test-seer-agent.sh` (created - structural validation)
+- `.haunt/tests/behavior/SEER-FUNCTIONAL-TESTING.md` (created - manual testing guide)
 
 **Effort:** M (2-4 hours)
 **Complexity:** MODERATE
 **Agent:** Dev-Infrastructure
 **Completion:**
-- gco-seer.md finalized and under 200 lines
-- Task tool successfully spawns all agent types
-- Memory check/write implemented and tested
+- gco-seer.md finalized and under 200 lines (153 lines)
+- Task tool successfully spawns all agent types (MANUAL TESTING REQUIRED)
+- Memory check/write implemented and tested (MANUAL TESTING REQUIRED)
 - Deployed via setup script to `~/.claude/agents/`
 
-**Blocked by:** None
+**Blocked by:** Manual functional testing (requires live Claude Code session as Seer agent)
+
+**Implementation Notes (2026-01-02):**
+- **Structural implementation complete:** Agent finalized (153 lines), deployed, 21/21 structural tests passing
+- **Architecture:** Thin orchestrator leveraging gco-orchestrator skill, Opus model, flat spawning, session memory
+- **Testing:** Created comprehensive structural tests and functional testing guide
+- **Manual validation needed:** Task tool spawning, MCP memory operations, full séance workflow (see SEER-FUNCTIONAL-TESTING.md)
+- **Next steps:** User must invoke Seer in live session to complete Tests 1-10 in functional guide
+- **Status:** 🟡 In Progress - awaiting manual functional validation before marking 🟢
 
 ---
 

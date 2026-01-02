@@ -23,24 +23,36 @@ See `~/.claude/rules/gco-roadmap-format.md` for status update protocol (global r
 
 ### Current Items
 
-**Active Work:** None (all current work complete!)
+**Active Work (5 in progress):**
 
-**Backlog (7 requirements):**
+🟡 REQ-309: Document Explore Agent Integration Patterns
+   Agent: Dev-Infrastructure | Effort: S
 
-Visual Documentation:
-⚪ REQ-228: Create Séance Workflow Infographic (S)
-⚪ REQ-229: Create Agent Coordination Diagram (S)
-⚪ REQ-230: Create Session Startup Protocol Diagram (S)
+🟡 REQ-310: Refactor gco-dev.md Agent (Option B - References)
+   Agent: Dev-Infrastructure | Effort: M
 
-CLI Improvements:
-⚪ REQ-231: Implement /haunt status --batch Command (M)
-⚪ REQ-232: Add Effort Estimation to Batch Status (S, blocked by REQ-231)
+🟡 REQ-311: Fix haunt-metrics.sh Parsing Bugs
+   Agent: Dev-Infrastructure | Effort: S
 
-GitHub Integration:
-⚪ REQ-205: GitHub Issues Integration (Research-Analyst → Dev-Infrastructure)
-⚪ REQ-206: Create /bind Command (Dev-Infrastructure)
+🟡 REQ-316: Refactor gco-testing-mindset Skill
+   Agent: Dev-Infrastructure | Effort: S
 
-**Recently Archived (2026-01-02):** REQ-307 (Model Selection), REQ-297-306 (Env Secrets Wrapper), REQ-283-285 (Skill Token Optimization)
+🟡 REQ-317: Refactor gco-roadmap-planning Skill
+   Agent: Dev-Infrastructure | Effort: S
+
+**Seer Implementation:**
+🟢 REQ-319: Consolidate Research Agents (XS) - Complete
+🟡 REQ-320: Core Seer Agent (M) ⭐ - Structural complete, needs manual testing
+⚪ REQ-321: Seance Integration (S, blocked by REQ-320)
+⚪ REQ-322: Full Seer Testing (S, blocked by REQ-320, 321)
+
+**Blocked (4 awaiting dependencies):**
+- REQ-312 (blocked by REQ-311)
+- REQ-313 (blocked by REQ-312)
+- REQ-314 (blocked by REQ-313)
+- REQ-315 (blocked by REQ-312, REQ-314)
+
+**Ready to Archive:** REQ-308, REQ-316, REQ-317, REQ-318, REQ-319
 
 See `.haunt/plans/roadmap.md` for full details.
 
