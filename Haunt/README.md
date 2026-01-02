@@ -168,6 +168,32 @@ bash Haunt/scripts/haunt-verify.sh REQ-042 backend
 
 **Result:** 60-98% token reduction for common operations, zero manual file parsing.
 
+### 🔐 Secrets Management: 1Password Integration
+
+Keep your `.env` files versionable while securing secrets in 1Password:
+
+```bash
+# .env file (safe to commit)
+# @secret:op:my-vault/api-keys/github-token
+GITHUB_TOKEN=placeholder
+
+# Load secrets from 1Password
+source Haunt/scripts/haunt-secrets.sh
+load_secrets .env
+
+# Secret is now available
+echo $GITHUB_TOKEN  # Actual value from 1Password
+```
+
+**Key Features:**
+- ✅ Tag secrets with `# @secret:op:vault/item/field` format
+- ✅ Keep `.env` files in version control (only placeholders)
+- ✅ Automatic secret fetching via 1Password CLI
+- ✅ Zero secret exposure in logs or error messages
+- ✅ Validation mode to check resolvability without loading
+
+**See:** [Haunt/docs/SECRETS-MANAGEMENT.md](docs/SECRETS-MANAGEMENT.md) for complete setup guide.
+
 ---
 
 ## The Séance Workflow
@@ -313,6 +339,7 @@ Haunt/
 | **[QUICK-REFERENCE.md](QUICK-REFERENCE.md)** | Cheat sheet for commands, agents, skills |
 | **[docs/WHITE-PAPER.md](docs/WHITE-PAPER.md)** | Framework design philosophy and architecture |
 | **[docs/SEANCE-EXPLAINED.md](docs/SEANCE-EXPLAINED.md)** | Complete Séance workflow guide |
+| **[docs/SECRETS-MANAGEMENT.md](docs/SECRETS-MANAGEMENT.md)** | 1Password secrets integration guide |
 | **[docs/SDK-INTEGRATION.md](docs/SDK-INTEGRATION.md)** | How SDK features integrate |
 | **[docs/SKILLS-REFERENCE.md](docs/SKILLS-REFERENCE.md)** | Complete skills catalog |
 | **[docs/PATTERN-DETECTION.md](docs/PATTERN-DETECTION.md)** | Pattern detection methodology |

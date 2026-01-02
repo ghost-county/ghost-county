@@ -213,6 +213,43 @@ npm install -D @playwright/test
 npx playwright install
 ```
 
+#### 7. 1Password CLI (for secrets management)
+**Purpose:** Secure secret management via 1Password integration
+
+```bash
+# Install on macOS (Homebrew)
+brew install 1password-cli
+
+# Install on Linux (Debian/Ubuntu)
+curl -sS https://downloads.1password.com/linux/keys/1password.asc | \
+  sudo gpg --dearmor --output /usr/share/keyrings/1password-archive-keyring.gpg
+
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/1password-archive-keyring.gpg] \
+  https://downloads.1password.com/linux/debian/$(dpkg --print-architecture) stable main" | \
+  sudo tee /etc/apt/sources.list.d/1password.list
+
+sudo apt update && sudo apt install 1password-cli
+
+# Install on Windows (winget)
+winget install AgileBits.1Password.CLI
+
+# Verify installation
+op --version
+```
+
+**Setup:**
+1. Get service account token from https://my.1password.com → Settings → Developer → Service Accounts
+2. Set environment variable:
+   ```bash
+   export OP_SERVICE_ACCOUNT_TOKEN="ops_your_token_here"
+   ```
+3. Verify authentication:
+   ```bash
+   op vault list  # Should list your vaults
+   ```
+
+**See:** [Haunt/docs/SECRETS-MANAGEMENT.md](docs/SECRETS-MANAGEMENT.md) for complete integration guide.
+
 ---
 
 ## Installation

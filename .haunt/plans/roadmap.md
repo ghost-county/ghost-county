@@ -522,7 +522,7 @@ Add `--validate` flag to check all secret tags are resolvable WITHOUT exporting 
 
 ---
 
-### ⚪ REQ-305: Documentation and Setup Guide
+### 🟢 REQ-305: Documentation and Setup Guide
 
 **Type:** Documentation
 **Reported:** 2026-01-02
@@ -533,14 +533,14 @@ Create comprehensive documentation for setup, usage, troubleshooting, and securi
 
 **Tasks:**
 
-- [ ] Create `Haunt/docs/SECRETS-MANAGEMENT.md`
-- [ ] Document 1Password CLI installation steps
-- [ ] Document tag format specification with examples
-- [ ] Provide quickstart example (end-to-end)
-- [ ] Document shell and Python usage patterns
-- [ ] Create troubleshooting guide (common errors + solutions)
-- [ ] Document security model and threat mitigation
-- [ ] Create migration guide (plaintext → tagged .env)
+- [x] Create `Haunt/docs/SECRETS-MANAGEMENT.md`
+- [x] Document 1Password CLI installation steps
+- [x] Document tag format specification with examples
+- [x] Provide quickstart example (end-to-end)
+- [x] Document shell and Python usage patterns
+- [x] Create troubleshooting guide (common errors + solutions)
+- [x] Document security model and threat mitigation
+- [x] Create migration guide (plaintext → tagged .env)
 
 **Files:**
 
@@ -560,7 +560,7 @@ Create comprehensive documentation for setup, usage, troubleshooting, and securi
 - Template .env.example demonstrates tag format
 - Documentation reviewed for clarity and completeness
 
-**Blocked by:** REQ-303, REQ-304
+**Blocked by:** None (REQ-303, REQ-304 complete)
 
 ---
 
