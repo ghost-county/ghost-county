@@ -72,21 +72,102 @@ Dev Agent:
 1. **REQ-XXX exists** in `.haunt/plans/roadmap.md`
 2. **User approved** the requirement (explicitly or via summoning prompt)
 
-**Before spawning dev agents or using Edit/Write on source code:**
+**Before transitioning SCRYING → SUMMONING:**
 
+Declare phase transition:
 ```
-□ Does REQ-XXX exist in roadmap?
-  - NO → STOP: Complete scrying first (spawn PM or create requirement)
-  - YES → Continue
+PHASE TRANSITION: SCRYING → SUMMONING
+Reason: REQ-042 created, user approved summoning
+```
 
-□ Did user approve the plan?
-  - NO → STOP: Present summoning prompt and wait for approval
-  - YES → Proceed with spawning agents
-```
+Then spawn agents.
+
+**VIOLATION DETECTION:**
+
+If you are about to spawn dev agents, check:
+- [ ] Did I present summoning prompt?
+- [ ] Did user say YES (not "maybe" or "later")?
+- [ ] Is current phase SCRYING (ready to transition to SUMMONING)?
+
+If ANY checkbox is unchecked → STOP, present summoning prompt, wait for YES
 
 **Anti-Pattern:** Agent and user discuss a feature for 10 messages, then agent starts editing files directly. This skips the formal scrying gate - no REQ-XXX was ever created.
 
 **Correct Pattern:** After discussion, agent says "Let me formalize this into a requirement" → creates REQ-XXX → presents summoning prompt → user approves → spawns dev agent.
+
+---
+
+## Phase State Management
+
+**CRITICAL:** The orchestrator operates in distinct phases. You MUST declare your current phase before EVERY action.
+
+**Phase Declaration Format:**
+```
+PHASE: [SCRYING | SUMMONING | BANISHING]
+Next action: [What you're about to do]
+```
+
+**Phase Definitions:**
+- **SCRYING:** Planning and roadmap creation (spawn PM, read files, write to `.haunt/plans/`)
+- **SUMMONING:** Execution (spawn dev agents, NO direct file editing on source code)
+- **BANISHING:** Cleanup (archive to `.haunt/completed/`, garden roadmap)
+
+**Phase Transition Gates:**
+
+SCRYING → SUMMONING:
+- ✅ REQ-XXX exists in roadmap
+- ✅ User said YES to summoning prompt (explicit approval in last 3 messages)
+- ❌ User said "maybe", "later", "not sure", or anything ambiguous
+
+SUMMONING → BANISHING:
+- ✅ All spawned agents completed
+- ✅ Work items marked 🟢 Complete
+
+**State File Enforcement:**
+
+Before using Edit or Write on source code files:
+1. Check `.haunt/state/current-phase.txt`
+2. If phase != SUMMONING and file is source code → REJECT action
+3. Remind yourself: "I am an orchestrator. This is dev agent work."
+
+**Spawn-Time Context Injection:**
+
+When spawning PM (SCRYING phase):
+```
+Task(prompt="You are in SCRYING phase. Create roadmap for: [idea].
+Do NOT implement code. Return when roadmap is complete.")
+```
+
+When spawning dev agents (SUMMONING phase):
+```
+Task(prompt="You are in SUMMONING phase. Implement REQ-XXX.
+Phase context: User approved summoning. Roadmap is complete.")
+```
+
+**Example:**
+```
+PHASE: SCRYING
+Next action: Spawn gco-project-manager to create roadmap
+
+[PM completes, roadmap created]
+
+PHASE: SCRYING
+Next action: Present summoning prompt to user
+
+User: "yes, summon them"
+
+PHASE: SUMMONING
+Next action: Spawn gco-dev-backend for REQ-042
+```
+
+**Violation Self-Check:**
+
+Before EVERY Edit, Write, or Task tool call, ask:
+- "What phase am I in?" (Check last phase declaration)
+- "Is this action allowed in this phase?" (Consult phase definitions)
+- "If spawning agents: Did user explicitly approve?" (Check last 3 messages)
+
+If ANY answer is wrong → STOP and declare phase correctly
 
 ---
 

@@ -150,6 +150,21 @@ else:
     mode = 3  # No args + new - new project prompt
 ```
 
+**Step 1B: Initialize Phase State**
+
+Create state directory and initialize phase tracking:
+
+```python
+import os
+
+# Ensure .haunt/state/ directory exists
+os.makedirs(".haunt/state", exist_ok=True)
+
+# Set initial phase to SCRYING
+with open(".haunt/state/current-phase.txt", "w") as f:
+    f.write("SCRYING")
+```
+
 **Step 2: Execute Mode-Specific Flow**
 
 Invoke the `gco-orchestrator` skill with detected mode, arguments, and planning depth:
@@ -159,6 +174,7 @@ MODE: {mode}
 ARGUMENTS: {args}  # With --quick/--deep removed
 PLANNING_DEPTH: {planning_depth}  # "quick", "standard", or "deep"
 HAS_HAUNT: {has_haunt}
+CURRENT_PHASE: SCRYING
 ```
 
 The skill will handle the appropriate flow based on mode and planning depth.

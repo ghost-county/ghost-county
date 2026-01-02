@@ -448,7 +448,15 @@ import re
 
 args = arguments.strip()
 
-# Step 1A: Detect project state (three-state classification)
+# Step 1A: Initialize Phase State
+os.makedirs(".haunt/state", exist_ok=True)
+with open(".haunt/state/current-phase.txt", "w") as f:
+    f.write("SCRYING")
+
+print("PHASE: SCRYING")
+print("Next action: Detect mode and context")
+
+# Step 1B: Detect project state (three-state classification)
 def detect_project_state():
     """
     Detect project state with three classifications:
@@ -569,28 +577,46 @@ else:
 - Prompt to summon
 
 **If planning_depth == "standard":**
-```
-Spawn gco-project-manager with:
-- User's original prompt/idea
-- Instruction based on project_state:
-  - "new_project" → "New project - execute full idea-to-roadmap workflow"
-  - "existing_codebase" → "Existing codebase - execute full idea-to-roadmap workflow for new features"
-  - "active_project" → "Existing project - add to roadmap"
-- Planning depth: standard
-- Project state: {project_state} (for debugging visibility)
+```python
+print("PHASE: SCRYING")
+print("Next action: Spawn gco-project-manager for planning")
+
+Task(
+    prompt=f"""You are in SCRYING phase. Create roadmap for: {user_prompt}
+
+Project context: {project_state}
+Instruction based on context:
+- "new_project" → Execute full idea-to-roadmap workflow
+- "existing_codebase" → Execute full idea-to-roadmap workflow for new features
+- "active_project" → Add to existing roadmap
+
+Planning depth: standard
+
+Do NOT implement code. Return when roadmap is complete.""",
+    subagent_type="gco-project-manager"
+)
 ```
 
 **If planning_depth == "deep":**
-```
-Spawn gco-project-manager with:
-- User's original prompt/idea
-- Instruction based on project_state:
-  - "new_project" → "New project - execute full idea-to-roadmap workflow"
-  - "existing_codebase" → "Existing codebase - execute full idea-to-roadmap workflow for new features"
-  - "active_project" → "Existing project - add to roadmap"
-- Planning depth: deep (extended Phase 2 analysis)
-- Create strategic analysis document: .haunt/plans/REQ-XXX-strategic-analysis.md
-- Project state: {project_state} (for debugging visibility)
+```python
+print("PHASE: SCRYING")
+print("Next action: Spawn gco-project-manager for deep planning")
+
+Task(
+    prompt=f"""You are in SCRYING phase. Create roadmap for: {user_prompt}
+
+Project context: {project_state}
+Instruction based on context:
+- "new_project" → Execute full idea-to-roadmap workflow
+- "existing_codebase" → Execute full idea-to-roadmap workflow for new features
+- "active_project" → Add to existing roadmap
+
+Planning depth: deep (extended Phase 2 analysis)
+Create strategic analysis document: .haunt/plans/REQ-XXX-strategic-analysis.md
+
+Do NOT implement code. Return when roadmap is complete.""",
+    subagent_type="gco-project-manager"
+)
 ```
 
 **Mode 2 (Choice Prompt):** Handle user choice
@@ -680,6 +706,29 @@ The Project Manager executes its workflow:
 
 ---
 
+### Step 3.5: Validate Phase Before Transition
+
+After planning completes, verify SCRYING completion before transitioning to SUMMONING:
+
+```python
+# Read current phase
+with open(".haunt/state/current-phase.txt", "r") as f:
+    current_phase = f.read().strip()
+
+# Verify we're in SCRYING phase
+if current_phase != "SCRYING":
+    print(f"⚠️  WARNING: Expected SCRYING phase, but current phase is {current_phase}")
+    # Reset to SCRYING
+    with open(".haunt/state/current-phase.txt", "w") as f:
+        f.write("SCRYING")
+    current_phase = "SCRYING"
+
+print(f"PHASE: {current_phase}")
+print("Next action: Present summoning prompt to user")
+```
+
+---
+
 ### Step 4: Summoning Prompt
 
 After planning completes, **ALWAYS prompt before spawning agents**.
@@ -696,13 +745,31 @@ Wait for user response.
 
 **If "Yes" (or affirmative):**
 
+**Phase Transition to SUMMONING:**
+
+```python
+# Transition from SCRYING to SUMMONING
+print("PHASE TRANSITION: SCRYING → SUMMONING")
+print("Reason: User approved summoning")
+
+with open(".haunt/state/current-phase.txt", "w") as f:
+    f.write("SUMMONING")
+
+print("PHASE: SUMMONING")
+print("Next action: Spawn dev agents for roadmap requirements")
+```
+
 **Response Selection (75/25 Rule):**
 - **75% of the time:** Pick randomly from canned responses (see references/themed-prompts.md)
 - **25% of the time:** Create your own original themed response (spooky emoji + brief atmospheric line)
 
 Then spawn appropriate gco-* agents based on roadmap assignments:
 - Batch 1 items with no dependencies can spawn in parallel
-- Pass each agent its specific REQ-XXX assignment
+- Pass each agent its specific REQ-XXX assignment with phase context:
+  ```python
+  Task(prompt=f"You are in SUMMONING phase. Implement {req_id}.
+  Phase context: User approved summoning. Roadmap is complete.")
+  ```
 - Use Task tool with appropriate subagent_type
 
 **If "No" (or decline):**
@@ -719,6 +786,20 @@ Confirm roadmap location:
 ### Step 6: Garden and Archive (After Agents Complete Work)
 
 **When spawned agents finish their work**, automatically perform roadmap gardening:
+
+**Phase Transition to BANISHING:**
+
+```python
+# Transition from SUMMONING to BANISHING
+print("PHASE TRANSITION: SUMMONING → BANISHING")
+print("Reason: All spawned agents completed")
+
+with open(".haunt/state/current-phase.txt", "w") as f:
+    f.write("BANISHING")
+
+print("PHASE: BANISHING")
+print("Next action: Archive completed work and clean roadmap")
+```
 
 **Gardening Process:**
 
