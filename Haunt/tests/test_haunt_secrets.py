@@ -944,3 +944,199 @@ SECRET_VAR=placeholder
 
         with pytest.raises(FileNotFoundError):
             get_secrets("/nonexistent/.env")
+
+
+# ========== VALIDATE_SECRETS TESTS (REQ-304) ==========
+
+class TestValidateSecrets:
+    """Test suite for validate_secrets() - validation mode without exporting"""
+
+    def test_validate_secrets_all_resolvable(self, monkeypatch):
+        """Should return success when all secrets are resolvable"""
+        import subprocess
+        from unittest.mock import Mock
+        import tempfile
+
+        env_content = """# @secret:op:vault1/item1/field1
+SECRET1=placeholder
+
+# @secret:op:vault2/item2/field2
+SECRET2=placeholder
+"""
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.env') as f:
+            f.write(env_content)
+            f.flush()
+            env_file = f.name
+
+        try:
+            monkeypatch.setenv("OP_SERVICE_ACCOUNT_TOKEN", "test-token")
+
+            # Mock all secrets as resolvable
+            call_count = [0]
+
+            def mock_run(cmd, *args, **kwargs):
+                call_count[0] += 1
+                mock_result = Mock()
+                mock_result.returncode = 0
+                mock_result.stdout = f"secret-value-{call_count[0]}"
+                mock_result.stderr = ""
+                return mock_result
+
+            monkeypatch.setattr(subprocess, "run", mock_run)
+
+            from haunt_secrets import validate_secrets
+
+            result = validate_secrets(env_file)
+
+            # Verify result
+            assert result.success is True
+            assert len(result.validated) == 2
+            assert "SECRET1" in result.validated
+            assert "SECRET2" in result.validated
+            assert len(result.missing) == 0
+
+            # Verify os.environ was NOT modified
+            assert "SECRET1" not in os.environ
+            assert "SECRET2" not in os.environ
+        finally:
+            os.unlink(env_file)
+
+    def test_validate_secrets_some_missing(self, monkeypatch):
+        """Should return failure when some secrets are not resolvable"""
+        import subprocess
+        from unittest.mock import Mock
+        import tempfile
+
+        env_content = """# @secret:op:vault1/item1/field1
+SECRET1=placeholder
+
+# @secret:op:vault2/missing-item/field2
+SECRET2=placeholder
+"""
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.env') as f:
+            f.write(env_content)
+            f.flush()
+            env_file = f.name
+
+        try:
+            monkeypatch.setenv("OP_SERVICE_ACCOUNT_TOKEN", "test-token")
+
+            # Mock first secret succeeds, second fails
+            def mock_run(cmd, *args, **kwargs):
+                mock_result = Mock()
+                if "missing-item" in cmd[2]:
+                    mock_result.returncode = 1
+                    mock_result.stdout = ""
+                    mock_result.stderr = "item not found"
+                else:
+                    mock_result.returncode = 0
+                    mock_result.stdout = "secret-value"
+                    mock_result.stderr = ""
+                return mock_result
+
+            monkeypatch.setattr(subprocess, "run", mock_run)
+
+            from haunt_secrets import validate_secrets
+
+            result = validate_secrets(env_file)
+
+            # Verify result
+            assert result.success is False
+            assert len(result.validated) == 1
+            assert "SECRET1" in result.validated
+            assert len(result.missing) == 1
+            assert result.missing[0][0] == "SECRET2"  # var_name
+            assert "op://vault2/missing-item/field2" in result.missing[0][1]  # op_ref
+        finally:
+            os.unlink(env_file)
+
+    def test_validate_secrets_empty_env(self, monkeypatch):
+        """Should return success with empty lists when no secrets in .env"""
+        import tempfile
+
+        env_content = """PLAINTEXT1=value1
+PLAINTEXT2=value2
+"""
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.env') as f:
+            f.write(env_content)
+            f.flush()
+            env_file = f.name
+
+        try:
+            from haunt_secrets import validate_secrets
+
+            result = validate_secrets(env_file)
+
+            assert result.success is True
+            assert len(result.validated) == 0
+            assert len(result.missing) == 0
+        finally:
+            os.unlink(env_file)
+
+    def test_validate_secrets_debug_mode(self, monkeypatch, caplog):
+        """Should log debug information when debug=True"""
+        import subprocess
+        from unittest.mock import Mock
+        import tempfile
+        import logging
+
+        env_content = """# @secret:op:vault/item/field
+SECRET_VAR=placeholder
+"""
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.env') as f:
+            f.write(env_content)
+            f.flush()
+            env_file = f.name
+
+        try:
+            monkeypatch.setenv("OP_SERVICE_ACCOUNT_TOKEN", "test-token")
+
+            mock_result = Mock()
+            mock_result.returncode = 0
+            mock_result.stdout = "secret-value"
+            mock_result.stderr = ""
+
+            monkeypatch.setattr(subprocess, "run", lambda *args, **kwargs: mock_result)
+
+            from haunt_secrets import validate_secrets
+
+            with caplog.at_level(logging.INFO):
+                result = validate_secrets(env_file, debug=True)
+
+            # Verify debug logging
+            log_output = caplog.text
+            assert "SECRET_VAR" in log_output
+            assert "op://vault/item/field" in log_output
+
+            # Verify result
+            assert result.success is True
+            assert "SECRET_VAR" in result.validated
+        finally:
+            os.unlink(env_file)
+
+    def test_validate_secrets_nonexistent_file(self):
+        """Should raise FileNotFoundError for nonexistent .env file"""
+        from haunt_secrets import validate_secrets
+
+        with pytest.raises(FileNotFoundError):
+            validate_secrets("/nonexistent/.env")
+
+    def test_validation_result_attributes(self):
+        """ValidationResult should have success, validated, and missing attributes"""
+        from haunt_secrets import ValidationResult
+
+        # Test successful validation result
+        result_success = ValidationResult(success=True, validated=["VAR1", "VAR2"], missing=[])
+        assert result_success.success is True
+        assert result_success.validated == ["VAR1", "VAR2"]
+        assert result_success.missing == []
+
+        # Test failed validation result
+        result_failure = ValidationResult(
+            success=False,
+            validated=["VAR1"],
+            missing=[("VAR2", "op://vault/item/field", "not found")]
+        )
+        assert result_failure.success is False
+        assert result_failure.validated == ["VAR1"]
+        assert len(result_failure.missing) == 1

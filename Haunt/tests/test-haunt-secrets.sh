@@ -651,6 +651,217 @@ EOF
     unset OP_SERVICE_ACCOUNT_TOKEN KEY1 KEY2
 }
 
+# ==============================================================================
+# Validation Mode Tests (REQ-304)
+# ==============================================================================
+
+# Test: Validation mode - all secrets resolvable
+test_validate_mode_success() {
+    echo "TEST: Validation mode with all secrets resolvable"
+
+    local temp_env=$(mktemp)
+    cat > "$temp_env" <<'EOF'
+# @secret:op:ghost-county/api-keys/key1
+KEY1=placeholder
+
+# @secret:op:ghost-county/api-keys/key2
+KEY2=placeholder
+EOF
+
+    # Mock successful 'op' command
+    local temp_bin=$(mktemp -d)
+    cat > "$temp_bin/op" <<'EOF'
+#!/usr/bin/env bash
+echo "secret-value"
+exit 0
+EOF
+    chmod +x "$temp_bin/op"
+    export PATH="$temp_bin:$PATH"
+    export OP_SERVICE_ACCOUNT_TOKEN="test-token"
+
+    # Run validation mode
+    local temp_log=$(mktemp)
+    load_secrets "$temp_env" "true" "false" 2> "$temp_log"
+    local exit_code=$?
+    local output=$(cat "$temp_log")
+    rm -f "$temp_log"
+
+    # Verify exit code 0 (success)
+    assert_equals "0" "$exit_code" "Should exit with 0 on successful validation"
+
+    # Verify output shows validated secrets
+    assert_contains "$output" "validated" "Should show validation success message"
+    assert_contains "$output" "KEY1" "Should list KEY1"
+    assert_contains "$output" "KEY2" "Should list KEY2"
+
+    # Verify secrets NOT exported to environment
+    if [[ -z "${KEY1:-}" && -z "${KEY2:-}" ]]; then
+        TESTS_RUN=$((TESTS_RUN + 1))
+        TESTS_PASSED=$((TESTS_PASSED + 1))
+        echo "✓ PASS: Secrets not exported in validation mode"
+    else
+        TESTS_RUN=$((TESTS_RUN + 1))
+        TESTS_FAILED=$((TESTS_FAILED + 1))
+        echo "✗ FAIL: Secrets should not be exported in validation mode"
+    fi
+
+    rm -f "$temp_env"
+    rm -rf "$temp_bin"
+    unset OP_SERVICE_ACCOUNT_TOKEN KEY1 KEY2
+}
+
+# Test: Validation mode - some secrets missing
+test_validate_mode_failure() {
+    echo "TEST: Validation mode with missing secrets"
+
+    local temp_env=$(mktemp)
+    cat > "$temp_env" <<'EOF'
+# @secret:op:ghost-county/api-keys/key1
+KEY1=placeholder
+
+# @secret:op:ghost-county/api-keys/missing-key
+KEY2=placeholder
+EOF
+
+    # Mock 'op' command that fails for second secret
+    local temp_bin=$(mktemp -d)
+    cat > "$temp_bin/op" <<'EOF'
+#!/usr/bin/env bash
+if [[ "$2" =~ missing-key ]]; then
+    echo "ERROR: Item not found" >&2
+    exit 1
+fi
+echo "secret-value"
+exit 0
+EOF
+    chmod +x "$temp_bin/op"
+    export PATH="$temp_bin:$PATH"
+    export OP_SERVICE_ACCOUNT_TOKEN="test-token"
+
+    # Run validation mode
+    local temp_log=$(mktemp)
+    load_secrets "$temp_env" "true" "false" 2> "$temp_log" || true
+    local exit_code=$?
+    local output=$(cat "$temp_log")
+    rm -f "$temp_log"
+
+    # Verify exit code 1 (failure)
+    assert_equals "1" "$exit_code" "Should exit with 1 on validation failure"
+
+    # Verify output shows error for KEY2
+    assert_contains "$output" "error" "Should show error message"
+    assert_contains "$output" "KEY2" "Should mention failed secret KEY2"
+
+    rm -f "$temp_env"
+    rm -rf "$temp_bin"
+    unset OP_SERVICE_ACCOUNT_TOKEN
+}
+
+# Test: Validation mode with debug output
+test_validate_mode_debug() {
+    echo "TEST: Validation mode with debug output"
+
+    local temp_env=$(mktemp)
+    cat > "$temp_env" <<'EOF'
+# @secret:op:ghost-county/api-keys/key1
+KEY1=placeholder
+EOF
+
+    # Mock successful 'op' command
+    local temp_bin=$(mktemp -d)
+    cat > "$temp_bin/op" <<'EOF'
+#!/usr/bin/env bash
+echo "secret-value"
+exit 0
+EOF
+    chmod +x "$temp_bin/op"
+    export PATH="$temp_bin:$PATH"
+    export OP_SERVICE_ACCOUNT_TOKEN="test-token"
+
+    # Run validation mode with debug
+    local temp_log=$(mktemp)
+    load_secrets "$temp_env" "true" "true" 2> "$temp_log"
+    local output=$(cat "$temp_log")
+    rm -f "$temp_log"
+
+    # Verify debug output shows resolution steps
+    assert_contains "$output" "DEBUG" "Should show debug messages"
+    assert_contains "$output" "KEY1" "Should show variable being checked"
+    assert_contains "$output" "op://" "Should show op reference"
+
+    rm -f "$temp_env"
+    rm -rf "$temp_bin"
+    unset OP_SERVICE_ACCOUNT_TOKEN KEY1
+}
+
+# Test: CLI wrapper with --validate flag
+test_cli_validate_flag() {
+    echo "TEST: CLI wrapper with --validate flag"
+
+    local temp_env=$(mktemp)
+    cat > "$temp_env" <<'EOF'
+# @secret:op:ghost-county/api-keys/key1
+KEY1=placeholder
+EOF
+
+    # Mock successful 'op' command
+    local temp_bin=$(mktemp -d)
+    cat > "$temp_bin/op" <<'EOF'
+#!/usr/bin/env bash
+echo "secret-value"
+exit 0
+EOF
+    chmod +x "$temp_bin/op"
+    export PATH="$temp_bin:$PATH"
+    export OP_SERVICE_ACCOUNT_TOKEN="test-token"
+
+    # Run CLI with --validate flag
+    local output=$(bash "${SCRIPT_DIR}/scripts/haunt-secrets.sh" --validate "$temp_env" 2>&1)
+    local exit_code=$?
+
+    # Verify success
+    assert_equals "0" "$exit_code" "Should exit with 0"
+    assert_contains "$output" "validated" "Should show validation message"
+
+    rm -f "$temp_env"
+    rm -rf "$temp_bin"
+    unset OP_SERVICE_ACCOUNT_TOKEN
+}
+
+# Test: CLI wrapper with --validate --debug flags
+test_cli_validate_debug_flags() {
+    echo "TEST: CLI wrapper with --validate --debug flags"
+
+    local temp_env=$(mktemp)
+    cat > "$temp_env" <<'EOF'
+# @secret:op:ghost-county/api-keys/key1
+KEY1=placeholder
+EOF
+
+    # Mock successful 'op' command
+    local temp_bin=$(mktemp -d)
+    cat > "$temp_bin/op" <<'EOF'
+#!/usr/bin/env bash
+echo "secret-value"
+exit 0
+EOF
+    chmod +x "$temp_bin/op"
+    export PATH="$temp_bin:$PATH"
+    export OP_SERVICE_ACCOUNT_TOKEN="test-token"
+
+    # Run CLI with --validate --debug flags
+    local output=$(bash "${SCRIPT_DIR}/scripts/haunt-secrets.sh" --validate --debug "$temp_env" 2>&1)
+    local exit_code=$?
+
+    # Verify success and debug output
+    assert_equals "0" "$exit_code" "Should exit with 0"
+    assert_contains "$output" "DEBUG" "Should show debug output"
+
+    rm -f "$temp_env"
+    rm -rf "$temp_bin"
+    unset OP_SERVICE_ACCOUNT_TOKEN
+}
+
 # Run all tests
 main() {
     echo "========================================"
@@ -703,6 +914,16 @@ main() {
     test_load_secrets_sourceable
     echo ""
     test_load_secrets_logging_format
+    echo ""
+    test_validate_mode_success
+    echo ""
+    test_validate_mode_failure
+    echo ""
+    test_validate_mode_debug
+    echo ""
+    test_cli_validate_flag
+    echo ""
+    test_cli_validate_debug_flags
     echo ""
 
     echo "========================================"

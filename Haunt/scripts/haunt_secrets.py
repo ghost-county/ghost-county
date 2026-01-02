@@ -29,6 +29,44 @@ Main API Usage:
 Lower-level functions:
 - parse_secret_tags(env_file) -> Dict[str, Tuple[str, str, str]]
 - fetch_secret(vault, item, field) -> str
+
+========== OUTPUT MASKING IMPLEMENTATION (REQ-303) ==========
+
+This module prevents secret exposure through comprehensive output masking:
+
+1. LOGGING REDACTION:
+   - Only variable NAMES logged, never VALUES
+   - Implementation: logger.info(f"Loading secret for {var_name}") at line 258
+   - Secret values NEVER passed to logger
+
+2. ERROR MESSAGE SANITIZATION:
+   - Exceptions show metadata (vault/item/field names) but NEVER secret values
+   - Example: AuthenticationError("1Password authentication failed")
+   - Example: SecretNotFoundError(f"...Verify vault='{vault}', item='{item}'...")
+   - Implementation: Error messages constructed from function parameters (metadata)
+
+3. LOGGING CONFIGURATION:
+   - Module logger: logger = logging.getLogger(__name__)
+   - Callers can configure log level and handlers
+   - No secret values ever reach logging system
+
+4. SECURITY MARKERS IN CODE:
+   - Line 258: logger.info(f"Loading secret for {var_name}")  # Name only
+   - Line 287: logger.info(f"Loaded {len(secrets_dict)} secrets...")  # Count only
+   - Line 417: logger.info(f"Fetching secret from 1Password: vault={vault}...")  # Metadata
+   - Line 434: # SECURITY: Never log the actual secret value
+
+Anti-Leak Architecture:
+  - Function parameters: Metadata only (vault, item, field, var_name)
+  - Return values: Secret values (string) - caller responsible for secure handling
+  - Logging: Variable names and metadata only (never values)
+  - Exceptions: Metadata in messages (vault/item/field names, not values)
+
+Test Coverage:
+  - Haunt/tests/test_haunt_secrets.py::TestAntiLeakProtection (anti-leak tests)
+  - Haunt/tests/test_haunt_secrets.py (functional tests)
+
+==================================================================
 """
 
 import os
@@ -351,6 +389,93 @@ def get_secrets(env_file: str) -> Dict[str, str]:
     logger.info(f"Retrieved {len(secrets_dict)} secrets and {len(plaintext_vars)} plaintext variables")
 
     return result
+
+
+class ValidationResult:
+    """Result of validate_secrets() operation"""
+    def __init__(self, success: bool, validated: list = None, missing: list = None):
+        self.success = success
+        self.validated = validated or []
+        self.missing = missing or []
+
+
+def validate_secrets(env_file: str, debug: bool = False) -> ValidationResult:
+    """
+    Validate that all secrets in .env file are resolvable WITHOUT fetching/exporting them.
+
+    This function checks if all tagged secrets can be retrieved from 1Password
+    without modifying os.environ or actually storing the secret values.
+
+    Args:
+        env_file: Path to .env file
+        debug: If True, print detailed diagnostics to stderr
+
+    Returns:
+        ValidationResult with:
+            - success: True if all secrets resolvable, False otherwise
+            - validated: List of successfully resolved variable names
+            - missing: List of tuples (var_name, op_reference, error_msg) for failures
+
+    Raises:
+        FileNotFoundError: If env_file doesn't exist
+        SecretTagError: If secret tags are malformed
+
+    Example:
+        >>> result = validate_secrets(".env", debug=True)
+        >>> if result.success:
+        ...     print(f"All {len(result.validated)} secrets are valid")
+        ... else:
+        ...     print(f"Missing: {result.missing}")
+    """
+    # Parse secret tags
+    if debug:
+        logger.info(f"Parsing secret tags from {env_file}")
+
+    secret_tags = parse_secret_tags(env_file)
+
+    if not secret_tags:
+        logger.info("No secret tags found in .env file")
+        return ValidationResult(success=True, validated=[], missing=[])
+
+    if debug:
+        logger.info(f"Found {len(secret_tags)} secret tag(s) to validate")
+
+    # Validate each secret
+    validated = []
+    missing = []
+
+    for var_name, (vault, item, field) in secret_tags.items():
+        op_ref = f"op://{vault}/{item}/{field}"
+
+        if debug:
+            logger.info(f"Checking {var_name} → {op_ref}")
+
+        try:
+            # Attempt to fetch secret (validates it exists and is accessible)
+            _ = fetch_secret(vault, item, field)
+
+            if debug:
+                logger.info(f"✓ {var_name} is resolvable")
+
+            validated.append(var_name)
+
+        except (MissingTokenError, OpNotInstalledError, AuthenticationError, SecretNotFoundError) as e:
+            error_msg = str(e)
+
+            if debug:
+                logger.error(f"✗ {var_name} failed validation: {error_msg}")
+
+            missing.append((var_name, op_ref, error_msg))
+
+    # Report summary
+    if missing:
+        logger.error(f"Validation failed for {len(missing)} secret(s)")
+        for var_name, op_ref, error_msg in missing:
+            logger.error(f"  - {var_name} ({op_ref}): {error_msg}")
+        return ValidationResult(success=False, validated=validated, missing=missing)
+    else:
+        logger.info(f"✓ Validated {len(validated)} secret(s): {', '.join(validated)}")
+        return ValidationResult(success=True, validated=validated, missing=[])
 
 
 def fetch_secret(vault: str, item: str, field: str) -> str:
