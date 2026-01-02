@@ -45,39 +45,48 @@
 > Threshold: Focus on skills >600 lines. Skills 500-600 have marginal ROI.
 > Pattern: Use REQ-282 as template (reference index + consultation gates).
 
-### ⚪ REQ-283: Refactor gco-requirements-analysis Skill
+### 🟢 REQ-283: Refactor gco-requirements-analysis Skill
 
 **Type:** Enhancement
 **Reported:** 2025-12-31
 **Source:** Skill refactoring analysis
+**Completed:** 2026-01-02
 
 **Description:**
 gco-requirements-analysis is 824 lines (65% over 500-line limit). This is a core PM workflow skill used in every séance. High token cost per invocation.
 
 **Tasks:**
 
-- [ ] Analyze skill structure and identify natural domain splits
-- [ ] Create `references/` directory
-- [ ] Extract detailed rubric examples to reference file
-- [ ] Extract JTBD/Kano/RICE implementation details to reference file
-- [ ] Slim SKILL.md to ~400 lines with overview + reference index
-- [ ] Add consultation gates (Pattern 1 + Pattern 5)
-- [ ] Test PM workflow still functions correctly
+- [x] Analyze skill structure and identify natural domain splits
+- [x] Create `references/` directory
+- [x] Extract detailed rubric examples to reference file
+- [x] Extract JTBD/Kano/RICE implementation details to reference file
+- [x] Slim SKILL.md to ~400 lines with overview + reference index
+- [x] Add consultation gates (Pattern 1 + Pattern 5)
+- [x] Test PM workflow still functions correctly
 
 **Files:**
 
-- `Haunt/skills/gco-requirements-analysis/SKILL.md` (modify)
-- `Haunt/skills/gco-requirements-analysis/references/*.md` (create)
+- `Haunt/skills/gco-requirements-analysis/SKILL.md` (modified - 824→364 lines, 56% reduction)
+- `Haunt/skills/gco-requirements-analysis/references/framework-reference.md` (created - 188 lines)
+- `Haunt/skills/gco-requirements-analysis/references/standard-template.md` (created - 265 lines)
+- `Haunt/skills/gco-requirements-analysis/references/deep-mode-template.md` (created - 453 lines)
+
+**Results:**
+- Main skill reduced from 824 to 364 lines (56% reduction)
+- 6 consultation gates added (Pattern 1 + Pattern 5)
+- Reference files contain framework definitions, templates
+- PM workflow verified functional (references deployed to ~/.claude/skills/)
 
 **Effort:** M (2-4 hours)
 **Complexity:** MODERATE
 **Agent:** Dev-Infrastructure
 **Completion:**
 
-- SKILL.md under 500 lines
-- Reference files created with appropriate content
-- Consultation gates implemented
-- PM workflow functions correctly
+- ✅ SKILL.md under 500 lines (364 lines)
+- ✅ Reference files created with appropriate content
+- ✅ Consultation gates implemented (6 gates)
+- ✅ PM workflow functions correctly
 
 **Blocked by:** None
 
