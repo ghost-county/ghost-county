@@ -1,7 +1,10 @@
 """
-haunt_secrets.py - Tag Parser for 1Password Secret References
+haunt_secrets.py - Tag Parser and 1Password CLI Wrapper for Secret Management
 
-This module provides functionality to parse 1Password secret references from .env files.
+This module provides functionality to:
+1. Parse 1Password secret references from .env files (REQ-298)
+2. Fetch secrets from 1Password using the `op` CLI (REQ-300)
+
 Secret tags use the format: # @secret:op:vault/item/field
 
 Example:
@@ -11,19 +14,51 @@ Example:
 Returns dict mapping variable names to (vault, item, field) tuples.
 """
 
+import os
 import re
+import subprocess
+import logging
 from pathlib import Path
 from typing import Dict, Tuple
 
+
+# Configure logging
+logger = logging.getLogger(__name__)
 
 # Constants for tag format
 SECRET_TAG_PREFIX = "@secret:op:"
 EXPECTED_TAG_PARTS = 3
 TAG_SEPARATOR = "/"
 
+# Constants for 1Password CLI
+OP_CLI_COMMAND = "op"
+OP_TOKEN_ENV_VAR = "OP_SERVICE_ACCOUNT_TOKEN"
+
+
+# ========== EXCEPTION CLASSES ==========
 
 class SecretTagError(Exception):
     """Exception raised for malformed secret tags or invalid .env file structure"""
+    pass
+
+
+class MissingTokenError(Exception):
+    """Exception raised when OP_SERVICE_ACCOUNT_TOKEN environment variable is not set"""
+    pass
+
+
+class OpNotInstalledError(Exception):
+    """Exception raised when the 1Password CLI (op) is not installed or not found"""
+    pass
+
+
+class AuthenticationError(Exception):
+    """Exception raised when 1Password authentication fails"""
+    pass
+
+
+class SecretNotFoundError(Exception):
+    """Exception raised when vault, item, or field is not found in 1Password"""
     pass
 
 
@@ -163,3 +198,111 @@ def parse_secret_tags(env_file: str) -> Dict[str, Tuple[str, str, str]]:
         i += 1
 
     return result
+
+
+def fetch_secret(vault: str, item: str, field: str) -> str:
+    """
+    Fetch a secret value from 1Password using the `op` CLI.
+
+    Args:
+        vault: Name of the 1Password vault
+        item: Name of the item within the vault
+        field: Name of the field within the item
+
+    Returns:
+        The secret value as a string
+
+    Raises:
+        TypeError: If vault, item, or field are not strings
+        ValueError: If vault, item, or field are empty strings
+        MissingTokenError: If OP_SERVICE_ACCOUNT_TOKEN environment variable not set
+        OpNotInstalledError: If the `op` CLI is not installed or not found
+        AuthenticationError: If 1Password authentication fails
+        SecretNotFoundError: If vault, item, or field doesn't exist in 1Password
+
+    Security:
+        - Secret values are NEVER logged (only metadata like variable names)
+        - Secrets exist in memory only, never written to disk
+        - Uses OP_SERVICE_ACCOUNT_TOKEN from environment for authentication
+
+    Example:
+        >>> token = fetch_secret("my-vault", "api-keys", "github-token")
+        >>> # Use token securely...
+    """
+    # Input validation - type checking
+    if not isinstance(vault, str):
+        raise TypeError(f"vault must be str, got {type(vault).__name__}")
+    if not isinstance(item, str):
+        raise TypeError(f"item must be str, got {type(item).__name__}")
+    if not isinstance(field, str):
+        raise TypeError(f"field must be str, got {type(field).__name__}")
+
+    # Input validation - empty string checking
+    if not vault:
+        raise ValueError("vault must not be empty")
+    if not item:
+        raise ValueError("item must not be empty")
+    if not field:
+        raise ValueError("field must not be empty")
+
+    # Check for service account token
+    token = os.environ.get(OP_TOKEN_ENV_VAR)
+    if not token:
+        raise MissingTokenError(
+            f"{OP_TOKEN_ENV_VAR} environment variable is not set. "
+            "Set it to your 1Password service account token."
+        )
+
+    # Construct op:// reference format
+    op_reference = f"op://{vault}/{item}/{field}"
+
+    # Build command
+    command = [OP_CLI_COMMAND, "read", op_reference]
+
+    # Execute op CLI command
+    try:
+        logger.info(f"Fetching secret from 1Password: vault={vault}, item={item}, field={field}")
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            check=False  # Don't raise on non-zero exit - we handle errors manually
+        )
+    except FileNotFoundError as e:
+        logger.error(f"1Password CLI (op) not found: {e}")
+        raise OpNotInstalledError(
+            f"1Password CLI (op) is not installed or not found in PATH. "
+            f"Install it from: https://developer.1password.com/docs/cli"
+        )
+
+    # Check for success
+    if result.returncode == 0:
+        secret_value = result.stdout.strip()
+        logger.info(f"Successfully fetched secret for vault={vault}, item={item}, field={field}")
+        # SECURITY: Never log the actual secret value
+        return secret_value
+
+    # Handle errors based on stderr content
+    stderr = result.stderr.lower()
+
+    # Authentication errors
+    if "invalid service account token" in stderr or "authentication" in stderr:
+        logger.error(f"1Password authentication failed: {result.stderr.strip()}")
+        raise AuthenticationError(
+            f"1Password authentication failed. Check that {OP_TOKEN_ENV_VAR} is valid."
+        )
+
+    # Not found errors (vault, item, or field)
+    if "not found" in stderr:
+        logger.error(f"Secret not found: {result.stderr.strip()}")
+        raise SecretNotFoundError(
+            f"Secret not found in 1Password. "
+            f"Verify vault='{vault}', item='{item}', field='{field}' exist. "
+            f"Error: {result.stderr.strip()}"
+        )
+
+    # Generic error fallback
+    logger.error(f"1Password CLI error: {result.stderr.strip()}")
+    raise SecretNotFoundError(
+        f"Failed to fetch secret from 1Password. Error: {result.stderr.strip()}"
+    )
