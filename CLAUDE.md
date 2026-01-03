@@ -23,22 +23,18 @@ See `~/.claude/rules/gco-roadmap-format.md` for status update protocol (global r
 
 ### Current Items
 
-**Seer Implementation (Remaining):**
-🟡 REQ-320: Core Seer Agent (M) - Structural complete, needs manual testing
-⚪ REQ-321: Seance Integration (S, blocked by REQ-320)
-⚪ REQ-322: Full Seer Testing (S, blocked by REQ-320, 321)
+**Unblocked (Ready to Work):**
+⚪ REQ-232: Add Effort Estimation to Batch Status (S, Dev-Infrastructure)
+⚪ REQ-313: Create haunt-regression-check Script (M, Dev-Infrastructure)
 
-**Metrics Pipeline (Remaining):**
-⚪ REQ-313: Create Dashboard Visualization (blocked by REQ-312)
-⚪ REQ-314: Add Historical Trend Tracking (blocked by REQ-313)
-⚪ REQ-315: Implement Metrics Alerts (blocked by REQ-312, REQ-314)
+**Blocked:**
+🔴 REQ-314: Baseline Metrics Storage (blocked by REQ-313)
+🔴 REQ-315: Update gco-weekly-refactor (blocked by REQ-314)
+🔴 REQ-331: Add Context Overhead to Metrics (blocked by REQ-313)
 
-**Recently Completed (2026-01-03 Séance):**
-See `.haunt/completed/2026-01/seance-2026-01-03.md` for full archive.
-- REQ-312: Context Overhead Metric (baseline: 1,523 lines)
-- REQ-324, REQ-206, REQ-231: Commands and setup
-- REQ-228, REQ-229, REQ-230: Documentation infographics
-- REQ-326: JetStream Research (DEFER recommendation)
+**Recently Completed (2026-01-03):**
+- Efficiency Overhaul: REQ-327, REQ-328, REQ-329, REQ-330, REQ-332, REQ-333
+- Seer deprecated → `.haunt/deprecated/gco-seer.md`
 
 See `.haunt/plans/roadmap.md` for full details.
 

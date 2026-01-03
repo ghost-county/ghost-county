@@ -19,7 +19,7 @@
 
 ## Batch: CLI Improvements
 
-### 🟡 REQ-232: Add Effort Estimation to Batch Status
+### 🟢 REQ-232: Add Effort Estimation to Batch Status
 
 **Type:** Enhancement
 **Reported:** 2026-01-03
