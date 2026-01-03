@@ -13,412 +13,68 @@ Advanced session initialization guidance for edge cases and complex scenarios.
 
 ## When to Invoke
 
-- When resuming work after extended context loss or session interruption
-- When dealing with complex multi-session feature work
-- When troubleshooting startup issues or broken test states
-- When initialization appears unclear or ambiguous
+- Resuming work after extended context loss or session interruption
+- Dealing with complex multi-session feature work
+- Troubleshooting startup issues or broken test states
+- Initialization appears unclear or ambiguous
 
 ## Context Management (SDK Integration)
 
-Claude Code's Agent SDK provides automatic context management. Understanding the division of responsibility helps optimize session startup:
-
 ### Automatic (SDK Handles)
-- **Context compaction:** Automatically triggered when approaching token limits
-- **CLAUDE.md caching:** 60-minute TTL ensures fast repeated access
-- **Session continuity:** Summarization maintains conversation flow across context boundaries
+- Context compaction (triggered approaching token limits)
+- CLAUDE.md caching (60-minute TTL)
+- Session continuity (summarization across context boundaries)
 
 ### Manual (You Handle)
-- **Assignment verification:** Check Active Work or roadmap for current tasks
-- **Test validation:** Verify tests pass before starting new work (critical path)
-- **Agent memory usage:** Explicitly invoke `recall_context()` for multi-session features
-- **Broken state recovery:** Fix failing tests immediately, don't skip validation
+- Assignment verification (Active Work or roadmap)
+- Test validation (verify tests pass before starting)
+- Agent memory usage (`recall_context()` for multi-session features)
+- Broken state recovery (fix failing tests immediately)
 
-## Complex Scenario Handling
+## Quick Resolution Guide
 
-### Scenario: Tests Failing on Startup
-
-**Problem:** Test suite broken from previous session or recent changes.
-
-**Resolution:**
-1. Identify failing test(s) with full output: `pytest tests/ -v`
-2. Review recent commits for potential breakage: `git diff HEAD~3..HEAD`
+### Tests Failing on Startup
+1. Identify failing test(s): `pytest tests/ -v`
+2. Review recent commits: `git diff HEAD~3..HEAD`
 3. Fix tests BEFORE starting assigned work (non-negotiable)
 4. Verify fix with full suite run
-5. Document fix in commit if changes required
 
-**Never skip this step.** Broken tests indicate unstable foundation.
-
-### Scenario: No Clear Assignment After Full Lookup
-
-**Problem:** Checked all sources (Direct → Active Work → Roadmap) but no work found.
-
-**Resolution:**
-1. Verify you checked ALL sources:
-   - User's direct message (explicit task assignment)
-   - CLAUDE.md Active Work section (your agent type)
-   - `.haunt/plans/roadmap.md` (⚪ or 🟡 status, your domain)
-2. If truly no assignment: STOP and explicitly ask PM
+### No Clear Assignment
+1. Verify checked ALL sources (Direct → Active Work → Roadmap)
+2. If truly no assignment: STOP and ask PM explicitly
 3. Include context: "Checked Active Work and roadmap, no assignments for [agent-type]"
 
-**Do not assume** what work needs doing. PM coordinates priorities.
+### Multiple Potential Assignments
+1. Check `Blocked by:` field - skip blocked items
+2. Prefer items at top of current focus section
+3. Check effort estimate - prefer S over M
+4. If ambiguous: Ask PM which to prioritize
 
-### Scenario: Multiple Potential Assignments
-
-**Problem:** Roadmap shows several ⚪ requirements in your domain.
-
-**Resolution:**
-1. Check `Blocked by:` field for each - skip blocked items
-2. Prefer items at top of current focus section (higher priority)
-3. Check effort estimate - prefer S over M for session boundaries
-4. If still ambiguous: Ask PM which to prioritize
-5. Update chosen requirement to 🟡 and proceed
-
-### Scenario: Resuming Mid-Feature Work
-
-**Problem:** Previous session left feature partially complete.
-
-**Resolution:**
+### Resuming Mid-Feature Work
 1. Find feature in roadmap (should be 🟡 In Progress)
-2. Review unchecked tasks in task list
+2. Review unchecked tasks
 3. Check `git diff` for uncommitted WIP
-4. **Check for story file** (see Story File Loading below)
-5. Use `recall_context("[agent-id]-[req-id]")` if feature is complex
-6. Read implementation notes in roadmap entry
-7. Continue from first unchecked task
+4. Check for story file (`.haunt/plans/stories/REQ-XXX-story.md`)
+5. Use `recall_context("[agent-id]-[req-id]")` if complex
+6. Continue from first unchecked task
 
-**Never start new features with WIP in progress.**
+## Consultation Gates
 
-### Scenario: Assignment in Different Batch (Sharded Roadmaps)
+⛔ **CONSULTATION GATE:** For detailed scenarios (sharded roadmaps, story file loading, Explore workflows, agent memory patterns, lessons-learned integration), READ `references/advanced-scenarios.md`.
 
-**Problem:** Sharded roadmap shows assignment in different batch than active batch.
+## Reference Index
 
-**Resolution:**
-1. Check "Other Batches" section in `roadmap.md` for batch file path
-2. Read full batch file: `.haunt/plans/batches/batch-N-[name].md`
-3. Find assigned requirement in batch file
-4. Proceed with work using batch file context
-
-**Example:**
-```bash
-# Assignment: Implement REQ-105 (in different batch)
-# 1. Roadmap.md shows: "Batch: Command Improvements - File: batches/batch-1-command-improvements.md"
-# 2. Read batch file
-cat .haunt/plans/batches/batch-1-command-improvements.md
-
-# 3. Find REQ-105 details in batch file
-# 4. Proceed with implementation
-```
-
-## Batch Loading (Sharded Roadmaps)
-
-**When roadmap is sharded:** Token-efficient mode for large projects (10+ requirements).
-
-**How sharding works:**
-- Main `roadmap.md` contains: overview + active batch requirements only
-- Other batches stored in: `.haunt/plans/batches/batch-N-[name].md`
-- Achieves 60-80% token reduction by loading only relevant batch
-
-**Detection:**
-- Check if `.haunt/plans/batches/` directory exists
-- Check for "Sharding Info" section in `roadmap.md`
-- Check for "Other Batches" heading in `roadmap.md`
-
-**Workflow for active batch (normal case):**
-1. Read `roadmap.md` (contains active batch already)
-2. Find assignment in active batch
-3. Proceed with work - no additional loading needed
-
-**Workflow for different batch (edge case):**
-1. Assignment found in "Other Batches" section
-2. Note batch file path from overview
-3. Read `.haunt/plans/batches/batch-N-[name].md`
-4. Extract full requirement details from batch file
-5. Proceed with work using batch context
-
-**Example: Assignment in different batch**
-```bash
-# Scenario: Assigned REQ-105, but active batch is "Setup Improvements"
-# REQ-105 is in "Command Improvements" batch
-
-# 1. Check roadmap.md "Other Batches" section
-cat .haunt/plans/roadmap.md
-# Shows: "Batch: Command Improvements - File: batches/batch-1-command-improvements.md"
-
-# 2. Load specific batch file
-cat .haunt/plans/batches/batch-1-command-improvements.md
-
-# 3. Find REQ-105 full details
-# 4. Proceed with implementation
-```
-
-**Backward compatibility:**
-- If roadmap not sharded, use normal workflow (load full `roadmap.md`)
-- No changes needed to agent behavior
-
-**Token savings:**
-- Sharded: Load 500-1000 tokens (overview + active batch)
-- Monolithic: Load 3000-5000 tokens (entire roadmap)
-- Savings: 60-80% reduction
-
-## Story File Loading
-
-**When to check:** After assignment identification, before starting work.
-
-**Workflow:**
-1. Extract REQ-XXX from assignment (e.g., "Implement REQ-224" → REQ-224)
-2. Check if `.haunt/plans/stories/REQ-XXX-story.md` exists
-3. If story file exists:
-   - Read entire story file for implementation context
-   - Pay special attention to:
-     - **Implementation Approach**: Technical strategy and component breakdown
-     - **Code Examples & References**: Similar patterns in codebase
-     - **Known Edge Cases**: Scenarios to handle and error conditions
-     - **Session Notes**: Progress from previous sessions, gotchas discovered
-4. If no story file:
-   - Normal for XS-S sized work
-   - Proceed with roadmap completion criteria and task list
-
-**Story files supplement (not replace) roadmap:**
-- Roadmap has: title, tasks, completion criteria, file list
-- Story file adds: technical context, approach details, code examples, edge cases
-- Both are needed for complete understanding
-
-**When story files are most helpful:**
-- M-sized requirements spanning multiple sessions
-- Complex features with architectural decisions
-- Multi-component changes requiring coordination
-- Work resumed after context compaction or long gap
-- Features with known gotchas from previous attempts
-
-**Example workflow:**
-```bash
-# Assignment: Implement REQ-224
-# 1. Check for story file
-ls .haunt/plans/stories/REQ-224-story.md
-
-# 2. If exists, read it
-cat .haunt/plans/stories/REQ-224-story.md
-
-# 3. Use story context + roadmap to start work
-# Story tells you HOW to implement
-# Roadmap tells you WHAT to implement
-```
-
-## Codebase Reconnaissance with Explore
-
-**When to use built-in Explore agent:** Fast, read-only codebase orientation before starting implementation work.
-
-### Explore Decision Gate
-
-Before starting implementation, ask:
-
-**"Do I need to understand existing code patterns or project structure first?"**
-
-| Situation | Action |
-|-----------|--------|
-| **Refactoring existing code** | Use Explore to scan current implementation |
-| **Integrating with existing features** | Use Explore to find integration points |
-| **Unfamiliar codebase area** | Use Explore for quick orientation |
-| **New feature, clear requirements** | Skip Explore, proceed with implementation |
-| **Simple bug fix with known location** | Skip Explore, proceed with fix |
-
-### Reconnaissance Workflow
-
-**When reconnaissance is needed:**
-
-```bash
-# Session startup sequence
-1. Assignment identified: REQ-XXX
-2. Requirement indicates existing code modification
-3. Use Explore for quick recon (read-only)
-4. Explore returns: file locations, patterns, integration points
-5. Proceed with implementation using Explore findings
-```
-
-**Example: Refactoring existing authentication:**
-
-```
-Assignment: REQ-042 - Refactor authentication to use JWT
-
-Session startup:
-1. Assignment identified from roadmap
-2. Requirement involves refactoring existing code
-3. Use Explore:
-   - "Find all authentication-related code"
-   - Returns: 8 files in src/auth/, middleware/, routes/
-   - Identifies: Session-based auth currently in use
-4. Proceed with JWT implementation informed by Explore findings
-```
-
-### When NOT to Use Explore
-
-**Skip Explore for:**
-- New features with no existing code dependencies
-- Bug fixes in known file locations
-- Documentation-only changes
-- Configuration updates
-- Tests for new functionality
-
-### Explore vs gco-research
-
-| Situation | Use |
-|-----------|-----|
-| Quick codebase scan (<1 min) | Explore (built-in) |
-| File structure discovery | Explore (built-in) |
-| Git history review | Explore (built-in) |
-| Deep API/library research | gco-research (Haunt) |
-| External documentation lookup | gco-research (Haunt) |
-| Architecture recommendations | gco-research (Haunt) |
-
-**Key Distinction:**
-- **Explore:** Read-only codebase reconnaissance (Haiku, fast, ~516 tokens)
-- **gco-research:** Deep investigation with deliverables (Opus, thorough, can write reports)
-
-**See:** `Haunt/docs/INTEGRATION-PATTERNS.md` - Built-in Subagents Reference section for detailed Explore usage patterns.
-
----
-
-## Agent Memory Best Practices
-
-### When to Recall Context
-
-Use `recall_context("[agent-type]")` when:
-
-**Multi-session work:**
-- Resuming M-sized requirements that span multiple sessions
-- Continuing features started in previous sessions (>24 hour gap)
-- Work with complex implementation history requiring prior context
-
-**Complex debugging:**
-- Debugging issues that span multiple investigation sessions
-- Troubleshooting problems requiring knowledge of previous failed attempts
-- Root cause analysis that builds on prior research findings
-
-**Cross-agent handoffs:**
-- Receiving work from another agent type (e.g., Dev receives from Research)
-- Coordinating features requiring multiple agent specializations
-- Understanding context from previous agent's decisions or discoveries
-
-**Example workflow:**
-```bash
-# At session startup, after verifying assignment
-recall_context("dev-backend")
-
-# Review recalled context for:
-# - Previous implementation decisions
-# - Known blockers or gotchas
-# - Partial work from last session
-# - Cross-references to related requirements
-
-# Proceed with work using historical context
-```
-
-### When to Skip Memory
-
-Do NOT use `recall_context()` when:
-
-**Simple, self-contained work:**
-- S-sized tasks completable in single session
-- Straightforward bug fixes with clear root cause
-- New features with no dependency on prior sessions
-
-**Clear requirements:**
-- All context needed is documented in roadmap
-- Acceptance criteria and tasks are self-explanatory
-- No ambiguity about implementation approach
-
-**Fresh starts:**
-- Starting new feature with no prior attempts
-- Clean-slate work with no historical context
-- Requirements explicitly state "ignore previous approaches"
-
-### Storage Pattern
-
-After significant progress or insights:
-```bash
-store_memory(
-  content="[Key decisions, gotchas, next steps]",
-  category="dev-[backend|frontend|infra]",
-  tags=["session", "REQ-XXX", "feature-name"]
-)
-```
+| When You Need | Read This |
+|---------------|-----------|
+| **Sharded roadmap loading** (batch files, token savings) | `references/advanced-scenarios.md` |
+| **Story file workflows** (when to load, what to look for) | `references/advanced-scenarios.md` |
+| **Explore reconnaissance** (decision gates, vs gco-research) | `references/advanced-scenarios.md` |
+| **Agent memory patterns** (when to recall, when to skip) | `references/advanced-scenarios.md` |
+| **Lessons-learned integration** (when to check, what to look for) | `references/advanced-scenarios.md` |
 
 ## Success Criteria
 
 Advanced startup complete when:
-- Edge case handled (broken tests fixed, ambiguous assignment resolved, etc.)
+- Edge case handled (broken tests fixed, ambiguous assignment resolved)
 - Context restored for complex multi-session work (if applicable)
 - Ready to proceed with clear assignment and stable foundation
-- Understand why basic protocol was insufficient (learning for future sessions)
-
-## Lessons-Learned Reference
-
-For complex (M-sized) work, check the lessons-learned database for relevant project knowledge before implementation.
-
-### When to Check Lessons-Learned
-
-Use `.haunt/docs/lessons-learned.md` when:
-
-**M-sized requirements:**
-- Features spanning multiple sessions (2-4 hours)
-- Complex features with architectural decisions
-- Multi-component changes requiring coordination
-- Features touching previously problematic areas
-
-**After encountering blockers:**
-- Debugging issues that seem familiar
-- Architectural questions about existing patterns
-- Uncertainty about project conventions or gotchas
-
-**Before code review:**
-- Verify work against documented anti-patterns
-- Ensure architectural decisions align with project rationale
-- Check best practices for similar work
-
-### What to Look For
-
-**Common Mistakes:** Has this error been made before? What's the solution?
-
-**Anti-Patterns:** Are there code patterns to avoid? (Silent fallbacks, magic numbers, etc.)
-
-**Architecture Decisions:** Why did the project choose approach X over Y?
-
-**Project Gotchas:** Are there Ghost County-specific quirks to be aware of?
-
-**Best Practices:** What patterns work consistently well for this project?
-
-### Workflow
-
-```bash
-# During session startup (after assignment identification):
-# 1. Read assignment from roadmap
-# 2. If M-sized or complex feature:
-#    - Read .haunt/docs/lessons-learned.md
-#    - Skim relevant sections (check table of contents)
-#    - Note applicable lessons for current work
-# 3. Proceed with implementation, applying documented guidance
-```
-
-**Example:**
-```
-Assignment: REQ-XXX - Implement roadmap sharding feature (M-sized)
-
-Session startup:
-1. Assignment identified: REQ-XXX (M-sized, 4-6 hours)
-2. Check lessons-learned.md:
-   - "Framework Changes: Always Update Source First" → Reminder to edit Haunt/ first
-   - "Roadmap Sharding" architecture decision → Understand existing rationale
-   - "Session Startup Optimization" → Related work for context
-3. Implement with lessons in mind (avoid documented mistakes)
-```
-
-### Integration with Story Files
-
-**Story files** (`.haunt/plans/stories/REQ-XXX-story.md`) provide implementation-specific context for individual requirements.
-
-**Lessons-learned** provides project-wide knowledge across all requirements.
-
-**Use both when:**
-- Story file exists for current REQ-XXX → Load for feature-specific context
-- Lessons-learned → Skim for general project patterns/gotchas
-- Combined context reduces mistakes and improves implementation quality

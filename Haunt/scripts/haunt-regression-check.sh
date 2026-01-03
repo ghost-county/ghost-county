@@ -97,10 +97,12 @@ Options:
   --help, -h             Show this help message
 
 Metrics Compared:
-  1. Rule Count          - Number of rule files
-  2. Total Lines         - Sum of all rule lines
-  3. Instruction Count   - Count of imperative instructions
-  4. Context Overhead    - Total context consumption (if available)
+  1. Rule Count              - Number of rule files
+  2. Total Lines             - Sum of all rule lines
+  3. Instruction Count       - Count of imperative instructions
+  4. Total Overhead Lines    - Agent + Rules + CLAUDE.md combined
+  5. Base Overhead Lines     - Core context overhead
+  6. Rules Overhead Lines    - Rules-specific overhead
 
 Threshold Levels:
   - OK:       Within baseline targets
@@ -160,6 +162,21 @@ load_baseline() {
     INSTRUCTION_COUNT_WARNING=$(echo "$baseline_json" | jq -r '.regression_thresholds.instruction_count.warning // 0')
     INSTRUCTION_COUNT_CRITICAL=$(echo "$baseline_json" | jq -r '.regression_thresholds.instruction_count.critical // 0')
 
+    # Extract context overhead baselines
+    BASELINE_TOTAL_OVERHEAD=$(echo "$baseline_json" | jq -r '.context_overhead_baseline.total_overhead_lines // 0')
+    BASELINE_BASE_OVERHEAD=$(echo "$baseline_json" | jq -r '.context_overhead_baseline.base_overhead_lines // 0')
+    BASELINE_RULES_OVERHEAD=$(echo "$baseline_json" | jq -r '.context_overhead_baseline.rules_lines // 0')
+
+    # Extract context overhead thresholds
+    TOTAL_OVERHEAD_WARNING=$(echo "$baseline_json" | jq -r '.regression_thresholds.context_overhead.total_overhead_lines.warning // 0')
+    TOTAL_OVERHEAD_CRITICAL=$(echo "$baseline_json" | jq -r '.regression_thresholds.context_overhead.total_overhead_lines.critical // 0')
+
+    BASE_OVERHEAD_WARNING=$(echo "$baseline_json" | jq -r '.regression_thresholds.context_overhead.base_overhead_lines.warning // 0')
+    BASE_OVERHEAD_CRITICAL=$(echo "$baseline_json" | jq -r '.regression_thresholds.context_overhead.base_overhead_lines.critical // 0')
+
+    RULES_OVERHEAD_WARNING=$(echo "$baseline_json" | jq -r '.regression_thresholds.context_overhead.rules_lines.warning // 0')
+    RULES_OVERHEAD_CRITICAL=$(echo "$baseline_json" | jq -r '.regression_thresholds.context_overhead.rules_lines.critical // 0')
+
     # Extract baseline date
     BASELINE_DATE=$(echo "$baseline_json" | jq -r '.measured_at // "unknown"')
 }
@@ -182,9 +199,10 @@ count_instructions() {
         return
     fi
 
-    # Count lines starting with imperative verbs (after trimming whitespace)
-    # Common instruction patterns: MUST, NEVER, ALWAYS, DO NOT, Should, Must, etc.
-    grep -iE '^\s*(MUST|NEVER|ALWAYS|DO NOT|SHOULD|SHALL|CANNOT|REQUIRED|MANDATORY|FORBIDDEN|PROHIBITED)' "$file" | wc -l | tr -d ' '
+    # Count lines with imperative instructions (updated for slim rule format)
+    # Matches list items starting with imperatives: "- NEVER", "- ALWAYS", etc.
+    # Also matches standalone imperative statements at line start
+    grep -iE '(^-?\s*)(MUST|NEVER|ALWAYS|DO NOT|SHOULD|SHALL|CANNOT|REQUIRED|MANDATORY|FORBIDDEN|PROHIBITED)' "$file" | wc -l | tr -d ' '
 }
 
 # Collect current metrics
@@ -209,7 +227,51 @@ collect_current_metrics() {
         done
     fi
 
+    # Collect context overhead metrics
+    collect_context_overhead
+
     CURRENT_DATE=$(date +%Y-%m-%d)
+}
+
+# Collect context overhead metrics
+collect_context_overhead() {
+    local agent_lines=0
+    local rules_lines=0
+    local claude_md_lines=0
+
+    # Count agent character sheet lines (use largest as representative)
+    local max_agent=0
+    if [ -d "$PROJECT_ROOT/Haunt/agents" ]; then
+        for agent_file in "$PROJECT_ROOT/Haunt/agents"/*.md; do
+            if [ -f "$agent_file" ]; then
+                local lines=$(count_effective_lines "$agent_file")
+                if [ "$lines" -gt "$max_agent" ]; then
+                    max_agent=$lines
+                fi
+            fi
+        done
+    fi
+    agent_lines=$max_agent
+
+    # Count rules lines (sum of all rules)
+    if [ -d "$PROJECT_ROOT/Haunt/rules" ]; then
+        for rule_file in "$PROJECT_ROOT/Haunt/rules"/*.md; do
+            if [ -f "$rule_file" ]; then
+                local lines=$(count_effective_lines "$rule_file")
+                rules_lines=$((rules_lines + lines))
+            fi
+        done
+    fi
+
+    # Count CLAUDE.md lines
+    if [ -f "$PROJECT_ROOT/CLAUDE.md" ]; then
+        claude_md_lines=$(count_effective_lines "$PROJECT_ROOT/CLAUDE.md")
+    fi
+
+    # Calculate base overhead
+    CURRENT_TOTAL_OVERHEAD=$((agent_lines + rules_lines + claude_md_lines))
+    CURRENT_BASE_OVERHEAD=$((agent_lines + rules_lines + claude_md_lines))
+    CURRENT_RULES_OVERHEAD=$rules_lines
 }
 
 # Compare metric against thresholds
@@ -300,8 +362,13 @@ perform_regression_check() {
     # Check instruction count
     local instruction_count_status=$(check_threshold "$CURRENT_INSTRUCTION_COUNT" "$BASELINE_INSTRUCTION_COUNT" "$INSTRUCTION_COUNT_WARNING" "$INSTRUCTION_COUNT_CRITICAL")
 
+    # Check context overhead metrics
+    local total_overhead_status=$(check_threshold "$CURRENT_TOTAL_OVERHEAD" "$BASELINE_TOTAL_OVERHEAD" "$TOTAL_OVERHEAD_WARNING" "$TOTAL_OVERHEAD_CRITICAL")
+    local base_overhead_status=$(check_threshold "$CURRENT_BASE_OVERHEAD" "$BASELINE_BASE_OVERHEAD" "$BASE_OVERHEAD_WARNING" "$BASE_OVERHEAD_CRITICAL")
+    local rules_overhead_status=$(check_threshold "$CURRENT_RULES_OVERHEAD" "$BASELINE_RULES_OVERHEAD" "$RULES_OVERHEAD_WARNING" "$RULES_OVERHEAD_CRITICAL")
+
     # Determine overall status (worst of all checks)
-    for status in "$rule_count_status" "$total_lines_status" "$instruction_count_status"; do
+    for status in "$rule_count_status" "$total_lines_status" "$instruction_count_status" "$total_overhead_status" "$base_overhead_status" "$rules_overhead_status"; do
         if [ "$status" = "CRITICAL" ]; then
             overall_status="CRITICAL"
             exit_code=2
@@ -343,6 +410,32 @@ perform_regression_check() {
         "warning_threshold": $INSTRUCTION_COUNT_WARNING,
         "critical_threshold": $INSTRUCTION_COUNT_CRITICAL,
         "status": "$instruction_count_status"
+      },
+      "context_overhead": {
+        "total_overhead_lines": {
+          "current": $CURRENT_TOTAL_OVERHEAD,
+          "baseline": $BASELINE_TOTAL_OVERHEAD,
+          "delta": $((CURRENT_TOTAL_OVERHEAD - BASELINE_TOTAL_OVERHEAD)),
+          "warning_threshold": $TOTAL_OVERHEAD_WARNING,
+          "critical_threshold": $TOTAL_OVERHEAD_CRITICAL,
+          "status": "$total_overhead_status"
+        },
+        "base_overhead_lines": {
+          "current": $CURRENT_BASE_OVERHEAD,
+          "baseline": $BASELINE_BASE_OVERHEAD,
+          "delta": $((CURRENT_BASE_OVERHEAD - BASELINE_BASE_OVERHEAD)),
+          "warning_threshold": $BASE_OVERHEAD_WARNING,
+          "critical_threshold": $BASE_OVERHEAD_CRITICAL,
+          "status": "$base_overhead_status"
+        },
+        "rules_overhead_lines": {
+          "current": $CURRENT_RULES_OVERHEAD,
+          "baseline": $BASELINE_RULES_OVERHEAD,
+          "delta": $((CURRENT_RULES_OVERHEAD - BASELINE_RULES_OVERHEAD)),
+          "warning_threshold": $RULES_OVERHEAD_WARNING,
+          "critical_threshold": $RULES_OVERHEAD_CRITICAL,
+          "status": "$rules_overhead_status"
+        }
       }
     }
   }
@@ -363,6 +456,18 @@ JSON
         echo ""
 
         format_comparison "Instruction Count" "$CURRENT_INSTRUCTION_COUNT" "$BASELINE_INSTRUCTION_COUNT" "$instruction_count_status" "$INSTRUCTION_COUNT_WARNING" "$INSTRUCTION_COUNT_CRITICAL"
+        echo ""
+
+        section "Context Overhead Metrics"
+        echo ""
+
+        format_comparison "Total Overhead Lines" "$CURRENT_TOTAL_OVERHEAD" "$BASELINE_TOTAL_OVERHEAD" "$total_overhead_status" "$TOTAL_OVERHEAD_WARNING" "$TOTAL_OVERHEAD_CRITICAL"
+        echo ""
+
+        format_comparison "Base Overhead Lines" "$CURRENT_BASE_OVERHEAD" "$BASELINE_BASE_OVERHEAD" "$base_overhead_status" "$BASE_OVERHEAD_WARNING" "$BASE_OVERHEAD_CRITICAL"
+        echo ""
+
+        format_comparison "Rules Overhead Lines" "$CURRENT_RULES_OVERHEAD" "$BASELINE_RULES_OVERHEAD" "$rules_overhead_status" "$RULES_OVERHEAD_WARNING" "$RULES_OVERHEAD_CRITICAL"
         echo ""
 
         section "Overall Status"

@@ -6,14 +6,21 @@
 
 ## Current Focus
 
-**Recently Completed (2026-01-03 Séance):**
-- See `.haunt/completed/2026-01/seance-2026-01-03.md` for full archive
-- 16 requirements archived including: REQ-312 (Context Overhead), REQ-326 (JetStream Research), REQ-228/229/230 (Infographics)
+**Batch: Framework Evolution (Kai-Inspired)**
+> Goal: 80% deterministic code, 20% AI reasoning. Trust the model more.
 
-**Now Unblocked:**
-- REQ-232: Effort Estimation (REQ-231 complete)
-- REQ-313: Regression Check Script (REQ-312 complete)
-- REQ-331: Context Overhead Metrics (REQ-330 complete)
+**Ready to Start:**
+- REQ-337: Learning Extraction (S) - Unblocked (REQ-335 complete)
+
+**Just Completed:**
+- REQ-335: UOCS Implementation (M) - History directory, hooks integration, CLI, full spec
+- REQ-338: Slim Skill Consolidation (M) - 76% reduction (959 lines → 309 lines)
+- REQ-336: Agent Character Sheet Minimization (M) - 56% reduction (813 lines saved)
+- REQ-334: Expand Hook Event Types (M) - SessionStart, Stop, SubagentStop hooks added
+
+**Previously Completed:**
+- See `.haunt/completed/2026-01/seance-2026-01-03.md` for archive
+- 11 requirements from Metrics Pipeline + Rule Optimization batches
 
 ---
 
@@ -384,41 +391,15 @@ Extend the metrics system (REQ-312) to track instruction count and rule overhead
 
 ---
 
-## Summary
+## Summary (Mid-File)
 
-| Status | Count | Items |
-|--------|-------|-------|
-| ⚪ Not Started | 0 | - |
-| 🟡 In Progress | 0 | - |
-| 🟢 Complete | 11 | REQ-232, REQ-313, REQ-314, REQ-315, REQ-327, REQ-328, REQ-329, REQ-330, REQ-331, REQ-332, REQ-333 |
-| 🔴 Blocked | 0 | - |
+| Status | Count | Requirements |
+|--------|-------|--------------|
+| 🟢 Complete | 15 | REQ-232, REQ-313, REQ-314, REQ-315, REQ-327-338 |
+| ⚪ Not Started | 1 | REQ-334 |
 
-**Total Effort Remaining:** 0 hours (all requirements complete)
-
-**Dependency Chains:**
-```
-Existing:
-REQ-232 (unblocked) ─────────────────────────────────────────────┐
-                                                                  │
-REQ-313 (unblocked) → REQ-314 → REQ-315 ─────────────────────────┤
-                          │                                       │
-                          └───────────────────→ REQ-331 ──────────┘
-
-Efficiency Overhaul (COMPLETE):
-REQ-327 (COMPLETE ✓) ─────────────────────────────┐
-                                                   │
-REQ-328 (COMPLETE ✓) → REQ-329 (COMPLETE ✓)       │
-                              │                    │
-                              └→ REQ-330 (COMPLETE ✓) → REQ-331 (unblocked)
-```
-
-**Recommended Execution Order:**
-0. ~~**REQ-332** (XS, 30 min)~~ COMPLETE - Hook false positives fixed
-1. ~~**REQ-327** (XS, 45 min)~~ COMPLETE - Removed 66 lines
-2. ~~**REQ-328** (S, 2 hrs)~~ COMPLETE - Removed 274 lines from auto-load
-3. ~~**REQ-329** (M, 3 hrs)~~ COMPLETE - Final consolidation
-4. ~~**REQ-330** (S, 1 hr)~~ COMPLETE - Measured: 65 instructions, 244 lines
-5. **REQ-331** (S, 1 hr) - Add monitoring (now unblocked)
+**Previous Batch:** Metrics Pipeline + Rule Optimization (ALL COMPLETE ✓)
+**Current Batch:** Framework Evolution (Kai-Inspired) - See bottom of file
 
 ---
 
@@ -481,3 +462,369 @@ Orchestrator workflow:
 **Agent:** Dev-Infrastructure
 **Completion:** Phase hook uses file existence, orchestrator creates/removes file instead of writing phase strings
 **Blocked by:** None
+
+---
+
+## Batch: Framework Evolution (Kai-Inspired)
+
+> Based on analysis of Daniel Miessler's Personal AI Infrastructure patterns.
+> Goal: 80% deterministic code, 20% AI reasoning. Trust the model more.
+> See `.haunt/docs/determinism-audit-2026-01-03.md` and `.haunt/docs/determinism-audit-critical-review.md`
+
+### {🟢} REQ-334: Expand Hook Event Types
+
+**Type:** Enhancement
+**Reported:** 2026-01-03
+**Source:** Kai/PAI analysis - Hook System
+**Description:**
+Expand Haunt's hook coverage beyond PreToolUse to capture more lifecycle events. Adapt patterns from Kai's hook system.
+
+**Current State:**
+- 4 hooks: phase-enforcement, file-location-enforcer, commit-validator, completion-gate
+- All use PreToolUse event type only
+
+**Target State (from Kai):**
+- SessionStart: Initialize session, load context, set tab titles
+- PreToolUse: Existing enforcement hooks
+- PostToolUse: Capture outputs, log events
+- Stop: Capture session completion, route learnings
+- SubagentStop: Route agent outputs by type
+
+**Tasks:**
+- [x] Create `~/.claude/hooks/session-start/` directory structure
+- [x] Implement `initialize-session.sh` (directory setup, session logging)
+- [x] Create `~/.claude/hooks/stop/` directory structure
+- [x] Implement `capture-session-summary.sh` (session end logging)
+- [x] Create `~/.claude/hooks/subagent-stop/` directory structure
+- [x] Implement `route-agent-output.sh` (route agent outputs by type)
+- [x] Update `~/.claude/settings.json` with new hook registrations
+- [x] Test all new hook event types work correctly
+
+**Files:**
+- `~/.claude/hooks/session-start/initialize-session.sh` (created)
+- `~/.claude/hooks/stop/capture-session-summary.sh` (created)
+- `~/.claude/hooks/subagent-stop/route-agent-output.sh` (created)
+- `~/.claude/settings.json` (modified)
+
+**Reference Implementation:**
+```typescript
+// From Kai's initialize-session.ts
+// - Creates .haunt/ directory if needed
+// - Sets terminal tab title from prompt
+// - Logs session start event to history
+```
+
+**Effort:** M (2-4 hours)
+**Complexity:** MODERATE
+**Agent:** Dev-Infrastructure
+**Completion:** SessionStart and Stop hooks fire and log correctly
+**Blocked by:** None
+
+---
+
+### {🟢} REQ-335: Implement UOCS (Universal Output Capture System)
+
+**Type:** Enhancement
+**Reported:** 2026-01-03
+**Source:** Kai/PAI analysis - History System
+**Description:**
+Implement Kai's UOCS pattern: auto-capture ALL work via hooks into searchable history archive. Every interaction becomes discoverable institutional knowledge.
+
+**Architecture:**
+```
+.haunt/history/
+├── sessions/       # Full session transcripts (Stop hook)
+├── learnings/      # Extracted learnings (Stop hook, 2+ learning keywords)
+├── research/       # Research agent outputs (SubagentStop)
+├── decisions/      # Architectural decisions (SubagentStop)
+├── events/         # Raw event JSONL (PostToolUse)
+└── metadata/       # Session metadata, agent tracking
+```
+
+**Key Insight from Kai:**
+The Stop hook routes outputs:
+- 2+ learning keywords (learned, realized, discovered, insight, pattern, mistake) → learnings/
+- Otherwise → sessions/
+
+**Tasks:**
+- [x] Create `.haunt/history/` directory structure
+- [x] Implement `capture-all-events.sh` hook (PostToolUse → events/)
+- [x] Implement `capture-session-summary.sh` (Stop hook, routes to learnings/ vs sessions/)
+- [x] Implement `route-agent-output.sh` (SubagentStop, routes by agent type)
+- [x] Verify `haunt-history.sh` search CLI works with directory structure
+- [x] Document UOCS in `.haunt/docs/UOCS-SPEC.md`
+
+**Files:**
+- `.haunt/history/` (created - sessions, learnings, research, decisions, events, metadata)
+- `~/.claude/hooks/post-tool-use/capture-all-events.sh` (already created in REQ-334)
+- `~/.claude/hooks/stop/capture-session-summary.sh` (already created in REQ-334)
+- `~/.claude/hooks/subagent-stop/route-agent-output.sh` (already created in REQ-334)
+- `Haunt/scripts/haunt-history.sh` (already existed, verified compatibility)
+- `.haunt/docs/UOCS-SPEC.md` (created - comprehensive specification)
+
+**Implementation Notes:**
+- Most UOCS implementation was completed during REQ-334 (hook expansion)
+- Hooks already included learning keyword routing and agent type detection
+- This requirement completed the final integration by creating directory structure and documentation
+- All hooks verified executable and properly configured in settings.json
+- CLI tested with stats, list, and help commands
+
+**Effort:** M (3-4 hours)
+**Complexity:** MODERATE
+**Agent:** Dev-Infrastructure
+**Completion:** All hook events captured to .haunt/history/, searchable via CLI, fully documented
+**Blocked by:** REQ-334 (complete)
+
+---
+
+### {🟢} REQ-336: Agent Character Sheet Minimization
+
+**Type:** Enhancement
+**Reported:** 2026-01-03
+**Source:** Determinism audit critical review
+**Description:**
+Reduce agent character sheets from 129-316 lines to ~30 lines. Modern models (Opus 4.5, Sonnet 3.6) don't need verbose hand-holding.
+
+**Achieved Results:**
+```
+BEFORE (1,443 total lines):
+- gco-code-reviewer.md:   453 lines
+- gco-project-manager.md: 315 lines
+- gco-research.md:        312 lines
+- gco-dev.md:             128 lines
+- gco-research-critic.md: 136 lines
+- gco-release-manager.md:  99 lines
+
+AFTER (630 total lines):
+- gco-code-reviewer.md:    80 lines (↓82%)
+- gco-project-manager.md:  83 lines (↓74%)
+- gco-research.md:         78 lines (↓75%)
+- gco-dev.md:              59 lines (↓54%)
+- gco-research-critic.md:  77 lines (↓43%)
+- gco-release-manager.md:  57 lines (↓42%)
+
+TOTAL REDUCTION: 813 lines saved (56% reduction)
+```
+
+**Tasks:**
+- [x] Create slim template in `Haunt/agents/templates/slim-agent.md`
+- [x] Convert gco-dev to slim format (128→59 lines)
+- [x] Convert gco-code-reviewer to slim format (453→80 lines)
+- [x] Convert gco-research to slim format (312→78 lines)
+- [x] Convert gco-project-manager to slim format (315→83 lines)
+- [x] Convert gco-release-manager to slim format (99→57 lines)
+- [x] Convert gco-research-critic to slim format (136→77 lines)
+- [x] Archive verbose versions in `Haunt/agents/archive/`
+- [x] Measure context overhead reduction with `haunt-metrics.sh`
+- [x] Deploy updated agents with `setup-haunt.sh --agents-only`
+
+**Files:**
+- `Haunt/agents/templates/slim-agent.md` (created)
+- `Haunt/agents/gco-dev.md` (modified - 59 lines)
+- `Haunt/agents/gco-code-reviewer.md` (modified - 80 lines)
+- `Haunt/agents/gco-research.md` (modified - 78 lines)
+- `Haunt/agents/gco-project-manager.md` (modified - 83 lines)
+- `Haunt/agents/gco-release-manager.md` (modified - 57 lines)
+- `Haunt/agents/gco-research-critic.md` (modified - 77 lines)
+- `Haunt/agents/archive/` (created - contains original verbose versions)
+
+**Effort:** M (2-3 hours)
+**Complexity:** SIMPLE (mechanical but many files)
+**Agent:** Dev-Infrastructure
+**Completion:** All agents < 90 lines (target was 50), context overhead reduced by 56%
+**Blocked by:** None
+
+**Verification:**
+- Manual verification completed (infrastructure change)
+- All agents deployed successfully via `setup-haunt.sh --agents-only`
+- haunt-metrics.sh confirms reduction from 1,443 to 630 lines
+
+---
+
+### 🟢 REQ-337: Learning Extraction System
+
+**Type:** Enhancement
+**Reported:** 2026-01-03
+**Source:** Kai/PAI analysis - Stop hook routing
+**Description:**
+Implement the intelligent routing from Kai's stop-hook: detect learnings, patterns, mistakes, and insights and save them separately from regular sessions.
+
+**Key Pattern:**
+```bash
+# Count learning keywords in conversation
+LEARNING_KEYWORDS="learned|realized|discovered|insight|pattern|mistake|improved|optimized"
+LEARNING_COUNT=$(echo "$CONVERSATION" | grep -ciE "$LEARNING_KEYWORDS")
+
+if [ "$LEARNING_COUNT" -ge 2 ]; then
+    # Route to learnings/ with extracted context
+    save_to_learnings
+else
+    # Route to sessions/
+    save_to_sessions
+fi
+```
+
+**Tasks:**
+- [x] Design learning keyword detection algorithm
+- [x] Implement learning extraction in stop hook
+- [x] Create `.haunt/history/learnings/` format (date/topic structure)
+- [x] Add weekly learning summary generation script
+- [x] Test with various session types (debugging, feature, research)
+
+**Implementation Notes:**
+- Stop hook already implemented in REQ-335 with keyword detection (8 keywords, 2+ threshold)
+- Created `haunt-learning-summary.sh` with 3 output formats (text, markdown, JSON)
+- Tested with sample learning sessions - all features working correctly
+- Documentation comprehensive: system architecture, usage, troubleshooting, future enhancements
+
+**Files:**
+- `~/.claude/hooks/stop/capture-session-summary.sh` (already implemented in REQ-335)
+- `Haunt/scripts/haunt-learning-summary.sh` (created - 400+ lines, all formats)
+- `.haunt/docs/LEARNING-EXTRACTION.md` (created - comprehensive documentation)
+
+**Effort:** S (1-2 hours)
+**Complexity:** MODERATE
+**Agent:** Dev-Infrastructure
+**Completion:** Sessions with 2+ learning keywords auto-saved to learnings/, weekly summary generation working
+**Blocked by:** REQ-335
+
+---
+
+### {🟢} REQ-338: Slim Skill Consolidation (Phase 1)
+
+**Type:** Enhancement
+**Reported:** 2026-01-03
+**Source:** Determinism audit - Skill consolidation
+**Description:**
+Apply the "reference doc pattern" to verbose skills. Keep 80-100 line core skill, move detailed content to reference docs.
+
+**Target Skills (Phase 1 - Complete):**
+| Skill | Before | After | Reduction | Reference Doc |
+|-------|--------|-------|-----------|---------------|
+| gco-session-startup | 424 | 80 | 81% | advanced-scenarios.md (10KB) |
+| gco-completion | 326 | 91 | 72% | detailed-checklist.md (13KB) |
+| gco-code-quality | 518 | 138 | 73% | 4-pass-details.md (13KB) |
+| **Total** | **1,268** | **309** | **76%** | **36KB references** |
+
+**Deferred to Phase 2:**
+- gco-react-standards (595 lines)
+- gco-python-standards (688 lines)
+
+**Tasks:**
+- [x] Slim gco-session-startup (424 → 80 lines, -81%)
+- [x] Slim gco-completion (326 → 91 lines, -72%)
+- [x] Slim gco-code-quality (518 → 138 lines, -73%)
+- [x] Move detailed content to references/ subdirs
+- [x] Test skills still invoke correctly
+- [x] Deploy to Haunt/ source and ~/.claude/ global
+
+**Files:**
+- `Haunt/skills/gco-session-startup/SKILL.md` (modified, 80 lines)
+- `Haunt/skills/gco-session-startup/references/advanced-scenarios.md` (created, 10KB)
+- `Haunt/skills/gco-completion/SKILL.md` (modified, 91 lines)
+- `Haunt/skills/gco-completion/references/detailed-checklist.md` (created, 13KB)
+- `Haunt/skills/gco-code-quality/SKILL.md` (modified, 138 lines)
+- `Haunt/skills/gco-code-quality/references/4-pass-details.md` (created, 13KB)
+
+**Effort:** M (2-3 hours)
+**Complexity:** SIMPLE
+**Agent:** Dev-Infrastructure
+**Completion:** ✓ Phase 1 skills reduced by 76% (959 lines → 309 lines), reference docs created and deployed
+**Blocked by:** None
+
+---
+
+### {🟢} REQ-339: Work Completion Notification Hooks
+
+**Type:** Enhancement
+**Reported:** 2026-01-03
+**Source:** User request - need audible/visual notifications when agents complete work
+
+**Description:**
+Add notification hooks that alert the user when work is complete. This addresses the common scenario where the user has summoned dev agents and wants to know when they're done without constantly checking the terminal.
+
+**Use Cases:**
+1. Main session ends with work complete → "All work finished" notification
+2. Subagent completes work → "Agent X finished" notification
+3. Claude waiting for input → "Input needed" notification (different sound/style)
+
+**Implementation Approach (from research):**
+```bash
+# macOS notification via osascript
+osascript -e 'display notification "Work complete!" with title "Claude Code"'
+
+# Audible alert
+afplay /System/Library/Sounds/Glass.aiff
+
+# Distinguish complete vs needs-input by analyzing transcript keywords
+```
+
+**Configuration (Environment Variables):**
+```bash
+export HAUNT_NOTIFY=false        # Disable all notifications
+export HAUNT_NOTIFY_SOUND=false  # Disable sound only (keep visual)
+```
+
+**Tasks:**
+- [x] Create `Haunt/hooks/notify-completion.sh` - main notification logic
+- [x] Add notification to Stop hook (`capture-session-summary.sh`)
+- [x] Add notification to SubagentStop hook (`route-agent-output.sh`)
+- [x] Implement transcript analysis for "complete" vs "needs input" detection
+- [x] Add env var checks: `HAUNT_NOTIFY` and `HAUNT_NOTIFY_SOUND`
+- [x] Test with various session types (summoning, direct work, research)
+- [x] Document notification system and env var configuration
+
+**Files:**
+- `Haunt/hooks/notify-completion.sh` (created)
+- `~/.claude/hooks/stop/capture-session-summary.sh` (modified - notification integrated)
+- `~/.claude/hooks/subagent-stop/route-agent-output.sh` (modified - notification integrated)
+- `.haunt/docs/NOTIFICATIONS.md` (created)
+
+**Implementation Notes:**
+- Notification script created with 3 notification types: complete, input_needed, subagent
+- Stop hook analyzes transcript for completion keywords (1+ triggers "Work Complete")
+- Stop hook analyzes transcript for input keywords (2+ triggers "Input Needed")
+- SubagentStop hook extracts agent type and sends subagent notification
+- Environment variables HAUNT_NOTIFY and HAUNT_NOTIFY_SOUND control behavior
+- Tested all notification types and environment variable flags
+- macOS sounds: Glass.aiff (complete), Ping.aiff (subagent), Submarine.aiff (input needed)
+- Comprehensive documentation created with troubleshooting, testing, and configuration guidance
+
+**Effort:** S (1-2 hours)
+**Complexity:** SIMPLE
+**Agent:** Dev-Infrastructure
+**Completion:** Audible/visual notifications fire on session/subagent completion
+**Blocked by:** None (REQ-335 UOCS provides foundation but not strictly required)
+
+---
+
+## Summary
+
+| Status | Count | Requirements |
+|--------|-------|--------------|
+| 🟢 Complete | 17 | REQ-232, REQ-313-315, REQ-327-339 |
+| ⚪ Not Started | 0 | None |
+
+## Dependency Graph (Framework Evolution)
+
+```
+REQ-334 (Hook Event Types)
+    │
+    └→ REQ-335 (UOCS) ─────→ REQ-337 (Learning Extraction)
+
+REQ-336 (Agent Minimization) ─── independent
+REQ-338 (Skill Consolidation) ── independent
+```
+
+## Implementation Order (Recommended)
+
+**Week 1:**
+1. **REQ-334** (M, 3 hr) - Hook event types first (foundation for UOCS)
+2. **REQ-336** (M, 2 hr) - Agent minimization (immediate context savings)
+
+**Week 2:**
+3. **REQ-335** (M, 4 hr) - UOCS implementation (depends on REQ-334)
+4. **REQ-338** (M, 3 hr) - Skill consolidation (parallel track)
+
+**Week 3:**
+5. **REQ-337** (S, 2 hr) - Learning extraction (depends on REQ-335)

@@ -37,7 +37,7 @@ NC='\033[0m' # No Color
 FORMAT="text"
 SPECIFIC_REQ=""
 SINCE_DATE=""
-SHOW_CONTEXT=false
+SHOW_CONTEXT=true
 
 # Helper functions
 info() {
@@ -76,9 +76,6 @@ parse_args() {
             --since=*)
                 SINCE_DATE="${arg#*=}"
                 ;;
-            --context)
-                SHOW_CONTEXT=true
-                ;;
             --help|-h)
                 show_help
                 exit 0
@@ -103,7 +100,6 @@ Options:
   --format=json|text    Output format (default: text)
   --req=REQ-XXX         Filter to specific requirement
   --since=YYYY-MM-DD    Only include data since date
-  --context             Include context overhead metrics
   --help, -h            Show this help message
 
 Metrics Extracted:
@@ -111,14 +107,13 @@ Metrics Extracted:
   2. Effort Accuracy    - Estimated vs actual time (XS<1hr, S<2hr, M<4hr)
   3. First-Pass Success - Commits without "fix", "revert", "oops"
   4. Completion Rate    - Requirements completed vs abandoned
-  5. Context Overhead   - Token/context consumption (with --context flag)
+  5. Context Overhead   - Agent, rules, and skill overhead (always included)
 
 Examples:
   haunt-metrics                    # All metrics, text format
   haunt-metrics --format=json      # JSON output
   haunt-metrics --req=REQ-123      # Specific requirement only
   haunt-metrics --since=2025-12-01 # Since specific date
-  haunt-metrics --context          # Include context overhead metrics
 
 Data Sources:
   - Git commit history (REQ-XXX patterns)
@@ -577,11 +572,15 @@ main() {
     local first=true
     for req in "${REQUIREMENTS[@]}"; do
         if [ "$FORMAT" = "json" ]; then
-            if [ "$first" = false ]; then
-                echo ","
+            # Capture output to check if it's non-empty
+            local req_output=$(calculate_req_metrics "$req")
+            if [ -n "$req_output" ]; then
+                if [ "$first" = false ]; then
+                    echo ","
+                fi
+                first=false
+                echo "$req_output" | sed 's/^/    /'
             fi
-            first=false
-            calculate_req_metrics "$req" | sed 's/^/    /'
         else
             calculate_req_metrics "$req"
         fi
@@ -593,23 +592,19 @@ main() {
 
         # Output aggregate metrics
         calculate_aggregate_metrics "${REQUIREMENTS[@]}" | sed 's/^/  /'
+        echo "  ,"
 
-        # Add context overhead if requested
-        if [ "$SHOW_CONTEXT" = true ]; then
-            echo ","
-            measure_context_overhead | sed 's/^/  /'
-        fi
+        # Add context overhead (always included)
+        measure_context_overhead | sed 's/^/  /'
 
         echo "}"
     else
         echo ""
         calculate_aggregate_metrics "${REQUIREMENTS[@]}"
 
-        # Add context overhead if requested
-        if [ "$SHOW_CONTEXT" = true ]; then
-            echo ""
-            measure_context_overhead
-        fi
+        # Add context overhead (always included)
+        echo ""
+        measure_context_overhead
 
         echo ""
     fi

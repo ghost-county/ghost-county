@@ -1826,6 +1826,74 @@ setup_hooks() {
     info "  - completion-gate.sh: Requires test verification before marking complete"
 }
 
+# Setup Haunt environment file with default configuration
+setup_haunt_env() {
+    section "Phase 2d: Setting Up Haunt Environment (~/.haunt.env)"
+
+    local env_file="${HOME}/.haunt.env"
+
+    # Check if file already exists
+    if [[ -f "$env_file" ]]; then
+        info "Environment file already exists: $env_file"
+
+        # Check if notification vars are present
+        if grep -q "HAUNT_NOTIFY" "$env_file"; then
+            info "Notification settings already configured"
+            return 0
+        else
+            # Add notification settings to existing file
+            if [[ "$DRY_RUN" == false ]]; then
+                echo "" >> "$env_file"
+                echo "# Notification settings (added by setup-haunt.sh)" >> "$env_file"
+                echo "# Set to 'true' to enable notifications when work completes" >> "$env_file"
+                echo "export HAUNT_NOTIFY=false" >> "$env_file"
+                echo "export HAUNT_NOTIFY_SOUND=false" >> "$env_file"
+                success "Added notification settings to existing ~/.haunt.env"
+            else
+                info "[DRY RUN] Would add notification settings to existing ~/.haunt.env"
+            fi
+        fi
+    else
+        # Create new env file
+        if [[ "$DRY_RUN" == false ]]; then
+            cat > "$env_file" << 'EOF'
+# Haunt Environment Configuration
+# This file is sourced by Haunt hooks for configuration
+# Edit values below to customize behavior
+
+# ============================================================================
+# NOTIFICATION SETTINGS
+# ============================================================================
+# Control notifications when Claude Code sessions/agents complete
+
+# Master toggle: Set to 'true' to enable all notifications
+# When false, no notifications will be shown
+export HAUNT_NOTIFY=false
+
+# Sound toggle: Set to 'true' to enable sound notifications
+# Only applies when HAUNT_NOTIFY=true
+# When false, only visual notifications are shown (no sounds)
+export HAUNT_NOTIFY_SOUND=false
+
+# ============================================================================
+# HOOK SETTINGS
+# ============================================================================
+# Disable all hooks temporarily (useful for debugging)
+# export HAUNT_HOOKS_DISABLED=true
+
+EOF
+            success "Created ~/.haunt.env with default settings"
+        else
+            info "[DRY RUN] Would create ~/.haunt.env"
+        fi
+    fi
+
+    echo ""
+    info "To enable notifications, edit ~/.haunt.env:"
+    info "  export HAUNT_NOTIFY=true        # Enable notifications"
+    info "  export HAUNT_NOTIFY_SOUND=true  # Enable sound alerts"
+}
+
 # ============================================================================
 # PHASE 3: SKILLS SETUP
 # ============================================================================
@@ -4474,6 +4542,11 @@ main() {
     # Phase 2c: Hooks (Claude Code enforcement hooks)
     if [[ "$SKILLS_ONLY" == false ]]; then
         setup_hooks
+    fi
+
+    # Phase 2d: Haunt environment configuration
+    if [[ "$SKILLS_ONLY" == false ]]; then
+        setup_haunt_env
     fi
 
     # Phase 3: Project skills

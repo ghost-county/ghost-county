@@ -23,18 +23,22 @@ See `~/.claude/rules/gco-roadmap-format.md` for status update protocol (global r
 
 ### Current Items
 
-**Unblocked (Ready to Work):**
-⚪ REQ-232: Add Effort Estimation to Batch Status (S, Dev-Infrastructure)
-⚪ REQ-313: Create haunt-regression-check Script (M, Dev-Infrastructure)
+**Batch: Framework Evolution (Kai-Inspired)**
+> Goal: 80% deterministic code, 20% AI reasoning. Trust the model more.
+> See `.haunt/docs/determinism-audit-2026-01-03.md`
+
+**Ready to Start:**
+⚪ REQ-334: Expand Hook Event Types (M) - SessionStart, Stop, SubagentStop
+⚪ REQ-336: Agent Character Sheet Minimization (M) - 30-line templates
+⚪ REQ-338: Slim Skill Consolidation (M) - Reference doc pattern
 
 **Blocked:**
-🔴 REQ-314: Baseline Metrics Storage (blocked by REQ-313)
-🔴 REQ-315: Update gco-weekly-refactor (blocked by REQ-314)
-🔴 REQ-331: Add Context Overhead to Metrics (blocked by REQ-313)
+🔴 REQ-335: UOCS Implementation (M) - Blocked by REQ-334
+🔴 REQ-337: Learning Extraction (S) - Blocked by REQ-335
 
 **Recently Completed (2026-01-03):**
-- Efficiency Overhaul: REQ-327, REQ-328, REQ-329, REQ-330, REQ-332, REQ-333
-- Seer deprecated → `.haunt/deprecated/gco-seer.md`
+- Previous batches: 11 requirements (REQ-232 through REQ-333)
+- See `.haunt/completed/2026-01/seance-2026-01-03.md`
 
 See `.haunt/plans/roadmap.md` for full details.
 
