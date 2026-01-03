@@ -19,7 +19,7 @@
 
 ## Batch: CLI Improvements
 
-### ⚪ REQ-232: Add Effort Estimation to Batch Status
+### 🟡 REQ-232: Add Effort Estimation to Batch Status
 
 **Type:** Enhancement
 **Reported:** 2026-01-03
@@ -53,7 +53,7 @@ Extend the `/haunt status --batch` command to include effort estimation summarie
 
 > Build on REQ-312 (Context Overhead Metric) to create automated regression detection.
 
-### ⚪ REQ-313: Create haunt-regression-check Script
+### 🟢 REQ-313: Create haunt-regression-check Script
 
 **Type:** Enhancement
 **Reported:** 2026-01-02
@@ -64,14 +64,14 @@ Create script to compare current metrics against a stored baseline and detect re
 
 **Tasks:**
 
-- [ ] Create `Haunt/scripts/haunt-regression-check.sh`
-- [ ] Implement baseline loading from JSON file
-- [ ] Implement current metrics collection
-- [ ] Implement comparison with configurable thresholds
-- [ ] Add color-coded output
-- [ ] Add `--baseline=<file>` parameter
-- [ ] Add JSON output format
-- [ ] Create command documentation
+- [x] Create `Haunt/scripts/haunt-regression-check.sh`
+- [x] Implement baseline loading from JSON file
+- [x] Implement current metrics collection
+- [x] Implement comparison with configurable thresholds
+- [x] Add color-coded output
+- [x] Add `--baseline=<file>` parameter
+- [x] Add JSON output format
+- [x] Create command documentation
 
 **Files:**
 
@@ -371,11 +371,11 @@ Extend the metrics system (REQ-312) to track instruction count and rule overhead
 
 | Status | Count | Items |
 |--------|-------|-------|
-| ⚪ Not Started | 5 | REQ-232, REQ-313, REQ-314, REQ-315, REQ-331 |
-| 🟡 In Progress | 0 | - |
+| ⚪ Not Started | 3 | REQ-314, REQ-315, REQ-331 |
+| 🟡 In Progress | 2 | REQ-232, REQ-313 |
 | 🟢 Complete | 5 | REQ-327, REQ-328, REQ-329, REQ-330, REQ-332, REQ-333 |
 | 🔴 Blocked | 3 | REQ-314, REQ-315, REQ-331 |
-| ⚪ Unblocked | 3 | REQ-232, REQ-313, REQ-331 |
+| ⚪ Unblocked | 1 | REQ-331 |
 
 **Total Effort Remaining:** ~7-11 hours (1 M + 4 S)
 
