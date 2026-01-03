@@ -1700,6 +1700,133 @@ setup_rules() {
 }
 
 # ============================================================================
+# PHASE 2c: HOOKS SETUP
+# ============================================================================
+
+setup_hooks() {
+    section "Phase 2c: Installing Claude Code Hooks (GLOBAL)"
+
+    local hooks_source="${PROJECT_ROOT}/hooks"
+    local hooks_target="${HOME}/.claude/hooks"
+    local settings_file="${HOME}/.claude/settings.json"
+    local hooks_template="${PROJECT_ROOT}/templates/settings.hooks.json"
+
+    # Check if source hooks directory exists
+    if [[ ! -d "$hooks_source" ]]; then
+        warning "Hooks source directory not found: $hooks_source"
+        warning "Skipping hooks setup"
+        return 0
+    fi
+
+    # Check for jq (required for merging settings.json)
+    if ! command -v jq &> /dev/null; then
+        warning "jq is not installed. Hooks configuration cannot be merged into settings.json"
+        warning "Install jq: brew install jq (macOS) or apt install jq (Linux)"
+        warning "Skipping hooks setup"
+        return 0
+    fi
+
+    # Create hooks target directory
+    if [[ ! -d "$hooks_target" ]]; then
+        if [[ "$DRY_RUN" == false ]]; then
+            mkdir -p "$hooks_target"
+            success "Created hooks directory: $hooks_target"
+        else
+            info "[DRY RUN] Would create: $hooks_target"
+        fi
+    fi
+
+    # Copy hook scripts
+    local hooks_copied=0
+    local hooks_updated=0
+    local hooks_unchanged=0
+
+    for hook_script in "$hooks_source"/*.sh; do
+        [[ -f "$hook_script" ]] || continue
+
+        local script_name=$(basename "$hook_script")
+        local target_script="$hooks_target/$script_name"
+
+        if [[ -f "$target_script" ]]; then
+            if cmp -s "$hook_script" "$target_script"; then
+                ((hooks_unchanged++))
+            else
+                if [[ "$DRY_RUN" == false ]]; then
+                    cp "$hook_script" "$target_script"
+                    chmod +x "$target_script"
+                    ((hooks_updated++))
+                else
+                    info "[DRY RUN] Would update: $script_name"
+                fi
+            fi
+        else
+            if [[ "$DRY_RUN" == false ]]; then
+                cp "$hook_script" "$target_script"
+                chmod +x "$target_script"
+                ((hooks_copied++))
+            else
+                info "[DRY RUN] Would install: $script_name"
+            fi
+        fi
+    done
+
+    echo ""
+    echo "Hook scripts summary:"
+    echo "  - Installed: ${hooks_copied} script(s)"
+    echo "  - Updated: ${hooks_updated} script(s)"
+    echo "  - Unchanged: ${hooks_unchanged} script(s)"
+
+    # Merge hook configuration into settings.json
+    if [[ ! -f "$hooks_template" ]]; then
+        warning "Hooks template not found: $hooks_template"
+        warning "Skipping settings.json configuration"
+        return 0
+    fi
+
+    if [[ "$DRY_RUN" == false ]]; then
+        if [[ -f "$settings_file" ]]; then
+            # Backup existing settings
+            local backup_file="${settings_file}.backup.$(date +%Y%m%d_%H%M%S)"
+            cp "$settings_file" "$backup_file"
+            info "Backed up existing settings to: $backup_file"
+
+            # Merge existing settings with hook config
+            # The * operator deep-merges, with right-side taking precedence
+            local temp_file=$(mktemp)
+            if jq -s '.[0] * .[1]' "$settings_file" "$hooks_template" > "$temp_file" 2>/dev/null; then
+                mv "$temp_file" "$settings_file"
+                success "Merged hook configuration into settings.json"
+            else
+                rm -f "$temp_file"
+                warning "Failed to merge settings.json - copying hook config only"
+                cp "$hooks_template" "$settings_file"
+            fi
+        else
+            # Create new settings.json from template
+            mkdir -p "$(dirname "$settings_file")"
+            cp "$hooks_template" "$settings_file"
+            success "Created settings.json with hook configuration"
+        fi
+    else
+        if [[ -f "$settings_file" ]]; then
+            info "[DRY RUN] Would merge hook config into existing settings.json"
+        else
+            info "[DRY RUN] Would create settings.json from hooks template"
+        fi
+    fi
+
+    echo ""
+    info "Hooks installed. To disable temporarily:"
+    info "  HAUNT_HOOKS_DISABLED=1 claude"
+    info ""
+    info "Active hooks:"
+    info "  - phase-enforcement.sh: Blocks dev agents outside SUMMONING phase"
+    info "  - file-location-enforcer.sh: Blocks GCO artifacts outside .haunt/"
+    info "  - commit-validator.sh: Requires [REQ-XXX] prefix on commits"
+    info "  - completion-gate.sh: Requires test verification before marking complete"
+}
+
+# ============================================================================
 # PHASE 3: SKILLS SETUP
 # ============================================================================
 
@@ -4342,6 +4469,11 @@ main() {
     # Phase 2b: Rules (invariant enforcement protocols)
     if [[ "$SKILLS_ONLY" == false ]]; then
         setup_rules
+    fi
+
+    # Phase 2c: Hooks (Claude Code enforcement hooks)
+    if [[ "$SKILLS_ONLY" == false ]]; then
+        setup_hooks
     fi
 
     # Phase 3: Project skills

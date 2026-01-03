@@ -34,6 +34,53 @@ fi
 REQ_ID="$1"
 TYPE="$2"
 
+# Find project directory (look for .haunt/ marker)
+find_project_dir() {
+    local dir="$PWD"
+    while [ "$dir" != "/" ]; do
+        if [ -d "$dir/.haunt" ]; then
+            echo "$dir"
+            return 0
+        fi
+        dir=$(dirname "$dir")
+    done
+    # Fall back to current directory
+    echo "$PWD"
+}
+
+PROJECT_DIR=$(find_project_dir)
+
+# Create verification evidence file for completion-gate hook
+create_verification_evidence() {
+    local result="$1"
+    local test_output="$2"
+
+    local evidence_dir="$PROJECT_DIR/.haunt/progress"
+    local evidence_file="$evidence_dir/${REQ_ID}-verified.txt"
+
+    mkdir -p "$evidence_dir"
+
+    cat > "$evidence_file" << EOF
+Verification Evidence for $REQ_ID
+==================================
+Agent Type: $TYPE
+Timestamp: $(date -Iseconds)
+Result: $result
+
+Test Output Summary:
+$test_output
+
+This file was created by verify-tests.sh and is used by the
+completion-gate hook to verify tests passed before allowing
+a requirement to be marked complete (🟢).
+
+File is valid for 1 hour from creation time.
+EOF
+
+    echo ""
+    echo -e "${GREEN}Created verification evidence: $evidence_file${NC}"
+}
+
 echo "========================================="
 echo "Test Verification for $REQ_ID ($TYPE)"
 echo "========================================="
@@ -96,6 +143,7 @@ if [ "$TYPE" = "frontend" ]; then
         echo -e "${GREEN}✅ VERIFICATION PASSED${NC}"
         echo -e "${GREEN}All frontend tests passed for $REQ_ID${NC}"
         echo -e "${GREEN}=========================================${NC}"
+        create_verification_evidence "PASS" "npm test: PASSED, Playwright: PASSED"
         exit 0
     else
         echo -e "${RED}=========================================${NC}"
@@ -141,6 +189,7 @@ if [ "$TYPE" = "backend" ]; then
         echo -e "${GREEN}✅ VERIFICATION PASSED${NC}"
         echo -e "${GREEN}All backend tests passed for $REQ_ID${NC}"
         echo -e "${GREEN}=========================================${NC}"
+        create_verification_evidence "PASS" "$FRAMEWORK tests: PASSED"
         exit 0
     else
         echo ""
@@ -168,5 +217,6 @@ if [ "$TYPE" = "infrastructure" ]; then
     echo -e "${GREEN}✅ VERIFICATION REMINDER${NC}"
     echo -e "${GREEN}Manual verification required for $REQ_ID${NC}"
     echo -e "${GREEN}=========================================${NC}"
+    create_verification_evidence "PASS" "Infrastructure: Manual verification acknowledged"
     exit 0
 fi
