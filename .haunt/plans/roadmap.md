@@ -86,7 +86,7 @@ Create script to compare current metrics against a stored baseline and detect re
 
 ---
 
-### ⚪ REQ-314: Create Baseline Metrics Storage System
+### 🟢 REQ-314: Create Baseline Metrics Storage System
 
 **Type:** Enhancement
 **Reported:** 2026-01-02
@@ -97,14 +97,14 @@ Create system to store, manage, and version metric baselines for regression comp
 
 **Tasks:**
 
-- [ ] Create `.haunt/metrics/` directory structure
-- [ ] Create `Haunt/scripts/haunt-baseline.sh` script
-- [ ] Implement `create` command
-- [ ] Implement `list` command
-- [ ] Implement `show` command
-- [ ] Implement `set-active` command
-- [ ] Add calibration tracking
-- [ ] Create command documentation
+- [x] Create `.haunt/metrics/` directory structure
+- [x] Create `Haunt/scripts/haunt-baseline.sh` script
+- [x] Implement `create` command
+- [x] Implement `list` command
+- [x] Implement `show` command
+- [x] Implement `set-active` command
+- [x] Add calibration tracking
+- [x] Create command documentation
 
 **Files:**
 
@@ -112,11 +112,19 @@ Create system to store, manage, and version metric baselines for regression comp
 - `Haunt/commands/haunt-baseline.md` (create)
 - `.haunt/metrics/` directory structure
 
+**Implementation Notes:**
+- Script manages baselines in `.haunt/metrics/baselines/` directory
+- Active baseline tracked via symlink at `.haunt/metrics/instruction-count-baseline.json`
+- Calibration tracking via boolean flag in JSON and user prompts
+- Supports text and JSON output formats
+- Automatic threshold calculation (+23% warning, +54% critical)
+- Full integration with haunt-regression-check.sh
+
 **Effort:** S (1-2 hours)
 **Complexity:** SIMPLE
 **Agent:** Dev-Infrastructure
 **Completion:** Baselines can be created, listed, and managed
-**Blocked by:** REQ-313
+**Blocked by:** None (REQ-313 complete)
 
 ---
 
@@ -337,7 +345,7 @@ After completing REQ-327, REQ-328, REQ-329, measure the new instruction count an
 
 ---
 
-### {⚪} REQ-331: Add Context Overhead to Metrics System
+### 🟡 REQ-331: Add Context Overhead to Metrics System
 
 **Type:** Enhancement
 **Reported:** 2026-01-03
