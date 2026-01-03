@@ -434,19 +434,18 @@ measure_context_overhead() {
     local total_overhead=$((base_overhead + skill_lines))
 
     if [ "$FORMAT" = "json" ]; then
-        cat << JSON
-"context_overhead": {
-  "agent_lines": $agent_lines,
-  "rules_lines": $rules_lines,
-  "claude_md_lines": $claude_md_lines,
-  "estimated_skill_lines": $skill_lines,
-  "base_overhead_lines": $base_overhead,
-  "total_overhead_lines": $total_overhead,
-  "avg_skills_loaded_estimate": $avg_skills_loaded,
-  "avg_skill_size_lines": $avg_skill_size,
-  "total_skills_available": $skill_count
-}
-JSON
+        # Output context overhead field (without trailing brace/comma)
+        echo "\"context_overhead\": {"
+        echo "  \"agent_lines\": $agent_lines,"
+        echo "  \"rules_lines\": $rules_lines,"
+        echo "  \"claude_md_lines\": $claude_md_lines,"
+        echo "  \"estimated_skill_lines\": $skill_lines,"
+        echo "  \"base_overhead_lines\": $base_overhead,"
+        echo "  \"total_overhead_lines\": $total_overhead,"
+        echo "  \"avg_skills_loaded_estimate\": $avg_skills_loaded,"
+        echo "  \"avg_skill_size_lines\": $avg_skill_size,"
+        echo "  \"total_skills_available\": $skill_count"
+        echo "}"
     else
         section "Context Overhead"
         echo ""
@@ -520,16 +519,15 @@ calculate_aggregate_metrics() {
     fi
 
     if [ "$FORMAT" = "json" ]; then
-        cat << JSON
-"aggregate_metrics": {
-  "total_requirements": $total_reqs,
-  "completed_requirements": $completed,
-  "completion_rate": $completion_rate,
-  "first_pass_successes": $first_pass_successes,
-  "first_pass_rate": $first_pass_rate,
-  "average_cycle_time_hours": $avg_cycle_time
-}
-JSON
+        # Output aggregate metrics field (without trailing brace/comma)
+        echo "\"aggregate_metrics\": {"
+        echo "  \"total_requirements\": $total_reqs,"
+        echo "  \"completed_requirements\": $completed,"
+        echo "  \"completion_rate\": $completion_rate,"
+        echo "  \"first_pass_successes\": $first_pass_successes,"
+        echo "  \"first_pass_rate\": $first_pass_rate,"
+        echo "  \"average_cycle_time_hours\": $avg_cycle_time"
+        echo "}"
     else
         section "Aggregate Metrics"
         echo ""
@@ -592,6 +590,8 @@ main() {
     if [ "$FORMAT" = "json" ]; then
         echo ""
         echo "  ],"
+
+        # Output aggregate metrics
         calculate_aggregate_metrics "${REQUIREMENTS[@]}" | sed 's/^/  /'
 
         # Add context overhead if requested

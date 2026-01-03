@@ -664,7 +664,7 @@ Flags supported:
 
 ## Backlog: Visual Documentation
 
-🟡 REQ-228: Create Séance Workflow Infographic (Agent: Dev-Infrastructure, S)
+🟢 REQ-228: Create Séance Workflow Infographic (Agent: Dev-Infrastructure, S)
 🟢 REQ-229: Create Agent Coordination Diagram (Agent: Dev-Infrastructure, S)
 🟢 REQ-230: Create Session Startup Protocol Diagram (Agent: Dev-Infrastructure, S)
 
@@ -672,8 +672,53 @@ Flags supported:
 
 ## Backlog: CLI Improvements
 
-⚪ REQ-231: Implement /haunt status --batch Command (Agent: Dev-Infrastructure, M)
-⚪ REQ-232: Add Effort Estimation to Batch Status (Agent: Dev-Infrastructure, S, blocked by REQ-231)
+### 🟢 REQ-231: Implement /haunt status --batch Command
+
+**Type:** Enhancement
+**Reported:** User request
+**Source:** Need batch-organized status view of roadmap
+
+**Description:**
+Create a new command that shows batch-organized status of the roadmap, displaying requirements grouped by batch with completion summaries and blocking dependencies highlighted.
+
+**Tasks:**
+
+- [x] Create `Haunt/scripts/haunt-status.sh` implementation script
+- [x] Parse roadmap for batch sections (## Batch: and ## Priority:)
+- [x] Extract requirements with status icons (⚪🟡🟢🔴)
+- [x] Detect and display blocking dependencies
+- [x] Show status counts per batch (pending/in_progress/complete/blocked)
+- [x] Implement colored terminal output
+- [x] Implement JSON output format
+- [x] Create `Haunt/commands/haunt-status.md` command documentation
+- [x] Test with current roadmap structure
+
+**Files:**
+
+- `Haunt/commands/haunt-status.md` (create - command documentation)
+- `Haunt/scripts/haunt-status.sh` (create - implementation script)
+
+**Effort:** M (2-4 hours)
+**Complexity:** MODERATE
+**Agent:** Dev-Infrastructure
+**Completion:**
+
+- Script successfully parses all batches in roadmap
+- Blocking dependencies correctly identified and displayed
+- Both terminal and JSON outputs working
+- Status counts accurate for each batch
+
+**Blocked by:** None
+
+---
+
+### ⚪ REQ-232: Add Effort Estimation to Batch Status
+
+**Type:** Enhancement
+**Reported:** User request
+**Source:** Need effort tracking per batch
+
+**Blocked by:** REQ-231
 
 ---
 

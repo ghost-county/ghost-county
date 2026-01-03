@@ -217,7 +217,7 @@ validate_assignment() {
 Archived or ready to archive. Check .haunt/completed/ for details." 3
     fi
 
-    # Check if blocked
+    # Check if blocked (by status icon)
     if [[ "$status" == "$STATUS_BLOCKED" ]]; then
         local blocked_by
         blocked_by=$(get_blocked_by "$req_block")
@@ -226,6 +226,33 @@ Archived or ready to archive. Check .haunt/completed/ for details." 3
 Blocked by: $blocked_by
 
 Recommendation: Resolve blocker first or choose unblocked requirement." 3
+    fi
+
+    # Check if has active blocker (by Blocked by field)
+    local blocked_by
+    blocked_by=$(get_blocked_by "$req_block")
+    if [[ -n "$blocked_by" && "$blocked_by" != "None" && "$force" != "true" ]]; then
+        warn "$req_id has an unresolved blocker"
+        echo ""
+        echo "Blocked by: $blocked_by"
+        echo ""
+        echo "Do you want to:"
+        echo "  1. Assign anyway (blocker may be out of date)"
+        echo "  2. Cancel and resolve blocker first"
+        echo ""
+        read -rp "Choose [1/2]: " choice
+
+        case "$choice" in
+            1)
+                return 0
+                ;;
+            2)
+                exit 0
+                ;;
+            *)
+                error "Invalid choice" 1
+                ;;
+        esac
     fi
 
     # Warn if already in progress
@@ -430,9 +457,6 @@ main() {
     local current_status
     current_status=$(get_status "$req_block")
 
-    # Validate assignment
-    validate_assignment "$req_id" "$req_block" "$force"
-
     # Display assignment info
     local title
     title=$(get_title "$req_block")
@@ -442,9 +466,21 @@ main() {
         info "  Current status: $current_status"
         info "  New status: $STATUS_IN_PROGRESS"
         echo ""
+
+        # Check blockers in dry-run mode (informational only)
+        local blocked_by
+        blocked_by=$(get_blocked_by "$req_block")
+        if [[ -n "$blocked_by" && "$blocked_by" != "None" ]]; then
+            warn "  This requirement has an active blocker: $blocked_by"
+            echo ""
+        fi
+
         display_requirement "$req_id" "$req_block"
         exit 0
     fi
+
+    # Validate assignment (after dry-run check to avoid prompts in dry-run)
+    validate_assignment "$req_id" "$req_block" "$force"
 
     # Update status if not already in progress
     if [[ "$current_status" != "$STATUS_IN_PROGRESS" ]]; then
