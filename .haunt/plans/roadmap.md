@@ -358,12 +358,13 @@ Extend the metrics system (REQ-312) to track instruction count and rule overhead
 
 | Status | Count | Items |
 |--------|-------|-------|
-| ⚪ Not Started | 10 | REQ-232, REQ-313, REQ-314, REQ-315, REQ-327, REQ-328, REQ-329, REQ-330, REQ-331, REQ-332 |
+| ⚪ Not Started | 9 | REQ-232, REQ-313, REQ-314, REQ-315, REQ-327, REQ-328, REQ-329, REQ-330, REQ-331 |
 | 🟡 In Progress | 0 | - |
+| 🟢 Complete | 1 | REQ-332 |
 | 🔴 Blocked | 4 | REQ-314, REQ-315, REQ-329, REQ-330, REQ-331 |
-| ⚪ Unblocked | 6 | REQ-232, REQ-313, REQ-327, REQ-328, REQ-332 |
+| ⚪ Unblocked | 5 | REQ-232, REQ-313, REQ-327, REQ-328 |
 
-**Total Effort Remaining:** ~12-18 hours (2 M + 7 S/XS)
+**Total Effort Remaining:** ~11.5-17.5 hours (2 M + 6 S/XS)
 
 **Dependency Chains:**
 ```

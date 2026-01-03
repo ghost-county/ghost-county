@@ -24,13 +24,22 @@ if [[ "$FILE_PATH" != *"roadmap.md"* ]]; then
     exit 0
 fi
 
-# Check if the edit is changing status to complete (🟢)
-if [[ "$NEW_STRING" != *"🟢"* ]]; then
-    exit 0  # Not marking complete, allow
+# Check if the edit is changing a requirement status to complete (🟢)
+# Pattern: ### {🟢} REQ-XXX (requirement header with complete status)
+# This prevents false positives from emoji in other contexts (e.g., "🟢 Unblocked", summary tables)
+#
+# Strategy: Use grep to find lines matching the complete requirement header pattern.
+# If no such line exists, this is not a requirement completion (allow the edit).
+# If such a line exists, extract the REQ number and verify tests.
+
+COMPLETE_HEADER=$(echo "$NEW_STRING" | grep -E '###[[:space:]]*\{[[:space:]]*🟢[[:space:]]*\}[[:space:]]*REQ-[0-9]+' || true)
+
+if [[ -z "$COMPLETE_HEADER" ]]; then
+    exit 0  # Not marking requirement complete, allow
 fi
 
 # Extract REQ number being marked complete
-REQ_MATCH=$(echo "$NEW_STRING" | grep -oE 'REQ-[0-9]+' | head -1 || true)
+REQ_MATCH=$(echo "$COMPLETE_HEADER" | grep -oE 'REQ-[0-9]+' | head -1 || true)
 
 if [[ -z "$REQ_MATCH" ]]; then
     exit 0  # Can't determine REQ number, allow (defensive)
