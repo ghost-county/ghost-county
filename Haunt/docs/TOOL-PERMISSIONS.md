@@ -2,11 +2,60 @@
 
 This document explains how tool permissions work in the Haunt Framework.
 
-## How Tool Permissions Are Enforced
+## ⚠️ Critical: Agent YAML `tools` Field is Documentation Only
+
+**The `tools` field in agent YAML does NOT grant tool access.** This is the most common misunderstanding in the Haunt framework.
+
+### The Misconception
+
+```yaml
+---
+name: gco-seer
+tools: Task, Glob, Grep, Read, Write, mcp__agent_memory__*  # ← This does NOT work
+---
+```
+
+Many assume that listing tools in the agent YAML frontmatter will grant those tools when running `claude --agent <name>`. **This is incorrect.**
+
+### The Reality
+
+When you run `claude --agent gco-seer`:
+
+- ✅ Agent personality/instructions are loaded
+- ✅ Skills are loaded
+- ✅ Model selection is respected
+- ❌ Tool permissions are NOT read from YAML
+
+**Actual tool access is determined by:**
+
+1. **Main Session:** When running plain `claude`, you get ALL tools (Glob, Grep, Read, Write, Edit, Bash, Task, etc.)
+2. **Subagents via Task:** When spawning via Task tool, the `subagent_type` parameter determines tools
+3. **Agent Mode:** When using `--agent` flag, you get a LIMITED subset (no Task tool)
+
+### Why gco-seer Was Deprecated
+
+The original `gco-seer` agent was built on the incorrect assumption that `tools: Task` would grant Task tool access. Since the Task tool is only available in the main session (not via `--agent`), the Seer couldn't spawn other agents.
+
+**Solution:** Use `/seance` command in the main session instead of `claude --agent gco-seer`.
+
+See `.haunt/deprecated/gco-seer.md` for the full story.
+
+---
+
+## How Tool Permissions Are Actually Enforced
 
 Tool permissions in Claude Code are enforced at two levels:
 
-### 1. Task Tool Subagent Types (Actual Enforcement)
+### 1. Main Session Tools
+
+When running `claude` (without `--agent`), you have access to ALL tools:
+
+- Glob, Grep, Read, Edit, Write, Bash
+- Task (for spawning subagents)
+- TodoWrite, TodoRead
+- All configured MCP tools
+
+### 2. Task Tool Subagent Types (Subagent Enforcement)
 
 When spawning agents via the `Task` tool, the `subagent_type` parameter determines which tools the agent can access. This is **actual enforcement** - agents cannot access tools not assigned to their subagent type.
 
@@ -16,17 +65,20 @@ Task(subagent_type="Dev-Backend", prompt="...")
 
 The subagent type maps to a predefined set of tools that Claude Code enforces.
 
-### 2. Agent YAML Frontmatter (Documentation)
+### 3. Agent YAML Frontmatter (Documentation Only)
 
-Agent character sheets in `Haunt/agents/` include a `tools` field in their YAML frontmatter. This serves as **documentation** of intended tool access, helping humans understand what each agent should be able to do.
+Agent character sheets in `Haunt/agents/` include a `tools` field in their YAML frontmatter. This serves **only as documentation** of intended tool access, helping humans understand what each agent should be able to do.
 
 ```yaml
 ---
 name: dev
 tools: Glob, Grep, Read, Edit, Write, Bash, TodoWrite, mcp__context7__*, mcp__agent_memory__*
 # Tool permissions enforced by Task tool subagent_type (Dev-Backend, Dev-Frontend, Dev-Infrastructure)
+# ^^^ This comment is the key - the tools field is informational
 ---
 ```
+
+---
 
 ## Subagent Types and Their Tools
 
@@ -52,9 +104,12 @@ tools: Glob, Grep, Read, Edit, Write, Bash, TodoWrite, mcp__context7__*, mcp__ag
 
 **Note:** The `gco-dev.md` agent is a single polyglot that adapts based on file paths and task context. The Task tool's subagent_type determines tool access, while the agent determines its working mode internally.
 
+---
+
 ## Tool Categories
 
 ### Read-Only Tools
+
 - **Glob** - File pattern matching
 - **Grep** - Content search
 - **Read** - File reading
@@ -62,15 +117,23 @@ tools: Glob, Grep, Read, Edit, Write, Bash, TodoWrite, mcp__context7__*, mcp__ag
 - **WebFetch** - Web page fetching
 
 ### Write Tools
+
 - **Edit** - File editing
 - **Write** - File creation
 - **Bash** - Shell command execution
 - **TodoWrite** - Task list management
 
+### Orchestration Tools
+
+- **Task** - Spawn subagents (main session only)
+
 ### MCP Tools
+
 - **mcp__context7__*** - Library documentation lookup
 - **mcp__agent_memory__*** - Agent memory persistence
 - **mcp__agent_chat__*** - Inter-agent communication
+
+---
 
 ## Tool Restriction Patterns
 
@@ -83,15 +146,18 @@ Tool restrictions prevent accidental modifications and enforce separation of con
 **Pattern:** Remove Write, Edit, Bash, and TodoWrite tools while keeping read-only analysis tools.
 
 **When to use:**
+
 - Reviewing untrusted or third-party code
 - Investigating production systems
 - Reconnaissance before making changes
 - Research where modification risk must be zero
 
 **Examples:**
+
 - `gco-code-reviewer-readonly.md` - Code review without modification capability
 
 **Benefits:**
+
 - Zero accidental modification risk
 - Clear separation of analysis from implementation
 - Safe operation in shared/sensitive contexts
@@ -111,6 +177,7 @@ tools: [list of tools]
 ```
 
 **Philosophy statement should explain:**
+
 1. Why this set of tools (not more, not less)
 2. What the agent can and cannot do
 3. When to use this agent vs an alternative variant
@@ -137,6 +204,8 @@ tools: Glob, Grep, Read, WebSearch, WebFetch, mcp__context7__*, mcp__agent_memor
 # Tool Access Philosophy: Read-only enforcement prevents accidental modifications during research.
 ```
 
+---
+
 ## Model Selection
 
 Agent character sheets can specify a preferred model via the `model` field in YAML frontmatter. This allows optimizing performance and cost for different agent types.
@@ -153,24 +222,28 @@ Agent character sheets can specify a preferred model via the `model` field in YA
 ### Model Selection Guidelines
 
 **Use `haiku` for:**
+
 - Web searches and research (gco-research)
 - Quick code reviews (syntax/style checks)
 - Fast file searches and pattern matching
 - Read-only operations with low reasoning requirements
 
 **Use `sonnet` for:**
+
 - Complex code implementation
 - Planning and roadmap management (gco-project-manager)
 - Code review requiring architectural understanding
 - Risk assessment and release management
 
 **Use `opus` for:**
+
 - Critical architectural decisions
 - Security reviews
 - Complex refactoring across many files
 - High-stakes debugging
 
 **Use `inherit` for:**
+
 - Implementation agents (gco-dev) where task complexity varies
 - Allows caller to specify appropriate model for the task
 - Maintains flexibility for different use cases
@@ -201,6 +274,8 @@ When using `model: inherit`, the spawning agent can specify which model to use f
 
 If no model specified when spawning, the agent uses the current session's model. This allows dynamic model selection based on task complexity while maintaining a sensible default.
 
+---
+
 ## Best Practices
 
 ### For Agent Designers
@@ -210,26 +285,49 @@ If no model specified when spawning, the agent uses the current session's model.
 3. **Document Rationale** - Add Tool Access Philosophy comment explaining tool choices
 4. **Consider Variants** - Create read-only variants for safety-critical use cases
 5. **Choose Appropriate Model** - Select model based on agent's typical workload (haiku for speed, sonnet for reasoning, inherit for flexibility)
+6. **Remember: tools field is docs** - The tools field helps humans understand intent, but doesn't grant access
 
 ### For Framework Users
 
-1. **Use Correct Subagent Type** - When spawning agents, use the appropriate subagent_type for the task
-2. **Don't Assume Tools** - Don't expect agents to have tools not in their subagent type
-3. **Check Permissions First** - If an agent fails, verify the subagent_type has the required tools
-4. **Choose Appropriate Variant** - Use read-only variants when modification risk must be zero
+1. **Use Main Session for Orchestration** - If you need Task tool access, use `claude` not `claude --agent`
+2. **Use Correct Subagent Type** - When spawning agents, use the appropriate subagent_type for the task
+3. **Don't Assume Tools** - Don't expect agents to have tools not in their subagent type
+4. **Check Permissions First** - If an agent fails, verify the subagent_type has the required tools
+5. **Choose Appropriate Variant** - Use read-only variants when modification risk must be zero
+
+---
 
 ## Troubleshooting
+
+### Agent Can't Spawn Other Agents
+
+**Symptom:** Agent says "Task tool not available" or spawning fails
+
+**Cause:** Running with `--agent` flag, which doesn't provide Task tool
+
+**Fix:** Use main session with `/seance` command instead:
+
+```bash
+# Wrong - no Task tool access
+claude --agent gco-seer
+
+# Right - full tool access including Task
+claude --dangerously-skip-permissions
+/seance "your idea"
+```
 
 ### Agent Can't Write Files
 
 **Symptom:** Agent reports file creation but file doesn't exist on disk
 
 **Possible Causes:**
+
 1. **Mock reporting** - Agent describes what it would do without calling Write tool
 2. **Path issues** - File written to unexpected location
 3. **Tool not actually called** - Agent narrates action without executing
 
 **Fix:**
+
 - Verify agent explicitly calls Write tool (not just describes writing)
 - Use absolute paths for file creation
 - Check agent output for actual tool invocations vs descriptions
@@ -243,9 +341,12 @@ If no model specified when spawning, the agent uses the current session's model.
 
 **Fix:** Verify the subagent_type includes the required MCP tools
 
+---
+
 ## SDK Integration Notes
 
 Claude Code CLI already includes SDK features:
+
 - **Context compaction** - Automatic, handles long sessions
 - **Prompt caching** - 60-minute TTL for CLAUDE.md
 - **Subagent isolation** - Each subagent has isolated context

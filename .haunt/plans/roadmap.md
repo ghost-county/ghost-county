@@ -7,28 +7,202 @@
 ## Current Focus
 
 **Active Work:**
-- 🟡 REQ-309, 310, 311, 316, 317 (Dev-Infrastructure - skill/agent refactors + metrics fixes)
+
+- 🟡 REQ-325: Fix Seer Architecture - Task Tool Limitation (M) - 8/9 tasks complete, needs testing
 
 **Ready for Implementation:**
-- ⚪ REQ-320: Core Seer Agent (M) ← Start here
-- ⚪ REQ-321: Seance Integration (S, blocked by REQ-320)
-- ⚪ REQ-322: Full Seer Testing (S, blocked by REQ-320, REQ-321)
-- ⚪ REQ-324: Agent Memory MCP Setup Integration (S) ← NEW
+
+- ⚪ REQ-324: Agent Memory MCP Setup Integration (S)
+
+**Superseded (by REQ-325):**
+
+- ~~REQ-320, 321, 322~~ - Original Seer implementation based on incorrect assumption
 
 **Ready to Archive:**
+
 - 🟢 REQ-319: Consolidate Research Agents (XS)
 - 🟢 REQ-323: /seance Command Tool Limitation UX (XS)
 
 **Recently Archived (2026-01-02):**
+
 - 🟢 REQ-307: Model Selection (Opus for planning/research, Sonnet for implementation)
 - 🟢 REQ-297-306: Env Secrets Wrapper (1Password integration, shell + Python)
 - 🟢 REQ-283-285: Skill Token Optimization (requirements-analysis, code-patterns, task-decomposition)
 
 ---
 
-## Priority: Seer Meta-Orchestrator
+## Priority: Seer Meta-Orchestrator (Architecture Fix)
 
-> Strategic initiative: Create a meta-orchestrator agent that acts as the "person holding the séance" - the primary entry point that spawns all other agents.
+> **IMPORTANT:** REQ-320/321/322 were built on incorrect assumption that `--agent` flag gives Task tool access. REQ-325 fixes the architecture.
+
+### 🟡 REQ-325: Fix Seer Architecture - Task Tool Limitation
+
+**Type:** Architecture Fix
+**Reported:** 2026-01-05
+**Source:** User testing - discovered `tools:` field in agent YAML is documentation only, not enforcement
+
+**Problem Statement:**
+
+The original Seer implementation (REQ-318, 320, 321, 322) was built on a false assumption:
+
+> **Assumption:** The `tools:` field in agent YAML controls tool access when using `--agent` flag
+> **Reality:** The `tools:` field is **documentation only**. Actual tools are controlled by Claude Code CLI's built-in set.
+
+When running `claude --agent gco-seer`, the agent:
+
+- ✅ Gets agent personality/instructions
+- ✅ Gets skills loaded
+- ✅ Gets model selection respected
+- ❌ Does NOT get Task tool (required for spawning)
+- ❌ Does NOT get custom tool permissions from YAML
+
+**Root Cause:**
+
+From `Haunt/docs/TOOL-PERMISSIONS.md`:
+> Agent character sheets in `Haunt/agents/` include a `tools` field in their YAML frontmatter. This serves as **documentation** of intended tool access, helping humans understand what each agent should be able to do.
+
+The Task tool is only available:
+
+1. In the main Claude Code session (not `--agent` mode)
+2. When spawning subagents via Task tool's `subagent_type`
+
+**Solution: Architecture Pivot**
+
+Instead of an agent-based Seer, make `/seance` the primary entry point:
+
+| Before (Broken)                    | After (Fixed)                          |
+|------------------------------------|----------------------------------------|
+| `haunt` alias → `gco-seer` agent   | `haunt` alias → plain Claude Code      |
+| Agent YAML requests Task tool      | Main session has Task tool             |
+| `/seance` is secondary             | `/seance` is primary workflow          |
+| `gco-seer.md` is orchestrator      | `gco-orchestrator` skill is orchestrator |
+
+**New Architecture:**
+
+```text
+┌─────────────────────────────────────────┐
+│  haunt alias (entry point)              │
+│  = claude --dangerously-skip-permissions│
+└─────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────┐
+│  Main Claude Code Session               │
+│  ✅ Has Task tool                       │
+│  ✅ Has all tools                       │
+│  ✅ Can spawn any agent                 │
+└─────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────┐
+│  /seance command                        │
+│  = loads gco-orchestrator skill         │
+│  = starts séance workflow               │
+└─────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────┐
+│  Task tool spawns                       │
+│  → gco-project-manager                  │
+│  → gco-dev (backend/frontend/infra)     │
+│  → gco-research                         │
+│  → gco-code-reviewer                    │
+└─────────────────────────────────────────┘
+```
+
+**Tasks:**
+
+- [x] Update haunt alias recommendation:
+  - OLD: `alias haunt='claude --dangerously-skip-permissions --agent gco-seer'`
+  - NEW: `alias haunt='claude --dangerously-skip-permissions'`
+- [x] Deprecate `gco-seer.md` agent (move to `.haunt/deprecated/`)
+- [x] Update `gco-orchestrator` skill to be self-sufficient (no agent dependency)
+- [x] Remove "Seer vs /seance" distinction from docs (there's only /seance now)
+- [x] Update `/seance` command to remove "use haunt for full functionality" since haunt IS /seance now
+- [x] Update TOOL-PERMISSIONS.md to clarify agent YAML tools field is documentation
+- [x] Update docs that reference gco-seer (README updated)
+- [ ] Test full workflow: `haunt` → `/seance` → Task tool spawns work
+- [x] Update this roadmap's Current Focus section
+
+**Files:**
+
+- `Haunt/agents/gco-seer.md` (replaced with deprecation notice)
+- `.haunt/deprecated/gco-seer.md` (created - archived original)
+- `Haunt/skills/gco-orchestrator/SKILL.md` (modified - removed skill mode detection)
+- `Haunt/commands/seance.md` (modified - updated Quick Start, removed skill mode limitation)
+- `Haunt/docs/TOOL-PERMISSIONS.md` (modified - added Critical section about tools field)
+- `Haunt/README.md` (modified - added haunt alias, updated quick start)
+
+**Effort:** M (2-4 hours)
+**Complexity:** MODERATE
+**Agent:** Dev-Infrastructure
+**Completion:**
+
+- ✅ `haunt` alias works without `--agent` flag (docs updated)
+- ✅ `/seance` command docs updated for main session usage
+- ⏳ Agent spawning works from /seance workflow (needs testing)
+- ✅ No more "skill mode limitation" messages (removed from docs)
+- ✅ gco-seer.md deprecated (moved to .haunt/deprecated/)
+- ✅ All docs updated to reflect new architecture
+
+**Blocked by:** None
+
+**Supersedes:** REQ-320 (Core Seer Agent), REQ-321 (Seance Integration), REQ-322 (Full Seer Testing)
+
+**Implementation Notes (2026-01-05):**
+
+Files modified in this session:
+
+1. `.haunt/deprecated/gco-seer.md` - Created with full original content + deprecation explanation
+2. `Haunt/agents/gco-seer.md` - Replaced with deprecation notice pointing to correct workflow
+3. `Haunt/commands/seance.md` - Updated Quick Start, removed skill mode limitation, added alias setup
+4. `Haunt/skills/gco-orchestrator/SKILL.md` - Removed skill mode detection section
+5. `Haunt/README.md` - Added haunt alias setup, updated séance workflow section
+6. `Haunt/docs/TOOL-PERMISSIONS.md` - Added "Critical" section explaining tools field is docs only
+
+**Remaining:**
+
+- User needs to update their shell alias: `alias haunt='claude --dangerously-skip-permissions'`
+- Delete deployed copy: `rm ~/.claude/agents/gco-seer.md`
+- Test workflow: `haunt` → `/seance` → verify Task tool works
+
+---
+
+### ❌ REQ-320: Implement Core Seer Agent (SUPERSEDED)
+
+**Status:** SUPERSEDED by REQ-325
+
+**Reason:** Built on incorrect assumption that `tools:` field in agent YAML controls tool access. The `--agent` flag does not grant Task tool access.
+
+**Original Description:** Finalize the Seer agent character sheet and implement core functionality.
+
+**Disposition:** REQ-325 takes a different approach (skill-based instead of agent-based).
+
+---
+
+### ❌ REQ-321: Seance Integration and Documentation (SUPERSEDED)
+
+**Status:** SUPERSEDED by REQ-325
+
+**Reason:** The Seer vs /seance distinction no longer exists. There's only /seance now.
+
+**Original Description:** Document relationship between command-based séance and agent-based Seer.
+
+**Disposition:** Documentation updates folded into REQ-325.
+
+---
+
+### ❌ REQ-322: Full Seer Workflow Testing (SUPERSEDED)
+
+**Status:** SUPERSEDED by REQ-325
+
+**Reason:** Testing plan was for agent-based Seer which no longer exists.
+
+**Original Description:** End-to-end testing of Seer workflow.
+
+**Disposition:** New testing approach in REQ-325 (test /seance with Task tool access).
+
+---
 
 ### 🟢 REQ-318: Research Seer Agent Architecture
 
@@ -123,6 +297,7 @@ Research and design a "Seer" agent that serves as the primary orchestrator for t
 **Complexity:** MODERATE
 **Agent:** Research-Analyst (Opus model for strategic analysis)
 **Completion:**
+
 - Research document answers all 9 questions above
 - Explore integration pattern documented
 - Clear recommendation for Seer architecture
@@ -130,6 +305,8 @@ Research and design a "Seer" agent that serves as the primary orchestrator for t
 - Implementation roadmap with sized requirements
 
 **Blocked by:** None
+
+**Note:** Research was correct, but discovered during implementation (REQ-320) that `--agent` flag doesn't grant Task tool. See REQ-325 for architecture fix.
 
 ---
 
@@ -173,154 +350,6 @@ Remove the read-only `gco-research-analyst.md` variant and keep only `gco-resear
 
 ---
 
-### 🟡 REQ-320: Implement Core Seer Agent
-
-**Type:** Implementation
-**Reported:** 2026-01-03
-**Source:** REQ-318 research - Phase 1 of Seer implementation
-
-**Description:**
-Finalize the Seer agent character sheet and implement core functionality. The draft exists at `Haunt/agents/gco-seer.md` (~230 lines). Need to test Task tool spawning, verify gco-orchestrator skill integration, and implement persistent memory.
-
-**Architecture (from REQ-318):**
-- Thin orchestrator (~150-200 lines) that leverages gco-orchestrator skill
-- Opus model for strong orchestration decisions
-- Flat spawning model (Seer → all agents, no nesting)
-- Persistent memory via `mcp__agent_memory__*`
-- Explore-first pattern for codebase reconnaissance
-
-**Tasks:**
-
-- [x] Review and finalize `Haunt/agents/gco-seer.md` character sheet
-- [x] Slim down to target ~150-200 lines (currently ~230) - Reduced to 153 lines
-- [x] Verify setup-haunt.sh automatically deploys gco-seer.md (no changes needed)
-- [x] Deploy gco-seer.md to ~/.claude/agents/
-- [x] Create structural tests (test-seer-agent.sh - 21/21 passing)
-- [x] Create functional testing guide (SEER-FUNCTIONAL-TESTING.md)
-- [x] Implement memory operations in agent (mcp__agent_memory__search/store documented)
-- [ ] **MANUAL:** Test Task tool spawning with gco-project-manager (requires live session)
-- [ ] **MANUAL:** Test Task tool spawning with gco-dev (all modes) (requires live session)
-- [ ] **MANUAL:** Test Task tool spawning with gco-research (requires live session)
-- [ ] **MANUAL:** Test Task tool spawning with gco-code-reviewer (requires live session)
-- [ ] **MANUAL:** Verify gco-orchestrator skill integration (requires live session)
-- [ ] **MANUAL:** Test memory operations with MCP server (requires live session)
-- [ ] **MANUAL:** Test Explore agent integration for recon (requires live session)
-
-**Files:**
-
-- `Haunt/agents/gco-seer.md` (created - 153 lines, deployed)
-- `.haunt/tests/behavior/test-seer-agent.sh` (created - structural validation)
-- `.haunt/tests/behavior/SEER-FUNCTIONAL-TESTING.md` (created - manual testing guide)
-
-**Effort:** M (2-4 hours)
-**Complexity:** MODERATE
-**Agent:** Dev-Infrastructure
-**Completion:**
-- gco-seer.md finalized and under 200 lines (153 lines)
-- Task tool successfully spawns all agent types (MANUAL TESTING REQUIRED)
-- Memory check/write implemented and tested (MANUAL TESTING REQUIRED)
-- Deployed via setup script to `~/.claude/agents/`
-
-**Blocked by:** Manual functional testing (requires live Claude Code session as Seer agent)
-
-**Implementation Notes (2026-01-02):**
-- **Structural implementation complete:** Agent finalized (153 lines), deployed, 21/21 structural tests passing
-- **Architecture:** Thin orchestrator leveraging gco-orchestrator skill, Opus model, flat spawning, session memory
-- **Testing:** Created comprehensive structural tests and functional testing guide
-- **Manual validation needed:** Task tool spawning, MCP memory operations, full séance workflow (see SEER-FUNCTIONAL-TESTING.md)
-- **Next steps:** User must invoke Seer in live session to complete Tests 1-10 in functional guide
-- **Status:** 🟡 In Progress - awaiting manual functional validation before marking 🟢
-
----
-
-### ⚪ REQ-321: Seance Integration and Documentation
-
-**Type:** Documentation
-**Reported:** 2026-01-03
-**Source:** REQ-318 research - Phase 2 of Seer implementation
-
-**Description:**
-Update `/seance` command documentation to explain coexistence with Seer agent. Create shell alias setup guide. Document the relationship between command-based séance and agent-based Seer.
-
-**Key Distinction:**
-- `/seance` command = loads gco-orchestrator as a skill (no Task tool)
-- `gco-seer` agent = embodies orchestrator with Task tool + memory
-
-**Tasks:**
-
-- [x] Update `Haunt/commands/seance.md` to document Seer as alternative entry (completed via REQ-323)
-- [ ] Create shell alias documentation in `Haunt/docs/SHELL-ALIASES.md`
-- [ ] Document recommended alias: `alias haunt='claude --dangerously-skip-permissions --agent gco-seer'`
-- [ ] Update `Haunt/docs/SEANCE-EXPLAINED.md` with Seer section
-- [ ] Add "Entry Points" section showing /seance vs haunt alias
-- [ ] Update `Haunt/README.md` quick start with Seer entry point
-
-**Files:**
-
-- `Haunt/commands/seance.md` (modify)
-- `Haunt/docs/SHELL-ALIASES.md` (create)
-- `Haunt/docs/SEANCE-EXPLAINED.md` (modify)
-- `Haunt/README.md` (modify)
-
-**Effort:** S (1-2 hours)
-**Complexity:** SIMPLE
-**Agent:** Dev-Infrastructure
-**Completion:**
-- Documentation clearly explains /seance vs Seer agent
-- Shell alias setup guide complete
-- README updated with Seer entry point
-
-**Blocked by:** REQ-320
-
----
-
-### ⚪ REQ-322: Full Seer Workflow Testing
-
-**Type:** Testing
-**Reported:** 2026-01-03
-**Source:** REQ-318 research - Phase 3 of Seer implementation
-
-**Description:**
-End-to-end testing of the complete Seer workflow. Verify phase transitions, memory recall across sessions, error handling, and the full séance lifecycle.
-
-**Test Scenarios:**
-
-1. **Fresh project séance** - No memory, new .haunt/ setup
-2. **Returning user séance** - Memory recall, context restoration
-3. **Phase transitions** - SCRYING → SUMMONING → BANISHING
-4. **Error handling** - Agent failure, recovery options
-5. **Memory persistence** - Close session, reopen, verify recall
-
-**Tasks:**
-
-- [ ] Test complete séance workflow (idea → requirements → implementation → archive)
-- [ ] Test phase transitions and state file updates
-- [ ] Test memory write at session end
-- [ ] Test memory recall at session startup (new session)
-- [ ] Test error handling when spawned agent fails
-- [ ] Test Explore → specialist spawn pattern
-- [ ] Document test results in `.haunt/progress/seer-testing-report.md`
-- [ ] Update any issues found during testing
-
-**Files:**
-
-- `.haunt/progress/seer-testing-report.md` (create)
-- `Haunt/agents/gco-seer.md` (modify if issues found)
-- `Haunt/docs/SEANCE-EXPLAINED.md` (modify with learnings)
-
-**Effort:** S (1-2 hours)
-**Complexity:** SIMPLE
-**Agent:** Dev-Infrastructure
-**Completion:**
-- All 5 test scenarios pass
-- Memory recall works across sessions
-- Test report documents results
-- Any issues discovered are fixed or logged as new REQs
-
-**Blocked by:** REQ-320, REQ-321
-
----
-
 ### 🟢 REQ-323: /seance Command Tool Limitation UX
 
 **Type:** Bug Fix
@@ -336,7 +365,8 @@ When using `/seance` command (which loads gco-orchestrator as a skill), the orch
 4. Claude pivots awkwardly: "Interesting! The Task tool isn't available in this context"
 
 **User-reported error:**
-```
+
+```text
 ⏺ 👻 Summoning the spirits...
 
   This is exactly what I'm built for - delegating specialized work...
@@ -355,6 +385,7 @@ When using `/seance` command (which loads gco-orchestrator as a skill), the orch
 
 **Expected behavior:**
 The `/seance` command should either:
+
 1. **Detect early** that Task tool is unavailable and suggest using `haunt` alias instead
 2. **Fallback gracefully** to skill-mode behavior (direct execution instead of spawning)
 3. **Display clear guidance** at session start about limitations
@@ -363,11 +394,13 @@ The `/seance` command should either:
 
 - [x] Add Task tool availability check at /seance startup
 - [x] If Task tool unavailable, display clear message:
-  ```
+
+  ```text
   ⚠️ Running in skill mode (limited)
   For full agent spawning, use: haunt "your idea"
   Continuing with direct execution...
   ```
+
 - [x] Update gco-orchestrator skill to check Task tool before attempting spawn
 - [x] Add fallback behavior in SUMMONING phase when Task unavailable
 - [x] Document limitation clearly in /seance command help
@@ -381,6 +414,7 @@ The `/seance` command should either:
 **Complexity:** SIMPLE
 **Agent:** Dev-Infrastructure
 **Completion:**
+
 - ✓ /seance displays clear warning when Task tool unavailable
 - ✓ No confusing "pivoting" behavior (fallback documented)
 - ✓ User understands to use `haunt` alias for full functionality
@@ -389,11 +423,14 @@ The `/seance` command should either:
 
 **Completed:** 2026-01-04
 **Notes:**
+
 - Added "⚠️ Skill Mode Limitation" section at top of seance.md with comparison table
 - Added "Step 0: Skill Mode Detection" to command execution flow
 - Added comprehensive "SKILL MODE DETECTION" section to gco-orchestrator skill
 - Documented fallback behavior for each phase (SCRYING works, SUMMONING falls back to direct execution, BANISHING works)
 - Added haunt alias example to "See Also" section
+
+**Note:** REQ-325 supersedes this by fixing the architecture so /seance always has Task tool access.
 
 ---
 
@@ -405,16 +442,19 @@ The `/seance` command should either:
 
 **Description:**
 Add Agent Memory MCP server installation to setup-haunt.sh. The setup should:
+
 1. Check if MCP server is already configured
 2. Offer to install if not present
 3. Verify installation works with no errors before considering complete
 
 **Current State:**
+
 - Agent memory server exists at `Haunt/scripts/utils/agent-memory-server.py`
 - Best practices documented at `.haunt/docs/research/agent-memory-best-practices.md`
 - Manual setup requires copying files and editing `~/.claude/settings.json`
 
 **Expected Behavior:**
+
 ```bash
 $ bash Haunt/scripts/setup-haunt.sh
 
@@ -452,6 +492,7 @@ NOTE: Restart Claude Code to activate memory tools.
 - [ ] Document MCP setup in SETUP-GUIDE.md
 
 **Verification (must pass before complete):**
+
 ```bash
 # 1. Server starts without errors
 python3 ~/.claude/mcp-servers/agent-memory-server.py --test
@@ -473,6 +514,7 @@ test -d ~/.agent-memory && echo "OK"
 **Complexity:** SIMPLE
 **Agent:** Dev-Infrastructure
 **Completion:**
+
 - setup-haunt.sh prompts for MCP memory installation
 - Installation verified to work without errors
 - Server starts successfully
@@ -494,6 +536,7 @@ test -d ~/.agent-memory && echo "OK"
 **Description:** Implement state file + spawn-time context injection to prevent orchestrator from breaking out of seance workflow phases. Currently, after 15+ conversation turns, instruction degradation causes the model to skip the roadmap creation and user approval gates, jumping directly to implementation.
 
 **Implementation Notes:**
+
 - Hybrid enforcement using 3 layers: state file + spawn-time context + phase declarations
 - Phase state file created at `.haunt/state/current-phase.txt` with SCRYING/SUMMONING/BANISHING values
 - PM spawns include "You are in SCRYING phase" context
@@ -559,6 +602,7 @@ test -d ~/.agent-memory && echo "OK"
 **Complexity:** SIMPLE
 **Agent:** Dev-Infrastructure
 **Completion:**
+
 - Documentation clearly explains when to use Explore vs gco-research-analyst
 - Decision tree added to session-startup for reconnaissance workflow
 - Orchestration rules updated with built-in subagent delegation pattern
@@ -607,6 +651,7 @@ test -d ~/.agent-memory && echo "OK"
 gco-dev.md is 1,110 lines - 22x over the 50-line target for agent character sheets. Refactor using Option B: keep unified agent, extract mode-specific guidance to reference files.
 
 **Current Structure (1,110 lines):**
+
 - Core identity/values (~50 lines) - KEEP
 - TDD iteration loop (~200 lines) - EXTRACT
 - Testing accountability (~100 lines) - EXTRACT
@@ -615,7 +660,8 @@ gco-dev.md is 1,110 lines - 22x over the 50-line target for agent character shee
 - Infrastructure mode (~30 lines) - EXTRACT
 
 **Target Structure:**
-```
+
+```text
 gco-dev.md (~60 lines - identity only)
 └── references/
     ├── tdd-workflow.md
@@ -649,6 +695,7 @@ gco-dev.md (~60 lines - identity only)
 **Complexity:** MODERATE
 **Agent:** Dev-Infrastructure
 **Completion:**
+
 - gco-dev.md under 80 lines ✓ (128 lines with comprehensive gates)
 - Reference files contain extracted guidance ✓ (5 files, 827 lines)
 - Mode consultation gates implemented ✓ (⛔ gates for all modes)
@@ -656,6 +703,7 @@ gco-dev.md (~60 lines - identity only)
 - Context overhead reduced by ~90% ✓ (1,110 → 128 lines main, references loaded on-demand)
 
 **Completion Notes:**
+
 - Main agent reduced from 1,110 to 128 lines (88% reduction)
 - 5 reference files created and deployed successfully
 - setup-haunt.sh updated to copy references/ directories
@@ -698,6 +746,7 @@ gco-testing-mindset is 582 lines (16% over 500-line target). Extract detailed ex
 **Blocked by:** None
 
 **Completion Notes:**
+
 - Reduced SKILL.md from 583 to 287 lines (51% reduction, well under 500-line target)
 - Created `references/testing-scenarios.md` (10KB) with 5 common testing mistakes and user journey examples
 - Created `references/validation-checklists.md` (6.4KB) with comprehensive validation checklists
@@ -753,6 +802,7 @@ gco-roadmap-planning is 554 lines (11% over 500-line target). Extract examples a
 
 **Description:**
 haunt-metrics.sh has parsing issues:
+
 1. Effort estimate shows duplicate values (e.g., "S\nS\nS")
 2. Orphaned commits warning for recently archived requirements
 3. Archive file search not working properly
@@ -789,13 +839,15 @@ haunt-metrics.sh has parsing issues:
 Add context overhead measurement to haunt-metrics. Context overhead = how much context an agent consumes before doing useful work.
 
 **Components to measure:**
+
 - Agent character sheet size (lines)
 - Always-loaded rules size (lines)
 - CLAUDE.md size (lines)
 - Average skills loaded per session (estimated)
 
 **Formula:**
-```
+
+```text
 base_overhead = agent_lines + rules_lines + claude_md_lines
 skill_overhead = avg_skills_invoked × avg_skill_size
 total_context_overhead = base_overhead + skill_overhead
@@ -819,6 +871,7 @@ total_context_overhead = base_overhead + skill_overhead
 **Complexity:** MODERATE
 **Agent:** Dev-Infrastructure
 **Completion:**
+
 - `haunt-metrics --context` shows overhead breakdown
 - JSON output includes context_overhead_lines field
 - Baseline can be established for regression tracking
@@ -837,13 +890,15 @@ total_context_overhead = base_overhead + skill_overhead
 Create script to compare current metrics against a stored baseline and detect regressions.
 
 **Regression thresholds:**
+
 - Completion Rate: Alert if >5% worse than baseline
 - First-Pass Success: Alert if >10% worse than baseline
 - Avg Cycle Time: Alert if >25% worse than baseline
 - Context Overhead: Alert if >20% worse than baseline
 
 **Output:**
-```
+
+```text
 ┌─────────────────────────────────────────┐
 │         REGRESSION CHECK RESULTS        │
 ├─────────────────────────────────────────┤
@@ -876,6 +931,7 @@ Create script to compare current metrics against a stored baseline and detect re
 **Complexity:** MODERATE
 **Agent:** Dev-Infrastructure
 **Completion:**
+
 - Script compares current vs baseline metrics
 - Regressions clearly identified with visual indicators
 - Exit code reflects regression status (0=OK, 1=regression)
@@ -895,6 +951,7 @@ Create system to store, manage, and version metric baselines for regression comp
 
 **Storage location:** `.haunt/metrics/`
 **Baseline format:**
+
 ```json
 {
   "created": "2026-01-02",
@@ -912,6 +969,7 @@ Create system to store, manage, and version metric baselines for regression comp
 ```
 
 **Commands:**
+
 - `haunt-baseline create` - Create new baseline from current metrics
 - `haunt-baseline list` - List stored baselines
 - `haunt-baseline show <name>` - Show baseline details
@@ -938,6 +996,7 @@ Create system to store, manage, and version metric baselines for regression comp
 **Complexity:** SIMPLE
 **Agent:** Dev-Infrastructure
 **Completion:**
+
 - Baselines can be created, listed, and managed
 - Active baseline used by regression-check automatically
 - Calibration tracking prevents premature comparisons
@@ -954,12 +1013,14 @@ Create system to store, manage, and version metric baselines for regression comp
 
 **Description:**
 Update the weekly refactor skill to include:
+
 1. Phase 0: Metrics Review (run haunt-metrics)
 2. Phase 0.5: Regression Check (run haunt-regression-check)
 3. Phase 4: Context Audit (measure and review context overhead)
 
 **Updated Structure:**
-```
+
+```text
 Phase 0: Metrics Review (10 min) - NEW
 Phase 0.5: Regression Check (5 min) - NEW
 Phase 1: Pattern Hunt (30 min) - informed by metrics
@@ -988,6 +1049,7 @@ Phase 6: Version & Deploy (10 min) - updated for calibration
 **Complexity:** SIMPLE
 **Agent:** Dev-Infrastructure
 **Completion:**
+
 - Skill includes all new phases
 - Metrics inform pattern hunt
 - Regression check integrated into ritual

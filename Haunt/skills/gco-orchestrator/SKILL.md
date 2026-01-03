@@ -5,59 +5,9 @@ description: Conduct a séance - the Ghost County workflow orchestration ritual.
 
 # Seance Workflow Orchestration
 
-The Seance is Ghost County's primary workflow orchestration layer - a ritual that guides you from raw ideas to actionable roadmaps, then optionally summons worker agents ("spirits") to implement the plan.
+The Seance is Ghost County's primary workflow orchestration layer - a ritual that guides you from raw ideas to actionable roadmaps, then summons worker agents ("spirits") to implement the plan.
 
 **Framework Update Check:** Every seance begins by checking if the Haunt framework has been updated. If a new version is available, you'll be prompted to reinstall before continuing.
-
----
-
-## ⚠️ SKILL MODE DETECTION (Check First)
-
-**CRITICAL:** Before attempting ANY agent spawning, check if running in skill mode.
-
-### How to Detect Skill Mode
-
-| Context | Task Tool Available | Mode |
-|---------|---------------------|------|
-| Invoked via `/seance` command | ❌ NO | Skill Mode |
-| Invoked via `haunt` alias (gco-seer agent) | ✅ YES | Agent Mode |
-
-**If running via `/seance` command (skill mode):**
-
-1. Display startup notice:
-   ```
-   🕯️ Séance Initiated (Skill Mode)
-
-   Note: Running via /seance command (limited mode).
-   For full agent spawning: haunt "your idea"
-
-   Continuing with direct execution...
-   ```
-
-2. When SUMMONING phase is reached:
-   - **DO NOT** attempt Task tool calls (they will fail)
-   - **DO** execute work directly instead of spawning agents
-   - **DO** inform user: "⚠️ In skill mode - executing directly instead of spawning agents"
-
-### Skill Mode Fallback Behavior
-
-**SCRYING Phase (Planning):**
-- ✅ Works normally - create roadmap, analyze requirements directly
-
-**SUMMONING Phase (Execution):**
-- ❌ Cannot spawn gco-dev, gco-research, gco-pm agents
-- ✅ Fallback: Execute implementation work directly
-- ✅ Display: "Executing directly (skill mode - no agent spawning)"
-
-**BANISHING Phase (Archival):**
-- ✅ Works normally - archive completed work directly
-
-### Agent Mode (Full Capability)
-
-When invoked via `haunt` alias (gco-seer agent):
-- ✅ Task tool available
-- ✅ Can spawn all agent types
-- ✅ Full multi-agent workflow
 
 ---
 
@@ -66,51 +16,30 @@ When invoked via `haunt` alias (gco-seer agent):
 ⛔ **CRITICAL CHECKPOINT:** Before executing any action, verify you're not about to do specialized work.
 
 **Am I about to do specialized work?**
-- [ ] WebSearch/WebFetch → ⛔ STOP: Spawn gco-research (if Task available) OR execute directly (skill mode)
-- [ ] Multi-file analysis (>10 files) → ⛔ STOP: Spawn gco-research (if Task available) OR execute directly (skill mode)
-- [ ] Requirements analysis (JTBD/Kano/RICE) → ⛔ STOP: Spawn gco-project-manager (if Task available) OR execute directly (skill mode)
-- [ ] Write code/tests → ⛔ STOP: Spawn gco-dev-* (if Task available) OR execute directly (skill mode)
-- [ ] Code review → ⛔ STOP: Spawn gco-code-reviewer (if Task available) OR execute directly (skill mode)
+
+- [ ] WebSearch/WebFetch → ⛔ STOP: Spawn gco-research
+- [ ] Multi-file analysis (>10 files) → ⛔ STOP: Spawn gco-research
+- [ ] Requirements analysis (JTBD/Kano/RICE) → ⛔ STOP: Spawn gco-project-manager
+- [ ] Write code/tests → ⛔ STOP: Spawn gco-dev-*
+- [ ] Code review → ⛔ STOP: Spawn gco-code-reviewer
 
 **If ALL boxes are unchecked:** Proceed (this is coordination work)
-**If ANY box is checked AND Task available:** Spawn the indicated agent
-**If ANY box is checked AND skill mode:** Execute directly with notice
+**If ANY box is checked:** Spawn the indicated agent
 
 ⛔ **PROHIBITION:** Orchestrators NEVER execute WebSearch, WebFetch, or multi-file Read operations directly. These are research activities requiring specialist agents.
 
-⛔ **PROHIBITION (NEW - Tool Permissions):** Orchestrators CANNOT use Edit or Write tools on source code files. These tools are RESTRICTED to dev agents only. Attempting to modify source code will fail with a permissions error.
+⛔ **PROHIBITION (Tool Permissions):** Orchestrators CANNOT use Edit or Write tools on source code files. These tools are RESTRICTED to dev agents only.
 
 **What this means:**
+
 - Edit/Write on `.haunt/` files: ✅ ALLOWED (coordination work - roadmaps, notes, planning docs)
 - Edit/Write on source code (`.py`, `.ts`, `.js`, etc.): ❌ FORBIDDEN (spawn dev agent instead)
-- This is enforced by Claude Code's tool permissions system - not just guidance
 
 **If you attempt to edit source code:**
-1. Claude Code will return: "Error: Permission denied. This tool is restricted to dev agents."
-2. STOP immediately
-3. Spawn appropriate dev agent with task context
-4. Let dev agent perform the edit
 
-**Example (WRONG):**
-```
-User: "/seance Add login endpoint"
-
-Orchestrator:
-  [Creates REQ-042 in roadmap]
-  [Attempts: Edit(src/api/auth.py, ...)]  # ❌ PERMISSION DENIED
-```
-
-**Example (RIGHT):**
-```
-User: "/seance Add login endpoint"
-
-Orchestrator:
-  [Creates REQ-042 in roadmap]
-  [Spawns gco-dev-backend with REQ-042]
-
-Dev Agent:
-  [Edit(src/api/auth.py, ...)]  # ✅ ALLOWED (dev agent)
-```
+1. STOP immediately
+2. Spawn appropriate dev agent with task context
+3. Let dev agent perform the edit
 
 **See also:** `references/delegation-protocol.md` for detailed anti-patterns and examples
 
@@ -126,16 +55,18 @@ Dev Agent:
 **Before transitioning SCRYING → SUMMONING:**
 
 Declare phase transition:
+
 ```
 PHASE TRANSITION: SCRYING → SUMMONING
 Reason: REQ-042 created, user approved summoning
 ```
 
-Then spawn agents (or execute directly in skill mode).
+Then spawn agents.
 
 **VIOLATION DETECTION:**
 
 If you are about to spawn dev agents, check:
+
 - [ ] Did I present summoning prompt?
 - [ ] Did user say YES (not "maybe" or "later")?
 - [ ] Is current phase SCRYING (ready to transition to SUMMONING)?
@@ -153,12 +84,14 @@ If ANY checkbox is unchecked → STOP, present summoning prompt, wait for YES
 **CRITICAL:** The orchestrator operates in distinct phases. You MUST declare your current phase before EVERY action.
 
 **Phase Declaration Format:**
+
 ```
 PHASE: [SCRYING | SUMMONING | BANISHING]
 Next action: [What you're about to do]
 ```
 
 **Phase Definitions:**
+
 - **SCRYING:** Planning and roadmap creation (spawn PM, read files, write to `.haunt/plans/`)
 - **SUMMONING:** Execution (spawn dev agents, NO direct file editing on source code)
 - **BANISHING:** Cleanup (archive to `.haunt/completed/`, garden roadmap)
@@ -166,17 +99,20 @@ Next action: [What you're about to do]
 **Phase Transition Gates:**
 
 SCRYING → SUMMONING:
+
 - ✅ REQ-XXX exists in roadmap
 - ✅ User said YES to summoning prompt (explicit approval in last 3 messages)
 - ❌ User said "maybe", "later", "not sure", or anything ambiguous
 
 SUMMONING → BANISHING:
+
 - ✅ All spawned agents completed
 - ✅ Work items marked 🟢 Complete
 
 **State File Enforcement:**
 
 Before using Edit or Write on source code files:
+
 1. Check `.haunt/state/current-phase.txt`
 2. If phase != SUMMONING and file is source code → REJECT action
 3. Remind yourself: "I am an orchestrator. This is dev agent work."
@@ -184,18 +120,21 @@ Before using Edit or Write on source code files:
 **Spawn-Time Context Injection:**
 
 When spawning PM (SCRYING phase):
+
 ```
 Task(prompt="You are in SCRYING phase. Create roadmap for: [idea].
 Do NOT implement code. Return when roadmap is complete.")
 ```
 
 When spawning dev agents (SUMMONING phase):
+
 ```
 Task(prompt="You are in SUMMONING phase. Implement REQ-XXX.
 Phase context: User approved summoning. Roadmap is complete.")
 ```
 
 **Example:**
+
 ```
 PHASE: SCRYING
 Next action: Spawn gco-project-manager to create roadmap
@@ -214,6 +153,7 @@ Next action: Spawn gco-dev-backend for REQ-042
 **Violation Self-Check:**
 
 Before EVERY Edit, Write, or Task tool call, ask:
+
 - "What phase am I in?" (Check last phase declaration)
 - "Is this action allowed in this phase?" (Consult phase definitions)
 - "If spawning agents: Did user explicitly approve?" (Check last 3 messages)
@@ -297,8 +237,6 @@ If ANY answer is wrong → STOP and declare phase correctly
 - **Implementation:** Write code, tests, configs → Spawn gco-dev-*
 - **Code review:** Quality gates → Spawn gco-code-reviewer
 
-**Exception (Skill Mode):** When Task tool unavailable, execute directly with notice.
-
 **See also:** `references/delegation-protocol.md` for decision tree and success criteria
 
 ---
@@ -375,26 +313,29 @@ If ANY answer is wrong → STOP and declare phase correctly
 Before completing the Seance:
 
 **Mode Detection:**
+
 - [ ] Mode detected correctly (1-6)
 - [ ] `.haunt/` directory check performed
 - [ ] Arguments presence checked
 - [ ] Appropriate themed prompt displayed
-- [ ] Skill mode detected and communicated if applicable
 
 **Delegation:**
+
 - [ ] No WebSearch/WebFetch calls from orchestrator
 - [ ] No implementation code written by orchestrator
 - [ ] No multi-file analysis performed by orchestrator
-- [ ] PM spawned for all planning phases (or executed directly in skill mode)
-- [ ] Dev agents spawned for all implementation work (or executed directly in skill mode)
+- [ ] PM spawned for all planning phases
+- [ ] Dev agents spawned for all implementation work
 
 **Gates:**
+
 - [ ] Delegation gate checked before each action
 - [ ] Scrying gate verified before spawning dev agents
 - [ ] REQ-XXX exists in roadmap before implementation
 - [ ] User approved plan before summoning
 
 **Gardening (if agents spawned):**
+
 - [ ] Waited for all agents to complete
 - [ ] Verified task checkboxes for 🟢 items
 - [ ] Archived fully complete requirements
@@ -406,39 +347,40 @@ Before completing the Seance:
 ## Error Handling
 
 **If `.haunt/` detection fails:**
+
 - Default to incremental mode
 - Inform user of assumption
 
 **If PM fails during workflow:**
+
 - Report error with context
 - Don't proceed to summoning prompt
 - Leave partial artifacts for debugging
 
 **If user input is ambiguous:**
+
 - Treat "maybe", "not sure", "later" as "No"
 - Always err on side of NOT spawning agents
 
 **If no roadmap exists for --summon:**
+
 - "No roadmap found. Run `/seance --scry` first."
 
 **If all requirements blocked:**
+
 - List blocking dependencies
 - Suggest which to resolve first
-
-**If Task tool unavailable (skill mode):**
-- Display clear notice at startup
-- Fall back to direct execution
-- Do NOT attempt Task calls (they will fail)
 
 ---
 
 ## Integration with PM Agent
 
 The Seance skill is a **thin orchestration layer** that:
+
 1. Detects context
 2. Loads PM with appropriate mode
 3. Adds themed prompts at the end
-4. Optionally spawns workers
+4. Spawns workers
 
 **The PM agent does all the real work** (requirements, analysis, roadmap creation).
 

@@ -2,24 +2,18 @@
 
 Hold a séance to guide ideas through the complete Ghost County workflow: the three-part ritual of scrying (planning), summoning (execution), and banishing (archival).
 
-## ⚠️ Skill Mode Limitation
+## Quick Start
 
-**Important:** The `/seance` command runs in **skill mode**, which has limited capabilities:
-
-| Entry Point | Task Tool (Spawning) | Full Workflow |
-|-------------|---------------------|---------------|
-| `/seance` command | ❌ No | Scrying + Direct Execution |
-| `haunt` alias | ✅ Yes | Full agent spawning |
-
-**For full agent spawning capability, use the `haunt` alias instead:**
 ```bash
-haunt "Add OAuth login support"    # Full Seer agent with Task tool
+# Recommended: Use the haunt alias for full functionality
+alias haunt='claude --dangerously-skip-permissions'
+
+# Start a séance
+haunt
+/seance "Add OAuth login support"
 ```
 
-**What this means in practice:**
-- `/seance` can do planning (scrying) and direct work
-- `/seance` **cannot** spawn specialized agents (PM, Dev, Research)
-- Use `haunt` when you need the full multi-agent workflow
+The `haunt` alias starts Claude Code with full tool access. The `/seance` command loads the orchestration workflow.
 
 ---
 
@@ -32,6 +26,7 @@ haunt "Add OAuth login support"    # Full Seer agent with Task tool
 ```
 
 **Mystical vs Normie:**
+
 - **Mystical:** `--scry`, `--summon`, `--banish` (embrace the occult vibes)
 - **Normie:** `--plan`, `--execute`, `--archive` (keep it practical)
 
@@ -53,31 +48,40 @@ The séance adapts to task complexity:
 ## Usage Modes
 
 ### Mode 1: With Prompt
+
 ```bash
 /seance "Add OAuth login support"
 /seance Build a task management app
 /seance Fix the authentication bug and add tests
 ```
+
 Starts idea-to-roadmap workflow immediately with the provided prompt.
 
 ### Mode 2: Interactive (No Arguments + Existing Project)
+
 ```bash
 /seance
 ```
+
 In a repository with `.haunt/`:
+
 - **[A] Add something new** — Run scrying for new idea/feature/bug
 - **[B] Summon the spirits** — Run summoning for existing roadmap
 - **Tell Claude what to do** — Custom input
 
 ### Mode 3: Interactive (No Arguments + New Project)
+
 ```bash
 /seance
 ```
+
 In a repository without `.haunt/`:
+
 - Prompt: "What would you like to build?"
 - Run full scrying workflow for new project
 
 ### Mode 4: Explicit Scrying (Planning)
+
 ```bash
 /seance --scry "Add rate limiting to API"
 /seance --plan "Implement caching layer"
@@ -86,81 +90,66 @@ In a repository without `.haunt/`:
 /seance --scry --quick "Fix typo in header"
 /seance --scry --deep "Redesign authentication architecture"
 ```
+
 **Purpose:** Transform raw idea into formal roadmap
 **Output:** `.haunt/plans/roadmap.md` with sized, assigned requirements
 
 **Planning Depth:**
+
 - `--quick`: Minimal ceremony (XS-S tasks only, skip strategic frameworks)
 - No flag: Standard 3-phase workflow (default)
 - `--deep`: Extended analysis (M-SPLIT features, add strategic analysis document)
 
 ### Mode 5: Explicit Summoning (Execution)
+
 ```bash
 /seance --summon
 /seance --execute
 ```
+
 **Purpose:** Spawn agents for all ⚪ and 🟡 roadmap items
 **Output:** Parallel agent execution working until 🟢 Complete
 
-**⚠️ Note:** This mode requires Task tool. If running via `/seance`, will fall back to direct execution.
-
 ### Mode 6: Explicit Banishing (Archival)
+
 ```bash
 /seance --banish
 /seance --archive
 ```
+
 **Purpose:** Archive completed work and clean roadmap (runs `/banish --all`)
 **Output:** Clean roadmap + archived history in `.haunt/completed/`
 
 ### Mode 7: Quick Planning (--quick)
+
 ```bash
 /seance --quick "Fix typo in README"
 /seance --quick "Update config timeout value"
 ```
+
 **Purpose:** Fast-track simple tasks - skip strategic analysis, create basic REQ
 **Output:** Single requirement with minimal ceremony (<60 seconds)
 **When to use:** XS-S sized tasks - typos, config changes, simple bug fixes
 
 ### Mode 8: Deep Planning (--deep)
+
 ```bash
 /seance --deep "Redesign authentication system"
 /seance --deep "Implement multi-tenancy architecture"
 ```
+
 **Purpose:** Extended strategic analysis for high-impact features
 **Output:** Standard roadmap PLUS `.haunt/plans/REQ-XXX-strategic-analysis.md` with:
+
 - Expanded SWOT matrix
 - VRIO competitive analysis
 - Risk assessment matrix
 - Stakeholder impact analysis
 - Architectural implications
+
 **When to use:** M-SPLIT sized features with high strategic impact
 
 ## Task: $ARGUMENTS
-
-**Step 0: Skill Mode Detection**
-
-⚠️ **CRITICAL:** Check if running in skill mode (no Task tool).
-
-```
-SKILL MODE CHECK:
-- Running via /seance command = SKILL MODE
-- Task tool is NOT available in skill mode
-- Agent spawning will NOT work
-
-IF attempting agent spawning later:
-  Display: "⚠️ Running in skill mode. For agent spawning, use: haunt 'your idea'"
-  Fall back to direct execution
-```
-
-**Display this notice at startup when in skill mode:**
-```
-🕯️ Séance Initiated (Skill Mode)
-
-Note: Running via /seance command (limited mode).
-For full agent spawning: haunt "your idea"
-
-Continuing with direct execution...
-```
 
 **Step 1: Parse Arguments and Detect Mode**
 
@@ -223,18 +212,17 @@ ARGUMENTS: {args}  # With --quick/--deep removed
 PLANNING_DEPTH: {planning_depth}  # "quick", "standard", or "deep"
 HAS_HAUNT: {has_haunt}
 CURRENT_PHASE: SCRYING
-SKILL_MODE: true  # Task tool NOT available
 ```
 
 The skill will handle the appropriate flow based on mode and planning depth.
 
-**Important:** In skill mode, the orchestrator will execute work directly instead of spawning agents.
-
 ## Complete Workflow Examples
 
 ### Full Ritual (Interactive)
+
 ```bash
-$ /seance
+$ haunt
+> /seance
 > 🕯️ The spirits stir. What brings you to the veil?
 > [A] Add something new
 > [B] Summon the spirits
@@ -249,13 +237,14 @@ $ "Add OAuth login"
 
 $ yes
 > 👻 The spirits rise...
-> [Execution happens...]
+> [Spawns agents for implementation...]
 > ⚰️ Banishing completed work...
 > [Archival happens automatically...]
 > ✅ OAuth login complete
 ```
 
 ### Partial Ritual (Explicit Phases)
+
 ```bash
 # Just planning
 $ /seance --scry "Add dark mode"
@@ -275,18 +264,20 @@ $ /seance --banish
 ```
 
 ### Quick Full Ritual (With Prompt)
+
 ```bash
 $ /seance "Fix login bug and add tests"
 > 🔮 Scrying the future...
 > ✅ Requirements developed
 > Ready to summon? [yes]
 > 👻 The spirits rise...
-> [Work happens...]
+> [Spawns dev agent...]
 > ⚰️ Banishing completed work...
 > ✅ Complete
 ```
 
 ### Quick Mode (Simple Tasks)
+
 ```bash
 $ /seance --quick "Fix typo in error message"
 > ⚡ Quick scrying...
@@ -299,6 +290,7 @@ $ /seance --quick "Fix typo in error message"
 ```
 
 ### Deep Mode (Strategic Features)
+
 ```bash
 $ /seance --deep "Redesign authentication system"
 > 🔮 Deep scrying the future...
@@ -314,17 +306,26 @@ $ /seance --deep "Redesign authentication system"
 > Ready to summon the spirits? [yes/no]
 ```
 
-### Using haunt Alias (Full Agent Spawning)
+## Setting Up the haunt Alias
+
+Add to your shell configuration file (`~/.bashrc`, `~/.zshrc`, etc.):
+
 ```bash
-# For full multi-agent workflow, use haunt alias:
-$ haunt "Add OAuth login support"
-> 🔮 Seer agent activated...
-> [Spawns PM for planning...]
-> [PM completes roadmap...]
-> Ready to summon? [yes]
-> [Spawns Dev agents...]
-> ✅ Complete
+# Haunt alias - starts Claude Code with full tool access
+alias haunt='claude --dangerously-skip-permissions'
 ```
+
+Then reload your shell:
+
+```bash
+source ~/.bashrc   # or ~/.zshrc
+```
+
+**Why this works:**
+
+- The main Claude Code session has access to ALL tools including Task
+- The `/seance` command loads the orchestration workflow as a skill
+- Agent spawning via Task tool works because you're in the main session
 
 ## See Also
 
@@ -333,4 +334,3 @@ $ haunt "Add OAuth login support"
 - **`/summon <agent>`** - Directly spawn a specific agent
 - **`/banish --all`** - Quick archive (same as `/seance --banish`)
 - **`/haunting`** - View current active work
-- **`haunt` alias** - Full Seer agent with Task tool for multi-agent workflows

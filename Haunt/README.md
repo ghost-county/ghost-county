@@ -12,6 +12,7 @@
 **Haunt** is a lightweight framework that gives AI agents **persistent memory**, **specialized roles**, and **enforced best practices**—transforming one-off code generation into coordinated team development.
 
 While traditional AI coding assistants forget everything between sessions, Haunt creates AI teammates that:
+
 - ✅ **Remember your project conventions** across sessions
 - ✅ **Coordinate parallel workstreams** without conflicts
 - ✅ **Enforce quality standards** automatically
@@ -39,37 +40,46 @@ bash Haunt/scripts/setup-haunt.sh --verify
 ```
 
 **What setup does:**
+
 - Copies agent character sheets to `~/.claude/agents/`
 - Installs rules to `~/.claude/rules/` (auto-loaded every session)
 - Deploys skills to `~/.claude/skills/` (on-demand)
 
-### Your First Project
+### Set Up the Haunt Alias (Recommended)
 
-**Step 1: Start with Project Manager**
+Add to your shell config (`~/.bashrc`, `~/.zshrc`, etc.):
+
 ```bash
+# Haunt alias - starts Claude Code with full tool access
+alias haunt='claude --dangerously-skip-permissions'
+```
+
+Then reload: `source ~/.bashrc` (or `~/.zshrc`)
+
+### Your First Séance
+
+The fastest way to start a project:
+
+```bash
+haunt
+/seance "I want to build a REST API for book reviews"
+```
+
+The séance workflow will:
+
+1. 🔮 **Scry** - Create requirements and roadmap
+2. 👻 **Summon** - Spawn agents to implement features
+3. ⚰️ **Banish** - Archive completed work
+
+**Alternative: Direct Agent Access**
+
+```bash
+# Start with Project Manager
 claude -a project-manager
-```
 
-```
-You: "I want to build a REST API for managing book reviews.
-     Users can register, log in, post reviews, and rate books."
-```
-
-PM will generate requirements, perform strategic analysis, create roadmap, and assign work to agents.
-
-**Step 2: Implement with Dev Agent**
-```bash
+# Start with Dev agent
 claude -a dev
 ```
-
-Agent automatically runs session startup, finds assignment, implements feature with TDD, and creates properly formatted commit.
-
-**Step 3: Track Progress**
-
-Check `.haunt/plans/roadmap.md` for status:
-- 🟢 REQ-001: User registration endpoint (Complete)
-- 🟡 REQ-002: Login with JWT (In Progress)
-- ⚪ REQ-003: Book review CRUD (Not Started)
 
 ---
 
@@ -122,6 +132,7 @@ Instead of one "do everything" assistant, Haunt provides **5 specialized agents*
 ```
 
 **Features:**
+
 - Visual status tracking (⚪ Not Started, 🟡 In Progress, 🟢 Complete, 🔴 Blocked)
 - Dependency chains prevent premature work
 - Batch organization enables parallel execution
@@ -140,6 +151,7 @@ Instead of one "do everything" assistant, Haunt provides **5 specialized agents*
 7. ✅ Self-validation performed
 
 **Standardized commits:**
+
 ```
 [REQ-042] Add: JWT authentication endpoints
 
@@ -186,6 +198,7 @@ echo $GITHUB_TOKEN  # Actual value from 1Password
 ```
 
 **Key Features:**
+
 - ✅ Tag secrets with `# @secret:op:vault/item/field` format
 - ✅ Keep `.env` files in version control (only placeholders)
 - ✅ Automatic secret fetching via 1Password CLI
@@ -201,7 +214,8 @@ echo $GITHUB_TOKEN  # Actual value from 1Password
 Haunt's complete idea-to-shipped workflow:
 
 ```bash
-# One command: idea → shipped feature
+# Set up the alias first (see Quick Start)
+haunt
 /seance "Add OAuth login support"
 
 🔮 Scrying... (creates requirements, strategic analysis, roadmap)
@@ -212,6 +226,7 @@ Haunt's complete idea-to-shipped workflow:
 ```
 
 **Key Features:**
+
 - **Planning depth modes**: `--quick` (basic), default (standard), `--deep` (comprehensive analysis)
 - **Parallel execution**: Agents work simultaneously on independent requirements
 - **Automatic archival**: Completed work archived automatically
@@ -263,22 +278,29 @@ Haunt's complete idea-to-shipped workflow:
 ## What Makes Haunt Unique
 
 ### 1. External Memory for Stateless LLMs
+
 Rules, skills, and roadmap provide **persistent institutional knowledge** that survives across sessions.
 
 ### 2. Roadmap as Communication Layer
+
 Agents coordinate through **status updates** in the roadmap—no direct agent-to-agent communication needed.
 
 ### 3. One-Feature-Per-Session Rule
+
 Everything sized to complete in **one sitting** (max 4 hours)—prevents context sprawl and ensures atomic commits.
 
 ### 4. TDD for Agent Behavior
+
 **Pattern detection tests** ensure agents learn from mistakes:
+
 - Pattern Found → Test Written → Agent Trained → Pattern Defeated
 
 ### 5. Metrics Framework: Zero Agent Overhead
+
 Wrapper scripts emit metrics automatically—agents remain unaware of instrumentation.
 
 ### 6. Skill Refactoring Pattern
+
 Slim reference files (rules) with consultation gates to comprehensive skills (on-demand) prevent token bloat.
 
 ---
@@ -286,6 +308,7 @@ Slim reference files (rules) with consultation gates to comprehensive skills (on
 ## File Organization
 
 ### Project Structure
+
 ```
 .haunt/
 ├── plans/
@@ -302,6 +325,7 @@ Slim reference files (rules) with consultation gates to comprehensive skills (on
 ```
 
 ### Framework Structure
+
 ```
 Haunt/
 ├── agents/                       # Character sheets (source)
@@ -349,23 +373,29 @@ Haunt/
 ## FAQ
 
 ### Do I need to install MCP servers?
+
 **Optional.** Haunt works without MCP, but Context7 (docs lookup) and Playwright (E2E tests) enhance capabilities.
 
 ### How do I customize an agent?
+
 Edit the agent file in `~/.claude/agents/`. Changes apply to all projects using that agent.
 
 ### What if I want to remove Haunt?
+
 ```bash
 rm -rf ~/.claude/agents/gco-* ~/.claude/rules/gco-* ~/.claude/skills/gco-*
 ```
 
 ### Can I use both v1.0 and v2.0?
+
 **Not recommended.** Choose one architecture per project to avoid conflicting instructions.
 
 ### How much does this cost?
+
 Haunt is **MIT licensed** and free. You pay only for Claude API usage.
 
 ### Does this work with other LLMs?
+
 Currently designed for **Claude** via Claude Code CLI.
 
 ---
@@ -401,8 +431,16 @@ MIT License - see [LICENSE](LICENSE) for details.
 **Ready to build with AI teammates who actually remember your project?**
 
 ```bash
+# Set up the haunt alias
+echo "alias haunt='claude --dangerously-skip-permissions'" >> ~/.bashrc
+source ~/.bashrc
+
+# Run setup
 bash Haunt/scripts/setup-haunt.sh
-claude -a project-manager
+
+# Start your first séance
+haunt
+/seance "Build a task management API"
 ```
 
 Let's haunt some code. 👻
