@@ -49,18 +49,20 @@ This command runs: `bash Haunt/scripts/haunt-status.sh [OPTIONS]`
 ════════════════════════════════════════
 
 ## Batch: Metrics & Regression Framework
-  🟢 REQ-311: Fix haunt-metrics.sh Parsing Bugs
-  🟡 REQ-312: Add Context Overhead Metric
-  ⚪ REQ-313: Create haunt-regression-check Script (blocked by REQ-312)
-  ⚪ REQ-314: Create Baseline Metrics Storage System (blocked by REQ-313)
+  🟢 REQ-311: Fix haunt-metrics.sh Parsing Bugs [S]
+  🟡 REQ-312: Add Context Overhead Metric [M]
+  ⚪ REQ-313: Create haunt-regression-check Script [M] (blocked by REQ-312)
+  ⚪ REQ-314: Create Baseline Metrics Storage System [S] (blocked by REQ-313)
   Status: 1/4 complete
   ⚠️  2 blocked
+  Effort: 6.0h remaining / 9.5h total
 
 ## Batch: Agent/Skill Optimization
-  🟢 REQ-310: Refactor gco-dev.md Agent
-  🟢 REQ-316: Refactor gco-testing-mindset Skill
-  🟢 REQ-317: Refactor gco-roadmap-planning Skill
+  🟢 REQ-310: Refactor gco-dev.md Agent [S]
+  🟢 REQ-316: Refactor gco-testing-mindset Skill [M]
+  🟢 REQ-317: Refactor gco-roadmap-planning Skill [S]
   Status: 3/3 complete
+  Effort: 0h remaining / 5.5h total
 ```
 
 **Status Icons:**
@@ -80,19 +82,25 @@ This command runs: `bash Haunt/scripts/haunt-status.sh [OPTIONS]`
         "id": "REQ-311",
         "title": "Fix haunt-metrics.sh Parsing Bugs",
         "status": "complete",
-        "blockers": ""
+        "blockers": "",
+        "effort": "S",
+        "effort_hours": 1.5
       },
       {
         "id": "REQ-312",
         "title": "Add Context Overhead Metric",
         "status": "in_progress",
-        "blockers": ""
+        "blockers": "",
+        "effort": "M",
+        "effort_hours": 3
       },
       {
         "id": "REQ-313",
         "title": "Create haunt-regression-check Script",
         "status": "pending",
-        "blockers": "REQ-312"
+        "blockers": "REQ-312",
+        "effort": "M",
+        "effort_hours": 3
       }
     ],
     "summary": {
@@ -101,6 +109,10 @@ This command runs: `bash Haunt/scripts/haunt-status.sh [OPTIONS]`
       "in_progress": 1,
       "complete": 1,
       "blocked": 1
+    },
+    "effort": {
+      "total_hours": 7.5,
+      "remaining_hours": 6.0
     }
   }
 ]
@@ -225,6 +237,25 @@ haunt-status --json
 - `.haunt/plans/roadmap.md` - Source roadmap file
 - `Haunt/rules/gco-roadmap-format.md` - Roadmap format specification
 
+## Effort Estimation
+
+The command displays effort estimates for each requirement and batch:
+
+**Effort Sizes:**
+- `XS` - 30min-1hr (0.75hr midpoint)
+- `S` - 1-2hr (1.5hr midpoint)
+- `M` - 2-4hr (3hr midpoint)
+
+**Batch Summaries:**
+- **Total hours** - Sum of all requirements in batch
+- **Remaining hours** - Sum of incomplete requirements (pending/in_progress)
+
+**Example:**
+```
+Effort: 3.0h remaining / 6.0h total
+```
+This means 3 hours of work remaining out of 6 hours total batch effort.
+
 ## Future Enhancements
 
 Potential features for future versions:
@@ -234,17 +265,12 @@ Potential features for future versions:
    - `--batch="Metrics Framework"` - Show specific batch only
    - `--blocked-only` - Show only blocked requirements
 
-2. **Effort Estimation (REQ-232)**
-   - Display total effort per batch
-   - Show remaining effort
-   - Estimate completion time
-
-3. **Historical Tracking**
+2. **Historical Tracking**
    - Show velocity (completed work per week)
    - Trend analysis (completion rate increasing/decreasing)
    - Burndown charts in JSON output
 
-4. **Interactive Mode**
+3. **Interactive Mode**
    - Use `fzf` or similar for interactive batch selection
    - Quick navigation to requirement in roadmap
    - One-command unblocking workflow

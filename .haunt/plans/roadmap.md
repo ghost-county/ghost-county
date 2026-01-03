@@ -30,11 +30,11 @@ Extend the `/haunt status --batch` command to include effort estimation summarie
 
 **Tasks:**
 
-- [ ] Parse effort fields from requirements (XS/S/M)
-- [ ] Calculate effort totals per batch
-- [ ] Add effort column to terminal output
-- [ ] Add effort summary to JSON output
-- [ ] Update command documentation
+- [x] Parse effort fields from requirements (XS/S/M)
+- [x] Calculate effort totals per batch
+- [x] Add effort column to terminal output
+- [x] Add effort summary to JSON output
+- [x] Update command documentation
 
 **Files:**
 

@@ -78,6 +78,25 @@ extract_title() {
     echo "$line" | sed -E 's/.*REQ-[0-9]+: ([^(]+).*/\1/' | sed 's/^ *//;s/ *$//'
 }
 
+# Function to extract effort from requirement content
+extract_effort() {
+    local content="$1"
+    # Extract effort value (XS, S, M) from "**Effort:** X" line
+    local effort=$(echo "$content" | grep "^\*\*Effort:\*\*" | sed -E 's/.*\*\*Effort:\*\*[[:space:]]+([XSM]+).*/\1/' | head -1)
+    echo "$effort"
+}
+
+# Function to convert effort to hours (midpoint)
+effort_to_hours() {
+    local effort="$1"
+    case "$effort" in
+        XS) echo "0.75" ;;  # 30min-1hr -> 0.75hr midpoint
+        S)  echo "1.5" ;;   # 1-2hr -> 1.5hr midpoint
+        M)  echo "3" ;;     # 2-4hr -> 3hr midpoint
+        *)  echo "0" ;;
+    esac
+}
+
 # Function to check if line is blocked
 is_blocked() {
     local content="$1"
@@ -105,6 +124,8 @@ parse_batch() {
     local complete_count=0
     local blocked_count=0
     local total_count=0
+    local total_effort_hours=0
+    local remaining_effort_hours=0
 
     declare -a requirements
 
@@ -118,8 +139,8 @@ parse_batch() {
     local current_content=""
 
     while IFS= read -r line; do
-        # Check if this is a requirement header
-        if [[ "$line" =~ ^###[[:space:]]+[$ICON_PENDING$ICON_IN_PROGRESS$ICON_COMPLETE$ICON_BLOCKED] ]]; then
+        # Check if this is a requirement header (with or without braces)
+        if [[ "$line" =~ ^###[[:space:]]+(\{)?[$ICON_PENDING$ICON_IN_PROGRESS$ICON_COMPLETE$ICON_BLOCKED](\})? ]]; then
             # Save previous requirement if exists
             if [[ -n "$current_req_id" ]]; then
                 local blockers=""
@@ -127,7 +148,18 @@ parse_batch() {
                     blockers=$(extract_blockers "$current_content")
                     ((blocked_count++))
                 fi
-                requirements+=("$current_req_id|$current_status|$current_title|$blockers")
+
+                # Extract effort and calculate hours
+                local effort=$(extract_effort "$current_content")
+                local effort_hours=$(effort_to_hours "$effort")
+                total_effort_hours=$(echo "$total_effort_hours + $effort_hours" | bc)
+
+                # Add to remaining effort if not complete
+                if [[ "$current_status" != "complete" ]]; then
+                    remaining_effort_hours=$(echo "$remaining_effort_hours + $effort_hours" | bc)
+                fi
+
+                requirements+=("$current_req_id|$current_status|$current_title|$blockers|$effort")
             fi
 
             # Start new requirement
@@ -157,7 +189,18 @@ parse_batch() {
             blockers=$(extract_blockers "$current_content")
             ((blocked_count++))
         fi
-        requirements+=("$current_req_id|$current_status|$current_title|$blockers")
+
+        # Extract effort and calculate hours
+        local effort=$(extract_effort "$current_content")
+        local effort_hours=$(effort_to_hours "$effort")
+        total_effort_hours=$(echo "$total_effort_hours + $effort_hours" | bc)
+
+        # Add to remaining effort if not complete
+        if [[ "$current_status" != "complete" ]]; then
+            remaining_effort_hours=$(echo "$remaining_effort_hours + $effort_hours" | bc)
+        fi
+
+        requirements+=("$current_req_id|$current_status|$current_title|$blockers|$effort")
     fi
 
     # Output batch summary
@@ -165,7 +208,7 @@ parse_batch() {
 
     # Display requirements
     for req_entry in "${requirements[@]}"; do
-        IFS='|' read -r req_id status title blockers <<< "$req_entry"
+        IFS='|' read -r req_id status title blockers effort <<< "$req_entry"
 
         # Choose color and icon based on status
         local color=""
@@ -177,10 +220,16 @@ parse_batch() {
             blocked) color="$RED"; icon="$ICON_BLOCKED" ;;
         esac
 
+        # Format effort display
+        local effort_display=""
+        if [[ -n "$effort" ]]; then
+            effort_display=" [${effort}]"
+        fi
+
         if [[ -n "$blockers" ]]; then
-            echo -e "  ${color}${icon} ${req_id}: ${title} (blocked by ${blockers})${NC}"
+            echo -e "  ${color}${icon} ${req_id}: ${title}${effort_display} (blocked by ${blockers})${NC}"
         else
-            echo -e "  ${color}${icon} ${req_id}: ${title}${NC}"
+            echo -e "  ${color}${icon} ${req_id}: ${title}${effort_display}${NC}"
         fi
     done
 
@@ -188,6 +237,11 @@ parse_batch() {
     echo -e "  ${BLUE}Status: ${complete_count}/${total_count} complete"
     if [[ $blocked_count -gt 0 ]]; then
         echo -e "  ${RED}⚠️  ${blocked_count} blocked${NC}"
+    fi
+
+    # Display effort summary
+    if (( $(echo "$total_effort_hours > 0" | bc -l) )); then
+        echo -e "  ${BLUE}Effort: ${remaining_effort_hours}h remaining / ${total_effort_hours}h total${NC}"
     fi
     echo ""
 }
@@ -203,6 +257,8 @@ parse_batch_json() {
     local complete_count=0
     local blocked_count=0
     local total_count=0
+    local total_effort_hours=0
+    local remaining_effort_hours=0
 
     local requirements_json="["
     local first_req=true
@@ -217,14 +273,24 @@ parse_batch_json() {
     local current_content=""
 
     while IFS= read -r line; do
-        # Check if this is a requirement header
-        if [[ "$line" =~ ^###[[:space:]]+[$ICON_PENDING$ICON_IN_PROGRESS$ICON_COMPLETE$ICON_BLOCKED] ]]; then
+        # Check if this is a requirement header (with or without braces)
+        if [[ "$line" =~ ^###[[:space:]]+(\{)?[$ICON_PENDING$ICON_IN_PROGRESS$ICON_COMPLETE$ICON_BLOCKED](\})? ]]; then
             # Save previous requirement if exists
             if [[ -n "$current_req_id" ]]; then
                 local blockers=""
                 if is_blocked "$current_content"; then
                     blockers=$(extract_blockers "$current_content")
                     ((blocked_count++))
+                fi
+
+                # Extract effort and calculate hours
+                local effort=$(extract_effort "$current_content")
+                local effort_hours=$(effort_to_hours "$effort")
+                total_effort_hours=$(echo "$total_effort_hours + $effort_hours" | bc)
+
+                # Add to remaining effort if not complete
+                if [[ "$current_status" != "complete" ]]; then
+                    remaining_effort_hours=$(echo "$remaining_effort_hours + $effort_hours" | bc)
                 fi
 
                 # Add to JSON
@@ -239,7 +305,9 @@ parse_batch_json() {
   "id": "$current_req_id",
   "title": "$current_title",
   "status": "$current_status",
-  "blockers": "$blockers"
+  "blockers": "$blockers",
+  "effort": "$effort",
+  "effort_hours": $effort_hours
 }
 EOF
 )
@@ -273,6 +341,16 @@ EOF
             ((blocked_count++))
         fi
 
+        # Extract effort and calculate hours
+        local effort=$(extract_effort "$current_content")
+        local effort_hours=$(effort_to_hours "$effort")
+        total_effort_hours=$(echo "$total_effort_hours + $effort_hours" | bc)
+
+        # Add to remaining effort if not complete
+        if [[ "$current_status" != "complete" ]]; then
+            remaining_effort_hours=$(echo "$remaining_effort_hours + $effort_hours" | bc)
+        fi
+
         # Add to JSON
         if [[ "$first_req" == true ]]; then
             first_req=false
@@ -285,7 +363,9 @@ EOF
   "id": "$current_req_id",
   "title": "$current_title",
   "status": "$current_status",
-  "blockers": "$blockers"
+  "blockers": "$blockers",
+  "effort": "$effort",
+  "effort_hours": $effort_hours
 }
 EOF
 )
@@ -304,6 +384,10 @@ EOF
     "in_progress": $in_progress_count,
     "complete": $complete_count,
     "blocked": $blocked_count
+  },
+  "effort": {
+    "total_hours": $total_effort_hours,
+    "remaining_hours": $remaining_effort_hours
   }
 }
 EOF
