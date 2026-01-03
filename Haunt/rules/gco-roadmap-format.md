@@ -1,8 +1,6 @@
 # Roadmap Format (Slim Reference)
 
-## Requirement Structure
-
-Every requirement MUST follow:
+## Requirement Template
 
 ```markdown
 ### {🟡} REQ-XXX: [Action-oriented title]
@@ -10,7 +8,6 @@ Every requirement MUST follow:
 **Type:** Enhancement | Bug Fix | Documentation | Research
 **Reported:** YYYY-MM-DD
 **Source:** [Origin]
-
 **Description:** [What needs to be done]
 
 **Tasks:**
@@ -29,57 +26,30 @@ Every requirement MUST follow:
 
 ## Status Icons
 
-| Icon | Meaning | When to Use |
-|------|---------|-------------|
-| ⚪ | Not Started | Work not begun |
-| 🟡 | In Progress | Agent actively working |
-| 🟢 | Complete | All criteria met, ready to archive |
-| 🔴 | Blocked | Dependency unmet |
+| Icon | Meaning |
+|------|---------|
+| ⚪ | Not Started |
+| 🟡 | In Progress |
+| 🟢 | Complete |
+| 🔴 | Blocked |
 
-## Status Update Protocol
+## Sizing (One Sitting Rule)
 
-**Worker Agents (Dev, Research, Code Review):**
-- Update `.haunt/plans/roadmap.md` directly
-- Starting work: ⚪ → 🟡
-- Blocking issue: 🟡 → 🔴 (update "Blocked by:" field)
-- Task complete: `- [ ]` → `- [x]` (keep 🟡 until ALL done)
-- Requirement complete: 🟡 → 🟢
-- Do NOT update CLAUDE.md Active Work (PM only)
-
-**Project Manager Only:**
-- ⚪ → 🟡: Update roadmap + add to CLAUDE.md Active Work
-- 🟡 → 🟢: Verify complete, remove from Active Work, archive to `.haunt/completed/`
-
-**Roadmap is authoritative** - Full details live in `.haunt/plans/roadmap.md`
-
-## Sizing Rules (One Sitting Rule)
-
-Work items MUST complete in one uninterrupted session:
-
-| Size | Time | Files | Lines | Use For |
-|------|------|-------|-------|---------|
-| **XS** | 30min-1hr | 1-2 | <50 | Quick fixes, config changes |
-| **S** | 1-2hr | 2-4 | 50-150 | Single component, isolated bug fix |
-| **M** | 2-4hr | 4-8 | 150-300 | Multi-component feature |
-| **SPLIT** | >4hr | >8 | >300 | MUST decompose immediately |
+| Size | Time | Files | Lines |
+|------|------|-------|-------|
+| XS | 30min-1hr | 1-2 | <50 |
+| S | 1-2hr | 2-4 | 50-150 |
+| M | 2-4hr | 4-8 | 150-300 |
+| SPLIT | >4hr | >8 | >300 (decompose) |
 
 ## When to Invoke Full Skill
 
-For detailed format specifications, batch organization, dependency management, and archiving workflows:
+For batch organization, dependency management, Active Work section management, and archiving workflows:
 
-**Invoke:** `/gco-roadmap-format` skill
-
-The skill contains:
-- Complete requirement format with all fields
-- Batch organization and sequencing
-- Complexity indicators (SIMPLE/MODERATE/COMPLEX/UNKNOWN)
-- Active Work section management
-- Archiving workflows
-- File size limits and when to split
+**Invoke:** `gco-roadmap-format` skill
 
 ## Non-Negotiable
 
-- NEVER create requirements without REQ-XXX numbering
-- NEVER skip required fields (all fields in structure above)
+- NEVER skip required fields
 - NEVER allow SPLIT-sized work (decompose first)
-- NEVER exceed 500 lines in roadmap.md (archive immediately)
+- NEVER exceed 500 lines in roadmap.md (archive)

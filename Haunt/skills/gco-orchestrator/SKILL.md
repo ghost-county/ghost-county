@@ -79,86 +79,81 @@ If ANY checkbox is unchecked → STOP, present summoning prompt, wait for YES
 
 ---
 
-## Phase State Management
+## Séance State Management
 
-**CRITICAL:** The orchestrator operates in distinct phases. You MUST declare your current phase before EVERY action.
+**CRITICAL:** The orchestrator creates a summoning approval marker when user approves agent execution.
 
-**Phase Declaration Format:**
+**State Management:**
 
+Create `.haunt/state/` directory at séance start:
+```bash
+mkdir -p .haunt/state
 ```
-PHASE: [SCRYING | SUMMONING | BANISHING]
-Next action: [What you're about to do]
+
+Create summoning approval file ONLY after user says YES:
+```bash
+touch .haunt/state/summoning-approved
 ```
 
-**Phase Definitions:**
+Delete summoning file at séance end:
+```bash
+rm -f .haunt/state/summoning-approved
+```
 
-- **SCRYING:** Planning and roadmap creation (spawn PM, read files, write to `.haunt/plans/`)
-- **SUMMONING:** Execution (spawn dev agents, NO direct file editing on source code)
-- **BANISHING:** Cleanup (archive to `.haunt/completed/`, garden roadmap)
+**Workflow Phases:**
 
-**Phase Transition Gates:**
+- **SCRYING (Planning):** Spawn PM, create roadmap, present summoning prompt
+  - DO NOT create summoning-approved file yet
+  - Hook will block dev agents (file doesn't exist)
 
-SCRYING → SUMMONING:
+- **SUMMONING (Execution):** User approved, spawn dev agents
+  - Create summoning-approved file BEFORE spawning dev agents
+  - Hook will allow dev agents (file exists)
 
-- ✅ REQ-XXX exists in roadmap
-- ✅ User said YES to summoning prompt (explicit approval in last 3 messages)
-- ❌ User said "maybe", "later", "not sure", or anything ambiguous
-
-SUMMONING → BANISHING:
-
-- ✅ All spawned agents completed
-- ✅ Work items marked 🟢 Complete
-
-**State File Enforcement:**
-
-Before using Edit or Write on source code files:
-
-1. Check `.haunt/state/current-phase.txt`
-2. If phase != SUMMONING and file is source code → REJECT action
-3. Remind yourself: "I am an orchestrator. This is dev agent work."
+- **BANISHING (Cleanup):** Archive completed work, clean up
+  - Delete summoning-approved file
+  - Hook returns to permissive mode (no .haunt/state checks)
 
 **Spawn-Time Context Injection:**
 
 When spawning PM (SCRYING phase):
 
 ```
-Task(prompt="You are in SCRYING phase. Create roadmap for: [idea].
+Task(prompt="Create roadmap for: [idea].
 Do NOT implement code. Return when roadmap is complete.")
 ```
 
 When spawning dev agents (SUMMONING phase):
 
 ```
-Task(prompt="You are in SUMMONING phase. Implement REQ-XXX.
-Phase context: User approved summoning. Roadmap is complete.")
+Task(prompt="Implement REQ-XXX.
+User approved summoning. Roadmap is complete.")
 ```
 
-**Example:**
+**Example Workflow:**
 
 ```
-PHASE: SCRYING
-Next action: Spawn gco-project-manager to create roadmap
-
-[PM completes, roadmap created]
-
-PHASE: SCRYING
-Next action: Present summoning prompt to user
-
-User: "yes, summon them"
-
-PHASE: SUMMONING
-Next action: Spawn gco-dev-backend for REQ-042
+1. Create state directory: mkdir -p .haunt/state
+2. Spawn gco-project-manager to create roadmap
+3. [PM completes, roadmap created]
+4. Present summoning prompt to user
+5. User: "yes, summon them"
+6. Create approval: touch .haunt/state/summoning-approved
+7. Spawn gco-dev-backend for REQ-042
+8. [Agents complete work]
+9. Archive completed requirements
+10. Clean up: rm -f .haunt/state/summoning-approved
 ```
 
 **Violation Self-Check:**
 
-Before EVERY Edit, Write, or Task tool call, ask:
+Before spawning dev agents, verify:
 
-- "What phase am I in?" (Check last phase declaration)
-- "Is this action allowed in this phase?" (Consult phase definitions)
-- "If spawning agents: Did user explicitly approve?" (Check last 3 messages)
+- ✅ Summoning prompt presented to user
+- ✅ User said YES (not "maybe", "later", or ambiguous)
+- ✅ Summoning approval file created: `.haunt/state/summoning-approved`
 
-If ANY answer is wrong → STOP and declare phase correctly
+If ANY check fails → STOP and complete prerequisites
 
 ---
 

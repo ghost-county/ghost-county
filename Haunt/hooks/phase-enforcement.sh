@@ -1,9 +1,12 @@
 #!/bin/bash
 # Séance Phase Enforcement Hook
-# Blocks: gco-dev-* agents when phase != SUMMONING
+# Blocks: gco-dev-* agents when summoning not approved
 #
-# This hook ensures dev agents can only be spawned during the SUMMONING phase
-# of the Séance workflow. PM and Research agents are allowed in SCRYING.
+# Simple existence-based checking:
+# - No .haunt/state/ dir = not in séance, allow all spawns
+# - .haunt/state/ exists but no summoning-approved file = block dev agents
+# - summoning-approved file exists = allow dev agents
+# - PM/Research agents always allowed
 
 set -euo pipefail
 
@@ -25,31 +28,29 @@ fi
 
 # Find project directory
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(echo "$INPUT" | jq -r '.cwd')}"
-PHASE_FILE="$PROJECT_DIR/.haunt/state/current-phase.txt"
+STATE_DIR="$PROJECT_DIR/.haunt/state"
+SUMMONING_FILE="$STATE_DIR/summoning-approved"
 
-# If no phase file exists, we're not in a séance - allow the spawn
-# This permits dev agents outside of the séance workflow
-if [[ ! -f "$PHASE_FILE" ]]; then
+# If .haunt/state/ doesn't exist, we're not in a séance
+# Allow dev agents for regular non-séance work
+if [[ ! -d "$STATE_DIR" ]]; then
     exit 0
 fi
 
-# Read current phase
-CURRENT_PHASE=$(cat "$PHASE_FILE" 2>/dev/null || echo "UNKNOWN")
-
-# Block dev agents unless in SUMMONING phase
-if [[ "$CURRENT_PHASE" != "SUMMONING" ]]; then
-    echo "Phase violation: Cannot spawn $SUBAGENT_TYPE during $CURRENT_PHASE phase." >&2
+# We're in séance context - check if summoning is approved
+if [[ ! -f "$SUMMONING_FILE" ]]; then
+    echo "Séance phase violation: Cannot spawn $SUBAGENT_TYPE before summoning approval." >&2
     echo "" >&2
-    echo "The Séance workflow requires transitioning to SUMMONING before spawning dev agents." >&2
-    echo "Current phase: $CURRENT_PHASE" >&2
+    echo "You are in séance mode but summoning has not been approved yet." >&2
     echo "" >&2
     echo "To fix:" >&2
-    echo "1. Complete SCRYING (planning) first" >&2
+    echo "1. Complete planning (SCRYING) first" >&2
     echo "2. Present summoning prompt to user" >&2
-    echo "3. Get user approval to summon agents" >&2
-    echo "4. Write 'SUMMONING' to $PHASE_FILE" >&2
+    echo "3. Get user approval" >&2
+    echo "4. Create summoning approval: touch $SUMMONING_FILE" >&2
     echo "5. Then spawn dev agents" >&2
-    exit 2  # Blocking error - shown to Claude
+    exit 2  # Blocking error
 fi
 
+# Summoning approved - allow dev agents
 exit 0

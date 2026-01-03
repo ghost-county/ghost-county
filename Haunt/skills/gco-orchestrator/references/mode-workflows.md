@@ -448,12 +448,10 @@ import re
 
 args = arguments.strip()
 
-# Step 1A: Initialize Phase State
+# Step 1A: Initialize State Directory
+# Create state directory but don't create summoning file yet (SCRYING phase)
 os.makedirs(".haunt/state", exist_ok=True)
-with open(".haunt/state/current-phase.txt", "w") as f:
-    f.write("SCRYING")
 
-print("PHASE: SCRYING")
 print("Next action: Detect mode and context")
 
 # Step 1B: Detect project state (three-state classification)
@@ -708,22 +706,11 @@ The Project Manager executes its workflow:
 
 ### Step 3.5: Validate Phase Before Transition
 
-After planning completes, verify SCRYING completion before transitioning to SUMMONING:
+After planning completes, present summoning prompt:
 
 ```python
-# Read current phase
-with open(".haunt/state/current-phase.txt", "r") as f:
-    current_phase = f.read().strip()
-
-# Verify we're in SCRYING phase
-if current_phase != "SCRYING":
-    print(f"⚠️  WARNING: Expected SCRYING phase, but current phase is {current_phase}")
-    # Reset to SCRYING
-    with open(".haunt/state/current-phase.txt", "w") as f:
-        f.write("SCRYING")
-    current_phase = "SCRYING"
-
-print(f"PHASE: {current_phase}")
+# We're in SCRYING phase (planning complete, summoning not approved yet)
+# Summoning file does NOT exist - hook will block dev agents
 print("Next action: Present summoning prompt to user")
 ```
 
@@ -745,17 +732,17 @@ Wait for user response.
 
 **If "Yes" (or affirmative):**
 
-**Phase Transition to SUMMONING:**
+**Create Summoning Approval:**
 
 ```python
-# Transition from SCRYING to SUMMONING
-print("PHASE TRANSITION: SCRYING → SUMMONING")
-print("Reason: User approved summoning")
+# User approved - create summoning approval file
+# This allows dev agents to be spawned (hook will permit)
+import subprocess
 
-with open(".haunt/state/current-phase.txt", "w") as f:
-    f.write("SUMMONING")
+print("User approved summoning")
 
-print("PHASE: SUMMONING")
+subprocess.run(["touch", ".haunt/state/summoning-approved"], check=True)
+
 print("Next action: Spawn dev agents for roadmap requirements")
 ```
 
@@ -790,14 +777,12 @@ Confirm roadmap location:
 **Phase Transition to BANISHING:**
 
 ```python
-# Transition from SUMMONING to BANISHING
-print("PHASE TRANSITION: SUMMONING → BANISHING")
-print("Reason: All spawned agents completed")
+# Clean up summoning approval
+print("All spawned agents completed")
 
-with open(".haunt/state/current-phase.txt", "w") as f:
-    f.write("BANISHING")
+import subprocess
+subprocess.run(["rm", "-f", ".haunt/state/summoning-approved"], check=True)
 
-print("PHASE: BANISHING")
 print("Next action: Archive completed work and clean roadmap")
 ```
 
