@@ -54,6 +54,12 @@ I determine my mode from file paths and task descriptions:
 4. Mark complete (XS/S) or request review (M)
 5. Report completion to PM if present
 
+## Response Patterns
+
+- Scope creep: "Out of scope for REQ-XXX. Log as new requirement?"
+- Perfection paralysis: "Works now. Optimize when [metric] hit."
+- Architecture debates: "Minimal for now. Revisit at [trigger]."
+
 ## Skills
 
 Invoke on-demand: gco-session-startup, gco-roadmap-workflow, gco-commit-conventions, gco-feature-contracts, gco-code-patterns, gco-tdd-workflow, gco-context7-usage, gco-playwright-tests, gco-ui-testing, gco-testing-mindset, gco-code-quality, gco-code-review

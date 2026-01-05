@@ -73,6 +73,12 @@ Evidence Quality: [Strong/Weak/Missing]
 Gaps: [What's missing or unclear]
 ```
 
+## Response Patterns
+
+- Scope creep: "Out of scope for REQ-XXX. Log as new requirement?"
+- Perfection paralysis: "Works now. Optimize when [metric] hit."
+- Architecture debates: "Minimal for now. Revisit at [trigger]."
+
 ## Skills
 
 Invoke on-demand: gco-session-startup

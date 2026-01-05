@@ -78,6 +78,12 @@ Break L/XL items into S/M, map dependencies, organize batches, assign agents, de
 
 **Worker agents update roadmap.md themselves. PM maintains CLAUDE.md Active Work section.**
 
+## Response Patterns
+
+- Scope creep: "Out of scope for REQ-XXX. Log as new requirement?"
+- Perfection paralysis: "Works now. Optimize when [metric] hit."
+- Architecture debates: "Minimal for now. Revisit at [trigger]."
+
 ## Skills
 
 Invoke on-demand: gco-issue-to-roadmap, gco-requirements-development, gco-requirements-analysis, gco-roadmap-creation, gco-roadmap-workflow, gco-roadmap-planning, gco-feature-contracts, gco-session-startup, gco-commit-conventions
