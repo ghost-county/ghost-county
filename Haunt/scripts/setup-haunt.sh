@@ -1881,6 +1881,75 @@ setup_hooks() {
     info "  - Write tool: Prevents overwriting important configuration files"
 }
 
+# Setup shell hooks (root-level *.sh hooks in Haunt/hooks/)
+# These are utility hooks like commit-validator, format-code, etc.
+setup_shell_hooks() {
+    section "Phase 2d: Installing Shell Hooks (GLOBAL)"
+
+    local hooks_source="${PROJECT_ROOT}/hooks"
+    local hooks_target="${HOME}/.claude/hooks"
+
+    # Check if source hooks directory exists
+    if [[ ! -d "$hooks_source" ]]; then
+        warning "Hooks source directory not found: $hooks_source"
+        warning "Skipping shell hooks setup"
+        return 0
+    fi
+
+    # Create hooks target directory
+    if [[ ! -d "$hooks_target" ]]; then
+        if [[ "$DRY_RUN" == false ]]; then
+            mkdir -p "$hooks_target"
+            success "Created hooks directory: $hooks_target"
+        else
+            info "[DRY RUN] Would create: $hooks_target"
+        fi
+    fi
+
+    # Copy shell hook scripts
+    local hooks_installed=0
+    local hooks_updated=0
+    local hooks_unchanged=0
+
+    for hook_script in "$hooks_source"/*.sh; do
+        [[ -f "$hook_script" ]] || continue
+
+        local script_name=$(basename "$hook_script")
+        local target_script="$hooks_target/$script_name"
+
+        if [[ -f "$target_script" ]]; then
+            if cmp -s "$hook_script" "$target_script"; then
+                info "Unchanged: ${script_name}"
+                ((hooks_unchanged++))
+            else
+                if [[ "$DRY_RUN" == false ]]; then
+                    cp "$hook_script" "$target_script"
+                    chmod +x "$target_script"
+                    success "Updated ${script_name}"
+                    ((hooks_updated++))
+                else
+                    info "[DRY RUN] Would update: $script_name"
+                fi
+            fi
+        else
+            if [[ "$DRY_RUN" == false ]]; then
+                cp "$hook_script" "$target_script"
+                chmod +x "$target_script"
+                success "Installed ${script_name}"
+                ((hooks_installed++))
+            else
+                info "[DRY RUN] Would install: $script_name"
+            fi
+        fi
+    done
+
+    echo ""
+    echo "Shell hooks summary:"
+    echo "  - Installed: ${hooks_installed} script(s)"
+    echo "  - Updated:   ${hooks_updated} script(s)"
+    echo "  - Unchanged: ${hooks_unchanged} script(s)"
+}
+
 # Setup linting tools for auto-formatting hook
 # Prompts user for each tool, installs only what they want
 setup_linters() {
@@ -1993,7 +2062,7 @@ setup_linters() {
 
 # Setup Haunt environment file with default configuration
 setup_haunt_env() {
-    section "Phase 2d: Setting Up Haunt Environment (~/.haunt.env)"
+    section "Phase 2f: Setting Up Haunt Environment (~/.haunt.env)"
 
     local env_file="${HOME}/.haunt.env"
 
@@ -4757,9 +4826,14 @@ main() {
         setup_rules
     fi
 
-    # Phase 2c: Hooks (Claude Code enforcement hooks)
+    # Phase 2c: Hooks (Claude Code damage-control hooks)
     if [[ "$SKILLS_ONLY" == false ]]; then
         setup_hooks
+    fi
+
+    # Phase 2d: Shell hooks (utility hooks like format-code, commit-validator)
+    if [[ "$SKILLS_ONLY" == false ]]; then
+        setup_shell_hooks
     fi
 
     # Phase 2e: Linting tools (optional, for format-code.sh hook)
@@ -4767,7 +4841,7 @@ main() {
         setup_linters
     fi
 
-    # Phase 2d: Haunt environment configuration
+    # Phase 2f: Haunt environment configuration
     if [[ "$SKILLS_ONLY" == false ]]; then
         setup_haunt_env
     fi
