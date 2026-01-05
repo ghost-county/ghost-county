@@ -143,3 +143,4 @@ nats-data/
 .haunt/*
 !.haunt/.gitignore
 !.haunt/plans
+!.haunt/CHANGELOG.md
