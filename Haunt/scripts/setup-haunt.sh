@@ -1824,6 +1824,115 @@ setup_hooks() {
     info "  - file-location-enforcer.sh: Blocks GCO artifacts outside .haunt/"
     info "  - commit-validator.sh: Requires [REQ-XXX] prefix on commits"
     info "  - completion-gate.sh: Requires test verification before marking complete"
+    info "  - format-code.sh: Auto-formats code after edits (requires linters)"
+}
+
+# Setup linting tools for auto-formatting hook
+# Prompts user for each tool, installs only what they want
+setup_linters() {
+    section "Phase 2e: Installing Linting Tools (Optional)"
+
+    info "The format-code.sh hook can auto-format your code after edits."
+    info "Install linting tools to enable this feature."
+    info "Tools you skip will be gracefully ignored by the hook."
+    blank
+
+    local pkg_manager=$(detect_package_manager)
+    local installed_count=0
+    local skipped_count=0
+
+    # Helper to prompt and install a linter
+    prompt_linter() {
+        local tool_name="$1"
+        local tool_desc="$2"
+        local install_cmd="$3"
+        local check_cmd="${4:-$tool_name}"
+
+        # Check if already installed
+        if command -v "$check_cmd" &>/dev/null; then
+            success "$tool_name already installed"
+            ((installed_count++))
+            return 0
+        fi
+
+        # If --yes flag, auto-install
+        if [[ "$YES_TO_ALL" == true ]]; then
+            info "Auto-installing $tool_name (--yes flag set)"
+            if eval "$install_cmd" 2>/dev/null; then
+                success "$tool_name installed"
+                ((installed_count++))
+            else
+                warning "Failed to install $tool_name"
+            fi
+            return 0
+        fi
+
+        # Interactive prompt
+        echo -e "${YELLOW}?${NC} Install ${tool_name} (${tool_desc})? (Y/n): "
+        local response
+        read_from_terminal response
+
+        if [[ -z "$response" ]] || [[ "$response" =~ ^[Yy]$ ]]; then
+            info "Installing $tool_name..."
+            if [[ "$DRY_RUN" == false ]]; then
+                if eval "$install_cmd" 2>/dev/null; then
+                    success "$tool_name installed"
+                    ((installed_count++))
+                else
+                    warning "Failed to install $tool_name"
+                fi
+            else
+                info "[DRY RUN] Would install: $tool_name"
+            fi
+        else
+            info "Skipping $tool_name (hook will gracefully skip)"
+            ((skipped_count++))
+        fi
+    }
+
+    # ShellCheck - Bash/shell linting
+    if [[ "$pkg_manager" == "brew" ]]; then
+        prompt_linter "shellcheck" "Bash/shell linting - catches bugs" "brew install shellcheck"
+    elif [[ "$pkg_manager" == "apt" ]]; then
+        prompt_linter "shellcheck" "Bash/shell linting - catches bugs" "sudo apt-get install -y shellcheck"
+    fi
+
+    # Ruff - Python linting + formatting
+    if command -v pip &>/dev/null || command -v pip3 &>/dev/null; then
+        local pip_cmd="pip3"
+        command -v pip3 &>/dev/null || pip_cmd="pip"
+        prompt_linter "ruff" "Python linting+formatting - very fast" "$pip_cmd install ruff"
+    fi
+
+    # markdownlint - Markdown linting
+    if command -v npm &>/dev/null; then
+        prompt_linter "markdownlint" "Markdown linting - documentation quality" "npm install -g markdownlint-cli"
+    fi
+
+    # Prettier - JSON/YAML/general formatting
+    if command -v npm &>/dev/null; then
+        prompt_linter "prettier" "JSON/YAML/general formatting" "npm install -g prettier"
+    fi
+
+    # SQLFluff - SQL linting (optional, slow)
+    if command -v pip &>/dev/null || command -v pip3 &>/dev/null; then
+        local pip_cmd="pip3"
+        command -v pip3 &>/dev/null || pip_cmd="pip"
+        prompt_linter "sqlfluff" "SQL linting for Snowflake (slower)" "$pip_cmd install sqlfluff"
+    fi
+
+    # ESLint - TypeScript/JavaScript linting
+    if command -v npm &>/dev/null; then
+        prompt_linter "eslint" "TypeScript/JavaScript linting" "npm install -g eslint"
+    fi
+
+    blank
+    echo "Linting tools summary:"
+    echo "  - Installed/Available: ${installed_count} tool(s)"
+    echo "  - Skipped: ${skipped_count} tool(s)"
+    blank
+    info "To disable linting hook temporarily:"
+    info "  HAUNT_LINTERS_DISABLED=1 claude"
 }
 
 # Setup Haunt environment file with default configuration
@@ -4542,6 +4651,11 @@ main() {
     # Phase 2c: Hooks (Claude Code enforcement hooks)
     if [[ "$SKILLS_ONLY" == false ]]; then
         setup_hooks
+    fi
+
+    # Phase 2e: Linting tools (optional, for format-code.sh hook)
+    if [[ "$SKILLS_ONLY" == false ]]; then
+        setup_linters
     fi
 
     # Phase 2d: Haunt environment configuration
