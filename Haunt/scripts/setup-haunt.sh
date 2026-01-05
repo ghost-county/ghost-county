@@ -875,7 +875,7 @@ install_git() {
     if [[ "$pkg_manager" == "brew" ]]; then
         if prompt_install "git" "brew"; then
             info "Installing git via Homebrew..."
-            brew install git || {
+            brew install git </dev/null || {
                 error "Failed to install git"
                 return 1
             }
@@ -922,7 +922,7 @@ install_python() {
     if [[ "$pkg_manager" == "brew" ]]; then
         if prompt_install "Python 3.11+" "brew"; then
             info "Installing Python 3.11 via Homebrew..."
-            brew install python@3.11 || {
+            brew install python@3.11 </dev/null || {
                 error "Failed to install Python"
                 return 1
             }
@@ -1058,7 +1058,7 @@ install_nodejs() {
     if [[ "$pkg_manager" == "brew" ]]; then
         if prompt_install "Node.js 18+" "brew"; then
             info "Installing Node.js via Homebrew..."
-            brew install node || {
+            brew install node </dev/null || {
                 error "Failed to install Node.js"
                 return 1
             }
@@ -1858,7 +1858,8 @@ setup_linters() {
         # If --yes flag, auto-install
         if [[ "$YES_TO_ALL" == true ]]; then
             info "Auto-installing $tool_name (--yes flag set)"
-            if eval "$install_cmd" 2>/dev/null; then
+            # Redirect stdin from /dev/null to prevent brew/pip/npm from consuming script stdin
+            if eval "$install_cmd" </dev/null 2>/dev/null; then
                 success "$tool_name installed"
                 ((installed_count++))
             else
@@ -1875,7 +1876,8 @@ setup_linters() {
         if [[ -z "$response" ]] || [[ "$response" =~ ^[Yy]$ ]]; then
             info "Installing $tool_name..."
             if [[ "$DRY_RUN" == false ]]; then
-                if eval "$install_cmd" 2>/dev/null; then
+                # Redirect stdin from /dev/null to prevent brew/pip/npm from consuming script stdin
+                if eval "$install_cmd" </dev/null 2>/dev/null; then
                     success "$tool_name installed"
                     ((installed_count++))
                 else
