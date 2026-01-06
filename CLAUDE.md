@@ -21,13 +21,14 @@ See `~/.claude/rules/gco-roadmap-format.md` for status update protocol (global r
 
 ### Current Items
 
-**Status:** All requirements complete. Ready for archival.
+**Status:** All requirements complete. Roadmap clear.
 
-| REQ | Title | Agent | Status |
-|-----|-------|-------|--------|
-| REQ-380 | Create Haunt manifest.yaml as single source of truth | Dev-Infrastructure | 🟢 |
+**Archived (2026-01-06):**
+- 65 total requirements archived to `.haunt/completed/`
+- Latest: REQ-380 Haunt Manifest System
+- Previous: Repository Cleanup Batch, Damage Control Hooks, Secrets Management
 
-**Completed:** Manifest system implemented with generator script and deprecated item cleanup via `--clean` flag.
+Run `/seance` to start new work.
 
 ## Repository Structure
 
