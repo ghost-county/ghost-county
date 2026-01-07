@@ -58,6 +58,7 @@ rm -f .haunt/state/summoning-approved
 | 4 | `--scry` / `--plan` | Planning only |
 | 5 | `--summon` / `--execute` | Execution only |
 | 6 | `--banish` / `--archive` | Cleanup only |
+| 7 | `--handoff` | Handoff plan mode plan to PM for scrying |
 
 ## Planning Depth
 

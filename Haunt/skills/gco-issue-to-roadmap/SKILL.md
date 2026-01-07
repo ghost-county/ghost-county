@@ -39,6 +39,9 @@ Activate this workflow when the user says anything like:
 
 ## Workflow Execution
 
+**Quick Mode Flow:** Steps 1 → 2 → 2.5 (Sanity Check) → 3 → 4 → 5 → 6
+**Full Mode Flow:** Steps 1 → 2 → Escalate to detailed skills
+
 ### Step 1: Acknowledge and Confirm Understanding
 
 Immediately respond with:
@@ -68,6 +71,16 @@ Before proceeding, verify you have enough context:
 - Priority/urgency
 
 If critical context is missing, ask ONE focused question. Do not ask multiple questions - get the minimum needed to proceed.
+
+### Step 2.5: Sanity Check (Quick Mode Only)
+
+**Quick Mode requires this check before Step 3:**
+
+Ask yourself: "Is this the simplest solution? Could we solve this by modifying existing code instead of adding new?"
+
+Answer YES/NO + 1 sentence. If the check reveals significant complexity or need for a new system, escalate to Full Mode instead.
+
+**Time budget:** 30 seconds.
 
 ### Step 3: Generate Requirement (Silent)
 
@@ -153,9 +166,28 @@ Added to roadmap:
 
 ## Quick Mode vs Full Mode
 
-**Quick Mode (Default):** Steps 1-6 above. Use for clear, well-defined issues.
+### Quick Mode (Default)
 
-**Full Mode:** When the request is complex or strategic:
+Use for clear, well-defined issues. Follows Steps 1-6 above with one mandatory sanity check:
+
+**XS Sanity Check (before Step 3):**
+
+Before generating the requirement, ask yourself:
+
+> **"Is this the simplest solution? Could we solve this by modifying existing code instead of adding new?"**
+
+Answer with YES/NO + 1 sentence explanation. This check ensures Quick mode doesn't skip critique entirely.
+
+**Examples:**
+- Bug fix: "YES - Fixing validation logic in existing login handler."
+- Feature request: "NO - Dark mode requires new theme system and state management."
+- Enhancement: "YES - Adding field to existing form component."
+
+**Time budget:** 30 seconds for sanity check. Total Quick mode: ~90 seconds.
+
+### Full Mode
+
+When the request is complex or strategic:
 1. Invoke `requirements-development` skill for formal requirements
 2. Invoke `requirements-analysis` skill for strategic analysis
 3. Invoke `roadmap-creation` skill for breakdown and planning
@@ -165,6 +197,7 @@ Trigger Full Mode when:
 - Request affects multiple systems
 - Request has significant business impact
 - Request is ambiguous and needs exploration
+- Sanity check reveals significant complexity or new system needed
 
 ## Examples
 

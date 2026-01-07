@@ -321,6 +321,68 @@ Active roadmap cleaned.
 
 ---
 
+## Mode 7: Plan Mode Handoff (--handoff)
+
+**Triggered by:** `/seance --handoff`
+
+**Purpose:** Hand off a plan created in Claude Code's plan mode to the Project Manager for formal roadmap creation.
+
+**Context:** When users run Claude Code in plan mode, they get a plan file at `~/.claude/plans/<plan-id>.md`. This mode takes that plan and converts it into formal Ghost County requirements.
+
+**Flow:**
+1. Locate the plan file from context (user provides path or it's in recent conversation)
+2. Read the plan file content
+3. Spawn gco-project-manager with the plan as context:
+   ```python
+   Task(
+       prompt=f"""You are in SCRYING phase. Convert this plan mode plan into formal roadmap requirements.
+
+PLAN CONTENT:
+{plan_content}
+
+This is a **handoff from plan mode** - the technical design is already complete. Your job is to:
+1. Convert this into proper roadmap requirements (REQ-XXX format)
+2. Size them appropriately (XS/S/M or SPLIT if needed)
+3. Assign to appropriate dev agent
+4. Add to `.haunt/plans/roadmap.md`
+
+Use `--quick` planning depth since the technical design is already done - skip strategic analysis frameworks.""",
+       subagent_type="gco-project-manager"
+   )
+   ```
+4. PM creates requirements and adds to roadmap
+5. Prompt user for summoning (standard flow)
+
+**Output:**
+- Requirements added to `.haunt/plans/roadmap.md`
+- Sized and assigned to appropriate agents
+- Ready for summoning
+
+**When to Use:**
+- After completing Claude Code plan mode
+- When you have a detailed technical plan that needs formalization
+- When `/seance --handoff` is invoked with plan context
+
+**Example:**
+```
+User: /seance --handoff
+Agent:
+🔮 Reading plan mode plan...
+Found plan: Dashboard UI Reorganization: Collapsible Groups
+
+Handing off to Project Manager for formal requirements...
+[PM creates requirements...]
+
+✅ Created 5 requirements (REQ-639 through REQ-643)
+Ready to summon the spirits? [yes/no]
+```
+
+**Key Difference from Mode 1:**
+- Mode 1: Raw idea → full analysis → roadmap
+- Mode 7: Detailed plan → skip analysis → direct conversion to requirements
+
+---
+
 ## Workflow Steps
 
 ### Step 0: Check Haunt Framework Version (Run First)
@@ -539,6 +601,8 @@ elif args in ["--summon", "--execute"]:
     mode = 5
 elif args in ["--banish", "--archive"]:
     mode = 6
+elif args == "--handoff":
+    mode = 7  # Plan mode handoff
 elif args:
     mode = 1  # Immediate workflow with prompt
     # Use project_state to determine workflow type
@@ -665,6 +729,32 @@ Which requirements should the spirits work on?
 3. Handle based on planning_depth (same as Mode 1)
 4. Do NOT prompt to summon (user explicitly wants planning only)
 5. Suggest next step: `/seance --summon`
+
+**Mode 7 (Plan Mode Handoff --handoff):**
+1. Locate plan file from context:
+   - Check conversation history for recent plan file path (`~/.claude/plans/<id>.md`)
+   - Or ask user: "Which plan file should I use?"
+2. Read the plan file content
+3. Spawn gco-project-manager with `--quick` planning depth:
+   ```python
+   Task(
+       prompt=f"""You are in SCRYING phase. Convert this plan mode plan into formal roadmap requirements.
+
+PLAN CONTENT:
+{plan_content}
+
+This is a **handoff from plan mode** - the technical design is already complete. Your job is to:
+1. Convert this into proper roadmap requirements (REQ-XXX format)
+2. Size them appropriately (XS/S/M or SPLIT if needed)
+3. Assign to appropriate dev agent
+4. Add to `.haunt/plans/roadmap.md`
+
+Use `--quick` planning depth since the technical design is already done - skip strategic analysis frameworks.""",
+       subagent_type="gco-project-manager"
+   )
+   ```
+4. PM creates requirements and adds to roadmap
+5. Prompt user for summoning (standard flow continues from Step 4)
 
 ---
 

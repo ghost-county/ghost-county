@@ -237,6 +237,96 @@ Based on the analysis:
 - [Risk requiring attention during implementation]
 ```
 
+### Step 8: Solution Critique (MANDATORY)
+
+⛔ **CRITICAL:** This step is MANDATORY for all requirements. Do NOT proceed to roadmap creation without completing the appropriate tier of critique.
+
+Before creating the roadmap, challenge the proposed solution to ensure it's the simplest, most elegant approach. The depth of critique scales with requirement complexity:
+
+#### Tier Selection
+
+| Requirement Size | Critique Tier | Time Investment |
+|------------------|---------------|-----------------|
+| XS (30min-1hr, 1-2 files) | XS Tier | ~30 seconds |
+| S (1-2hr, 2-4 files) | S/M Tier | 1-3 minutes |
+| M (2-4hr, 4-8 files) | S/M Tier | 1-3 minutes |
+| Greenfield / Multi-requirement feature | Greenfield Tier | Full deep review |
+
+#### XS Tier: Quick Simplicity Check (~30 seconds)
+
+For small, focused changes, ask:
+
+```
+Before proceeding: Is this the simplest solution? Could we solve this by modifying existing code instead of adding new? [YES/NO + 1 sentence]
+```
+
+**Example:**
+> **Q:** Is this the simplest solution? Could we solve this by modifying existing code instead of adding new?
+>
+> **A:** YES. We can add a single parameter to the existing `formatDate()` function instead of creating a new `formatDateWithTimezone()` function.
+
+#### S/M Tier: Standard Solution Critique (1-3 minutes)
+
+For standard features and enhancements:
+
+```
+Solution Critique:
+1. Problem being solved (1 sentence)
+2. Simplest possible solution
+3. One alternative we're NOT doing, and why
+4. What can we eliminate?
+```
+
+**Example:**
+> **Solution Critique:**
+>
+> 1. **Problem:** Users can't filter dashboard widgets by date range
+> 2. **Simplest solution:** Add date range picker to existing filter bar, reuse current filter logic
+> 3. **Alternative NOT doing:** Custom date range builder with presets - adds complexity, users want simple start/end dates
+> 4. **Can eliminate:** "Smart date suggestions" feature - YAGNI, implement if users request it
+
+#### Greenfield Tier: Full Solution Space Exploration
+
+For new features, architectural changes, or multi-requirement work:
+
+```
+Full solution space exploration:
+1. Problem statement and root cause analysis
+2. 3+ alternative approaches with trade-offs
+3. Why chosen approach is optimal
+4. What's being deliberately excluded and why
+5. Risks and assumptions being made
+6. Dependencies that could change the approach
+```
+
+**Example:**
+> **Full Solution Space Exploration:**
+>
+> 1. **Problem & Root Cause:** Users abandon checkout because payment form requires account creation. Root cause: We conflated identity (account) with transaction (payment).
+>
+> 2. **Alternative Approaches:**
+>    - **Guest checkout with optional account:** Collect minimal info, offer account creation post-purchase
+>      - Trade-offs: Best UX, more complex account linking, potential duplicate records
+>    - **Social login only:** Use OAuth (Google/Apple) for instant accounts
+>      - Trade-offs: Fast implementation, excludes users without social accounts (~15%)
+>    - **Passwordless email-only:** Email magic link for identity
+>      - Trade-offs: Simple, requires email verification before purchase (friction)
+>
+> 3. **Why Chosen Approach (Guest checkout):** Removes friction for 100% of users, optional account creation captures emails for marketing, account linking is one-time complexity cost
+>
+> 4. **Deliberately Excluded:** Phone number as identity method - adds SMS costs, international complications, not requested by users
+>
+> 5. **Risks & Assumptions:**
+>    - Risk: Users create multiple accounts, fragment order history
+>    - Mitigation: Email-based duplicate detection, account merging workflow
+>    - Assumption: Guest checkout increases conversion more than marketing opt-ins decrease
+>
+> 6. **Dependencies:** Email service for order confirmations, analytics to measure conversion impact, account merging if duplicate detection triggers
+
+#### Integration with Quality Checklist
+
+Add solution critique completion to the quality checklist (see Quality Checklist section below).
+
 ## Creating the Analysis Document
 
 ⛔ **CONSULTATION GATE:** Before writing output, READ `references/standard-template.md` for complete document structure.
@@ -244,7 +334,7 @@ Based on the analysis:
 **Standard Analysis:**
 - Use template in `references/standard-template.md`
 - Output to: `.haunt/plans/requirements-analysis.md`
-- Include all 7 steps above with filled tables
+- Include all 8 steps above with filled tables (including Step 8: Solution Critique)
 
 **Deep Mode Analysis (if --deep flag):**
 - ALSO create extended analysis using `references/deep-mode-template.md`
@@ -266,6 +356,7 @@ Before completing Phase 2:
 - [ ] Impact/Effort placement determined
 - [ ] Strategic risks identified
 - [ ] Implementation sequence recommended
+- [ ] **Solution critique completed** (XS/S/M/Greenfield tier as appropriate)
 
 ## Deep Mode: Extended Strategic Analysis
 

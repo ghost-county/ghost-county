@@ -19,9 +19,13 @@ All planning modes (1, 2, 3, 4) support three depth levels that control how thor
    - Auto-assign to appropriate agent type
    - Set effort to XS or S based on description
    - Basic completion criteria (2-3 bullets)
-4. **Skip Phase 2 entirely** - no JTBD, Kano, RICE, SWOT, VRIO analysis
-5. Add requirement to roadmap immediately
-6. Prompt to summon agent (same as other modes)
+4. **Skip Phase 2 strategic analysis** - no JTBD, Kano, RICE, SWOT, VRIO analysis
+5. **Phase 2.5: XS-Tier Sanity Check (MANDATORY, ~30 seconds)**
+   - Spawn gco-research-critic for rapid review
+   - Focus: Obvious gaps, critical mistakes, scope misalignment
+   - Output: Quick pass/fail with brief critique (not full findings format)
+6. Add requirement to roadmap immediately
+7. Prompt to summon agent (same as other modes)
 
 **Output:**
 - Single requirement added to `.haunt/plans/roadmap.md`
@@ -40,6 +44,11 @@ All planning modes (1, 2, 3, 4) support three depth levels that control how thor
 - Features requiring strategic analysis
 - Cross-cutting changes affecting multiple systems
 
+**Non-Negotiable:**
+- **Cannot bypass sanity check** - Even XS tasks get 30-second critic review
+- Quick mode saves time on STRATEGIC analysis (JTBD, Kano, RICE), not on quality gates
+- If sanity check fails, requirement must be refined before roadmap addition
+
 **Example:**
 ```
 User: /seance --quick "Fix timeout value in config"
@@ -56,6 +65,14 @@ Completion:
 - Timeout value updated to recommended 30s
 - Config file validated
 - Changes tested
+
+🔍 Running sanity check...
+[gco-research-critic: 30-second review]
+
+✅ Sanity Check PASSED
+- Scope is clear
+- Completion criteria are testable
+- No obvious gaps
 
 Ready to summon the spirits?
 ```
@@ -177,8 +194,11 @@ print(f"   Effort: {effort} (~30 min)" if effort == "XS" else f"   Effort: {effo
 **Flow:**
 1. Phase 1: Requirements Development (14-dimension rubric, understanding confirmation)
 2. Phase 2: Requirements Analysis (JTBD, Kano, RICE scoring)
-3. **Phase 2.5: Critical Review** (spawn gco-research-critic to challenge assumptions, identify gaps)
-4. Phase 3: Roadmap Creation (batching, sizing, agent assignment with critic findings)
+3. **Phase 2.5: Solution Critique (MANDATORY, 1-3 min)**
+   - Spawn gco-research-critic for S/M-tier review
+   - Focus: Assumptions, edge cases, scope creep, error handling gaps, risks
+   - Output: Full findings format (Critical/Warnings/Strengths/Suggestions)
+4. Phase 3: Roadmap Creation (batching, sizing, agent assignment with critic findings integrated)
 
 **When to Use:**
 - S-M sized features
@@ -190,6 +210,11 @@ print(f"   Effort: {effort} (~30 min)" if effort == "XS" else f"   Effort: {effo
 - `.haunt/plans/requirements-document.md` (new projects)
 - `.haunt/plans/requirements-analysis.md` (new projects)
 - `.haunt/plans/roadmap.md` (updated)
+
+**Non-Negotiable:**
+- **Cannot bypass solution critique** - All standard features get full critic review
+- Critique findings MUST be integrated into roadmap before Phase 3 completes
+- Critical issues MUST be addressed; warnings SHOULD be addressed
 
 ---
 
@@ -207,7 +232,11 @@ print(f"   Effort: {effort} (~30 min)" if effort == "XS" else f"   Effort: {effo
    - Risk assessment matrix
    - Stakeholder impact analysis
    - Architectural implications document
-3. **Phase 2.5: Critical Review** (spawn gco-research-critic to review both requirements AND strategic analysis)
+3. **Phase 2.5: Greenfield-Tier Solution Exploration + Research-Critic Review (MANDATORY, extended)**
+   - Spawn gco-research-critic for deep analysis review
+   - Focus: Reviews BOTH requirements AND strategic analysis for alignment
+   - Additional focus: Architectural implications, stakeholder risks, competitive positioning
+   - Output: Extended findings format with strategic recommendations
 4. Phase 3: Roadmap Creation (standard, incorporating critic findings)
 
 **When to Use:**
@@ -220,6 +249,11 @@ print(f"   Effort: {effort} (~30 min)" if effort == "XS" else f"   Effort: {effo
 **Output:**
 - Standard outputs (requirements-document.md, requirements-analysis.md, roadmap.md)
 - **PLUS:** `.haunt/plans/REQ-XXX-strategic-analysis.md` (extended analysis)
+
+**Non-Negotiable:**
+- **Cannot bypass greenfield critique** - All deep features get extended critic review
+- Strategic analysis MUST align with requirements (critic validates)
+- Architectural implications MUST be reviewed and validated before roadmap creation
 
 **Example Deep Analysis Document:**
 ```markdown
@@ -243,27 +277,38 @@ print(f"   Effort: {effort} (~30 min)" if effort == "XS" else f"   Effort: {effo
 
 ---
 
-## Phase 2.5: Critical Review (Detailed)
+## Phase 2.5: Solution Critique (Detailed)
 
-**Applies to:** Standard and Deep planning modes only (Quick mode skips this phase)
+**Applies to:** ALL planning depths (Quick, Standard, Deep) - MANDATORY at all levels
 
 **Purpose:** Adversarial review of requirements and analysis to identify gaps, unstated assumptions, edge cases, and risks before roadmap creation.
+
+**Critique Tiers by Depth:**
+
+| Depth | Critique Tier | Duration | Focus |
+|-------|---------------|----------|-------|
+| Quick | XS-Tier Sanity Check | ~30 seconds | Obvious gaps, critical mistakes, scope misalignment |
+| Standard | S/M-Tier Solution Critique | 1-3 minutes | Full findings: assumptions, edge cases, scope, errors, risks |
+| Deep | Greenfield-Tier Exploration | Extended | Strategic analysis alignment, architectural implications, stakeholder risks |
 
 **Workflow:**
 
 1. **After Phase 2 Completes:**
    - Requirements document exists
-   - Analysis complete (JTBD, Kano, RICE for Standard; plus strategic analysis for Deep)
+   - Analysis complete (varies by depth: none for Quick; JTBD/Kano/RICE for Standard; plus strategic analysis for Deep)
    - Before roadmap creation begins
 
 2. **Spawn gco-research-critic Agent:**
    ```
    Spawn gco-research-critic with context:
-   - Requirements document path
-   - Analysis document path(s)
-   - Planning depth (Standard or Deep)
+   - Requirements document path (or inline requirement for Quick)
+   - Analysis document path(s) (if Standard/Deep)
+   - Planning depth (Quick/Standard/Deep)
 
-   Prompt: "Review the requirements and analysis for [feature name]. Challenge assumptions, identify gaps, and flag risks before roadmap creation."
+   Prompt (varies by depth):
+   - Quick: "Sanity check this requirement. Pass/fail only - obvious gaps or critical mistakes?"
+   - Standard: "Review the requirements and analysis for [feature name]. Challenge assumptions, identify gaps, and flag risks before roadmap creation."
+   - Deep: "Review the requirements and strategic analysis for [feature name]. Validate strategic alignment, architectural implications, and stakeholder risks."
    ```
 
 3. **Critic Review Focus:**
@@ -274,7 +319,16 @@ print(f"   Effort: {effort} (~30 min)" if effort == "XS" else f"   Effort: {effo
    - **Unstated risks:** What could block this work?
    - **Problem-solution alignment:** Does the requirement actually solve the stated problem?
 
-4. **Critic Output Format:**
+4. **Critic Output Format (varies by depth):**
+
+   **Quick (XS-Tier Sanity Check):**
+   ```
+   ✅ PASS / ❌ FAIL
+   - [Brief reason if fail]
+   - [Quick fix suggestion if fail]
+   ```
+
+   **Standard/Deep (Full Findings):**
    ```
    🔴 Critical Issues (must fix before roadmap):
    - [Specific finding with requirement reference]
@@ -334,16 +388,16 @@ REQ-XXX Tasks now include:
 - [ ] Test migration with existing user sessions
 ```
 
-**When Critic Review Adds Value:**
+**Critique Value by Depth:**
 
-- **Standard mode (most features):** Catches common oversights before implementation
-- **Deep mode (strategic features):** Reviews both requirements AND strategic analysis for alignment
+- **Quick mode (XS tasks):** Fast sanity check prevents obviously broken requirements from reaching implementation
+- **Standard mode (most features):** Catches common oversights before implementation (assumptions, edge cases, errors)
+- **Deep mode (strategic features):** Reviews both requirements AND strategic analysis for alignment and architectural soundness
 - **M-sized work:** Complex features benefit most from adversarial review
 - **High-risk changes:** Auth, data integrity, breaking changes deserve extra scrutiny
 
-**When to Skip (Quick mode):**
+**Non-Negotiable (All Depths):**
 
-- XS-S tasks with obvious scope
-- Typos, config changes, simple fixes
-- Time-sensitive hotfixes
-- Low-risk documentation updates
+- **Cannot skip critique** - Even XS tasks get 30-second sanity check
+- **Must address critical issues** - Roadmap cannot be created until critic findings are resolved
+- **Quick ≠ No critique** - Quick mode saves time on STRATEGIC analysis, not on quality gates
