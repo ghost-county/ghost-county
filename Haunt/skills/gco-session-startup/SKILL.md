@@ -52,11 +52,34 @@ Advanced session initialization guidance for edge cases and complex scenarios.
 
 ### Resuming Mid-Feature Work
 1. Find feature in roadmap (should be 🟡 In Progress)
-2. Review unchecked tasks
-3. Check `git diff` for uncommitted WIP
-4. Check for story file (`.haunt/plans/stories/REQ-XXX-story.md`)
-5. Use `recall_context("[agent-id]-[req-id]")` if complex
-6. Continue from first unchecked task
+2. Verify branch matches assignment (see Branch Mismatch below)
+3. Review unchecked tasks
+4. Check `git diff` for uncommitted WIP
+5. Check for story file (`.haunt/plans/stories/REQ-XXX-story.md`)
+6. Use `recall_context("[agent-id]-[req-id]")` if complex
+7. Continue from first unchecked task
+
+### Branch Mismatch Scenarios
+**On wrong feature branch:**
+1. Identify current branch: `bash Haunt/scripts/haunt-git.sh branch-current`
+2. Find correct branch: `bash Haunt/scripts/haunt-git.sh branch-for-req REQ-XXX`
+3. If correct branch exists → Prompt to checkout
+4. If no correct branch → Prompt to create or continue on main
+5. Wait for user decision before proceeding
+
+**On main but feature branch exists:**
+1. Detect via `branch-for-req` command
+2. Inform user: "Found branch feature/REQ-XXX-{slug} for this work"
+3. Ask: "Checkout feature branch? [yes/no]"
+4. If yes → `git checkout feature/REQ-XXX-{slug}`
+5. If no → Continue on main (user may have reason)
+
+**On feature branch for different requirement:**
+1. Extract REQ from current branch name
+2. Compare with assigned REQ-XXX
+3. Inform user: "Currently on {current-branch} but assigned {REQ-XXX}"
+4. Check if correct branch exists
+5. Offer to switch or ask user preference
 
 ## Consultation Gates
 

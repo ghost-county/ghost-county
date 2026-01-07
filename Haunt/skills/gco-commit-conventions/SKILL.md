@@ -70,6 +70,54 @@ Migration: <how to update>
 | **Release** | `[RELEASE] v1.2.0: Description` + list of included REQ-XXX |
 | **Skip CI** | `[REQ-XXX] Docs: Description [skip ci]` (docs-only, end of line) |
 
+## Branch Naming
+
+### Format
+
+**Pattern:** `{type}/REQ-XXX-{slug}`
+
+Where:
+- `{type}` - One of: feature, fix, docs, refactor
+- `{REQ-XXX}` - Requirement ID from roadmap
+- `{slug}` - Descriptive slug (lowercase, hyphens, 30 char max)
+
+### Branch Types
+
+| Type | Purpose | Example |
+|------|---------|---------|
+| **feature/** | New functionality | `feature/REQ-042-dark-mode` |
+| **fix/** | Bug fixes | `fix/REQ-099-login-bug` |
+| **docs/** | Documentation only | `docs/REQ-101-api-docs` |
+| **refactor/** | Code restructuring | `refactor/REQ-150-auth-cleanup` |
+
+### Slug Generation Rules
+
+1. Convert requirement title to lowercase
+2. Replace spaces with hyphens
+3. Remove special characters
+4. Truncate to 30 characters max
+
+**Examples:**
+- "Add OAuth Login Support" → `add-oauth-login-support`
+- "Fix: User profile not loading" → `user-profile-not-loading`
+- "Update API documentation for v2" → `update-api-documentation-for`
+
+### When to Use Feature Branches
+
+**Use feature branches when:**
+- Implementing M-sized requirements (2-4 hours, multiple files)
+- Working on features that need PR review/audit trail
+- Isolating experimental changes from main
+- Team collaboration requires clean separation
+
+**Skip feature branches when:**
+- XS-sized requirements (single file, < 30 min)
+- Hotfixes that must deploy immediately
+- Documentation-only changes to markdown files
+- Solo work with no review requirement
+
+**Default recommendation:** Use feature branches for all S/M/SPLIT requirements. Optional for XS.
+
 ## Git Operations
 
 **Undo before push:** `git reset --soft HEAD~1` (keep changes) or `git reset --hard HEAD~1` (discard)

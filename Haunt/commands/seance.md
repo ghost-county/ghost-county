@@ -152,7 +152,40 @@ In a repository without `.haunt/`:
 
 **When to use:** M-SPLIT sized features with high strategic impact
 
-### Mode 9: Bug Detection (Auto-Triggered)
+### Mode 9: Branch Creation (--branch)
+
+```bash
+/seance --branch "Add OAuth login" "Add OAuth login support"
+/seance --branch "dark-mode" --quick "Fix dark mode toggle"
+/seance --summon --branch "api-refactor"
+```
+
+**Purpose:** Create a feature branch at summoning time and work on it
+**Output:** Creates branch `feature/REQ-XXX-{branch-name-slug}` and checks it out before spawning agents
+
+**Branch Naming:**
+- Format: `feature/REQ-XXX-{slugified-branch-name}`
+- Slug generation: lowercase, hyphenated, max 30 chars
+- Example: `--branch "Add OAuth Login"` → `feature/REQ-042-add-oauth-login`
+
+**When to use:**
+- Working on new features that should be on separate branches
+- Following git-flow or feature-branch workflows
+- Isolating work from main branch
+
+**Default behavior (no --branch):**
+- Work happens on current branch (backward compatible)
+- No branch creation or checkout
+
+**Combining with other flags:**
+```bash
+/seance --branch "feature-name" --quick "Simple feature"
+/seance --branch "feature-name" --deep "Complex feature"
+/seance --scry --branch "feature-name" "Plan feature"
+/seance --summon --branch "feature-name"  # Create branch and summon
+```
+
+### Mode 10: Bug Detection (Auto-Triggered)
 
 When input contains error patterns (stack traces, exceptions, error messages), séance auto-detects and offers a choice:
 
@@ -205,6 +238,21 @@ def looks_like_bug(text):
     return any(re.search(p, text, re.IGNORECASE) for p in ERROR_PATTERNS)
 
 is_bug = looks_like_bug(args)
+
+# Extract branch creation flag and name
+branch_name = None
+if "--branch" in args:
+    # Extract branch name from --branch="name" or --branch "name"
+    import re
+    branch_match = re.search(r'--branch[= ]"([^"]+)"', args)
+    if not branch_match:
+        branch_match = re.search(r'--branch[= ]([^\s]+)', args)
+    if branch_match:
+        branch_name = branch_match.group(1)
+    # Remove --branch and its value from args
+    args = re.sub(r'--branch[= ]"[^"]+"', '', args)
+    args = re.sub(r'--branch[= ][^\s]+', '', args)
+    args = args.strip()
 
 # Extract planning depth modifiers
 planning_depth = "standard"  # default
@@ -341,18 +389,25 @@ Based on user's answer:
 
 **For all other modes:**
 
-Invoke the `gco-orchestrator` skill with detected mode, arguments, planning depth, and project:
+Invoke the `gco-orchestrator` skill with detected mode, arguments, planning depth, branch name, and project:
 
 ```
 MODE: {mode}
-ARGUMENTS: {args}  # With --quick/--deep removed
+ARGUMENTS: {args}  # With --quick/--deep/--branch removed
 PLANNING_DEPTH: {planning_depth}  # "quick", "standard", or "deep"
+BRANCH_NAME: {branch_name}  # Branch name from --branch flag, or None
 PROJECT: {selected_project}  # From Step 1C confirmation
 HAS_HAUNT: {has_haunt}
 CURRENT_PHASE: SCRYING
 ```
 
 The skill will handle the appropriate flow based on mode and planning depth. Requirements will be added under the appropriate `## {PROJECT}` section in roadmap.md.
+
+**Branch Creation Flow:**
+If `BRANCH_NAME` is provided, the orchestrator will:
+1. During summoning phase, extract REQ-XXX from the first requirement
+2. Call `bash Haunt/scripts/haunt-git.sh branch-create REQ-XXX "{BRANCH_NAME}"`
+3. Checkout the created branch before spawning agents
 
 ## Complete Workflow Examples
 
@@ -475,6 +530,28 @@ $ [Choose B]
 >    Agent: Dev-Backend
 >    Effort: XS
 > Ready to summon? [yes/no]
+```
+
+### Branch Creation Mode
+
+```bash
+$ /seance --branch "oauth-support" "Add OAuth login support"
+> 🔮 Scrying the future...
+> ✅ Created REQ-042: Add OAuth login support
+>    Project: TrueSight
+>    Effort: M
+>    Agent: Dev-Backend
+> Ready to summon the spirits? [yes]
+> 👻 Creating branch feature/REQ-042-oauth-support...
+> ✅ Branch created and checked out
+> 👻 Summoning gco-dev-backend on feature/REQ-042-oauth-support...
+> [Agent implements feature on branch...]
+> ✅ Complete
+
+# Later: merge the feature branch
+$ git checkout main
+$ git merge feature/REQ-042-oauth-support
+$ git push
 ```
 
 ## Setting Up the haunt Alias

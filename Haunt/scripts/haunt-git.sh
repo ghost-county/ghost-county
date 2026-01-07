@@ -64,6 +64,31 @@ escape_json() {
 }
 
 # ============================================================================
+# SLUG GENERATION
+# ============================================================================
+
+# Generate slug from title (lowercase, hyphenate, truncate 30 chars)
+generate_slug() {
+    local title="$1"
+    # Convert to lowercase (compatible with bash 3.2+)
+    local slug
+    slug=$(echo "$title" | tr '[:upper:]' '[:lower:]')
+    # Replace spaces with hyphens
+    slug=$(echo "$slug" | tr ' ' '-')
+    # Remove special characters (keep letters, numbers, hyphens)
+    slug=$(echo "$slug" | sed 's/[^a-z0-9-]//g')
+    # Remove multiple consecutive hyphens
+    slug=$(echo "$slug" | sed 's/-\+/-/g')
+    # Remove leading/trailing hyphens
+    slug=$(echo "$slug" | sed 's/^-\+//; s/-\+$//')
+    # Truncate to 30 characters
+    slug="${slug:0:30}"
+    # Remove trailing hyphen if truncation created one
+    slug=$(echo "$slug" | sed 's/-$//')
+    echo "$slug"
+}
+
+# ============================================================================
 # GIT STATUS COMMAND
 # ============================================================================
 
@@ -312,6 +337,253 @@ EOF
 }
 
 # ============================================================================
+# BRANCH MANAGEMENT COMMANDS
+# ============================================================================
+
+# Get current branch name
+cmd_branch_current() {
+    check_git_repo
+
+    local branch
+    branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "HEAD")
+
+    local is_detached="false"
+    if [[ "$branch" == "HEAD" ]]; then
+        is_detached="true"
+        branch=$(git rev-parse --short HEAD)
+    fi
+
+    branch=$(escape_json "$branch")
+
+    cat <<EOF
+{
+  "branch": "$branch",
+  "is_detached": $is_detached
+}
+EOF
+}
+
+# List all branches with REQ association
+cmd_branch_list() {
+    check_git_repo
+
+    local branches=()
+    local current_branch
+    current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "HEAD")
+
+    while IFS= read -r branch; do
+        if [[ -z "$branch" ]]; then
+            continue
+        fi
+
+        # Remove leading whitespace and asterisk
+        branch=$(echo "$branch" | sed 's/^[* ] *//')
+
+        local is_current="false"
+        if [[ "$branch" == "$current_branch" ]]; then
+            is_current="true"
+        fi
+
+        # Extract REQ-XXX from branch name (format: {type}/REQ-XXX-slug)
+        local req_id=""
+        if [[ "$branch" =~ (feature|fix|docs|refactor)/REQ-([0-9]+)- ]]; then
+            req_id="REQ-${BASH_REMATCH[2]}"
+        fi
+
+        branch=$(escape_json "$branch")
+        req_id=$(escape_json "$req_id")
+
+        branches+=("{\"name\": \"$branch\", \"req_id\": \"$req_id\", \"is_current\": $is_current}")
+    done < <(git branch 2>/dev/null)
+
+    # Build JSON output
+    local branches_json=""
+    if [[ ${#branches[@]} -gt 0 ]]; then
+        branches_json=$(IFS=,; echo "${branches[*]}")
+    fi
+
+    cat <<EOF
+{
+  "count": ${#branches[@]},
+  "branches": [$branches_json]
+}
+EOF
+}
+
+# Create a feature branch for a requirement
+cmd_branch_create() {
+    check_git_repo
+
+    if [[ $# -lt 2 ]]; then
+        error "Usage: branch-create REQ-XXX \"Title\""
+    fi
+
+    local req_id="$1"
+    local title="$2"
+    local branch_type="${3:-feature}"  # Default to feature
+
+    # Validate REQ-XXX format
+    if [[ ! "$req_id" =~ ^REQ-[0-9]+$ ]]; then
+        error "Invalid requirement ID format. Expected REQ-XXX"
+    fi
+
+    # Generate slug from title
+    local slug
+    slug=$(generate_slug "$title")
+
+    if [[ -z "$slug" ]]; then
+        error "Failed to generate slug from title"
+    fi
+
+    local branch_name="${branch_type}/${req_id}-${slug}"
+
+    # Check if branch already exists
+    if git rev-parse --verify "$branch_name" &>/dev/null; then
+        error "Branch already exists: $branch_name"
+    fi
+
+    # Create and checkout branch
+    if ! git checkout -b "$branch_name" 2>/dev/null; then
+        error "Failed to create branch: $branch_name"
+    fi
+
+    branch_name=$(escape_json "$branch_name")
+    req_id=$(escape_json "$req_id")
+    slug=$(escape_json "$slug")
+
+    cat <<EOF
+{
+  "branch": "$branch_name",
+  "req_id": "$req_id",
+  "slug": "$slug",
+  "created": true
+}
+EOF
+}
+
+# Find branch for a requirement
+cmd_branch_for_req() {
+    check_git_repo
+
+    if [[ $# -lt 1 ]]; then
+        error "Usage: branch-for-req REQ-XXX"
+    fi
+
+    local req_id="$1"
+
+    # Validate REQ-XXX format
+    if [[ ! "$req_id" =~ ^REQ-[0-9]+$ ]]; then
+        error "Invalid requirement ID format. Expected REQ-XXX"
+    fi
+
+    local found_branch=""
+    local branch_type=""
+
+    while IFS= read -r branch; do
+        if [[ -z "$branch" ]]; then
+            continue
+        fi
+
+        # Remove leading whitespace and asterisk
+        branch=$(echo "$branch" | sed 's/^[* ] *//')
+
+        # Check if branch matches REQ-ID pattern
+        if [[ "$branch" =~ ^(feature|fix|docs|refactor)/${req_id}- ]]; then
+            found_branch="$branch"
+            branch_type="${BASH_REMATCH[1]}"
+            break
+        fi
+    done < <(git branch 2>/dev/null)
+
+    if [[ -z "$found_branch" ]]; then
+        req_id=$(escape_json "$req_id")
+        cat <<EOF
+{
+  "found": false,
+  "req_id": "$req_id",
+  "branch": null
+}
+EOF
+    else
+        found_branch=$(escape_json "$found_branch")
+        branch_type=$(escape_json "$branch_type")
+        req_id=$(escape_json "$req_id")
+
+        cat <<EOF
+{
+  "found": true,
+  "req_id": "$req_id",
+  "branch": "$found_branch",
+  "type": "$branch_type"
+}
+EOF
+    fi
+}
+
+# Safely delete a merged branch
+cmd_branch_delete() {
+    check_git_repo
+
+    if [[ $# -lt 1 ]]; then
+        error "Usage: branch-delete <branch-name>"
+    fi
+
+    local branch="$1"
+    local force="${2:-false}"
+
+    # Prevent deleting current branch
+    local current_branch
+    current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+    if [[ "$branch" == "$current_branch" ]]; then
+        error "Cannot delete current branch. Checkout another branch first."
+    fi
+
+    # Prevent deleting main/master
+    if [[ "$branch" == "main" || "$branch" == "master" ]]; then
+        error "Cannot delete protected branch: $branch"
+    fi
+
+    # Check if branch exists
+    if ! git rev-parse --verify "$branch" &>/dev/null; then
+        error "Branch does not exist: $branch"
+    fi
+
+    # Check if branch is merged
+    local is_merged="false"
+    if git branch --merged | grep -q "^[* ]*${branch}$"; then
+        is_merged="true"
+    fi
+
+    # Delete branch
+    local deleted="false"
+    if [[ "$is_merged" == "true" ]]; then
+        if git branch -d "$branch" &>/dev/null; then
+            deleted="true"
+        else
+            error "Failed to delete branch: $branch"
+        fi
+    elif [[ "$force" == "true" ]]; then
+        if git branch -D "$branch" &>/dev/null; then
+            deleted="true"
+        else
+            error "Failed to force delete branch: $branch"
+        fi
+    else
+        error "Branch not merged and force=false: $branch"
+    fi
+
+    branch=$(escape_json "$branch")
+
+    cat <<EOF
+{
+  "branch": "$branch",
+  "deleted": $deleted,
+  "was_merged": $is_merged
+}
+EOF
+}
+
+# ============================================================================
 # HELP TEXT
 # ============================================================================
 
@@ -323,9 +595,15 @@ USAGE:
     $SCRIPT_NAME <command> [options]
 
 COMMANDS:
-    status                 Get repository status as JSON
-    diff-stat [<ref>..<ref>]  Get diff statistics as JSON
-    log [--count=N] [<ref>]   Get commit history as JSON
+    status                          Get repository status as JSON
+    diff-stat [<ref>..<ref>]        Get diff statistics as JSON
+    log [--count=N] [<ref>]         Get commit history as JSON
+
+    branch-current                  Get current branch name as JSON
+    branch-list                     List all branches with REQ associations as JSON
+    branch-create REQ-XXX "Title"   Create feature/REQ-XXX-slug branch
+    branch-for-req REQ-XXX          Find branch for requirement
+    branch-delete <branch> [force]  Safely delete merged branch
 
 OPTIONS:
     --raw                  Pass through to regular git (for any command)
@@ -347,6 +625,21 @@ EXAMPLES:
 
     # Get commits in a ref range
     $SCRIPT_NAME log main..HEAD
+
+    # Get current branch
+    $SCRIPT_NAME branch-current
+
+    # List all branches
+    $SCRIPT_NAME branch-list
+
+    # Create feature branch
+    $SCRIPT_NAME branch-create REQ-042 "Add Dark Mode Toggle"
+
+    # Find branch for requirement
+    $SCRIPT_NAME branch-for-req REQ-042
+
+    # Delete merged branch
+    $SCRIPT_NAME branch-delete feature/REQ-042-add-dark-mode-toggle
 
     # Pass through to regular git
     $SCRIPT_NAME status --raw
@@ -398,6 +691,21 @@ main() {
             ;;
         log)
             cmd_log "$@"
+            ;;
+        branch-current)
+            cmd_branch_current "$@"
+            ;;
+        branch-list)
+            cmd_branch_list "$@"
+            ;;
+        branch-create)
+            cmd_branch_create "$@"
+            ;;
+        branch-for-req)
+            cmd_branch_for_req "$@"
+            ;;
+        branch-delete)
+            cmd_branch_delete "$@"
             ;;
         --help|-h|help)
             show_help

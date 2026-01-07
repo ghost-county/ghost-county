@@ -46,12 +46,13 @@ Run `/seance` to start new work.
 | Familiar | 0 | 0 | 0 |
 | **Total** | 0 | 0 | 0 |
 
-**Archived:** 69 requirements → See `.haunt/completed/`
+**Archived:** 76 requirements → See `.haunt/completed/`
 
 ---
 
 ## Recent Archives
 
+- **2026-01-07:** Git Workflow Integration (7 requirements) → `roadmap-archive.md`
 - **2026-01-06:** Mandatory Solution Critique (4 requirements) → `mandatory-solution-critique.md`
 - **2026-01-06:** Haunt Manifest System (1 requirement) → `roadmap-archive.md`
 - **2026-01-05:** Repository Cleanup Batch (8 requirements) → `repo-cleanup-batch.md`
