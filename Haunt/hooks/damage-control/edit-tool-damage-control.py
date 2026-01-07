@@ -109,10 +109,18 @@ def main():
         print("REASON: File is under protected directory containing sensitive data", file=sys.stderr)
         sys.exit(2)
 
-    # Check readOnlyPaths (currently empty, but implement for future-proofing)
+    # Check readOnlyPaths (deployed framework assets)
     if is_protected(file_path, read_only):
-        print(f"BLOCKED: Edit to {file_path} targets read-only path", file=sys.stderr)
-        print("REASON: Path is marked read-only in patterns.yaml", file=sys.stderr)
+        print(f"BLOCKED: {file_path} is deployed framework code", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("Edit the source instead:", file=sys.stderr)
+        print("  ~/.claude/rules/    -> Haunt/rules/", file=sys.stderr)
+        print("  ~/.claude/agents/   -> Haunt/agents/", file=sys.stderr)
+        print("  ~/.claude/skills/   -> Haunt/skills/", file=sys.stderr)
+        print("  ~/.claude/commands/ -> Haunt/commands/", file=sys.stderr)
+        print("  ~/.claude/hooks/    -> Haunt/hooks/", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("Then deploy: bash Haunt/scripts/setup-haunt.sh", file=sys.stderr)
         sys.exit(2)
 
     # If no protection matched, allow the edit

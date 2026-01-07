@@ -94,13 +94,28 @@ def main():
     script_path = Path(__file__)
     patterns = load_patterns(script_path)
 
-    # Get zeroAccessPaths from patterns
+    # Get paths from patterns
     zero_access_paths = patterns.get("zeroAccessPaths", [])
+    read_only_paths = patterns.get("readOnlyPaths", [])
 
     # Check if file_path matches any zero access path
     if matches_zero_access_paths(file_path, zero_access_paths):
         # BLOCK: File is in zero access path
         print(f"BLOCKED: Cannot write to {file_path} (zero access path)", file=sys.stderr)
+        sys.exit(2)
+
+    # Check if file_path matches any read-only path (deployed framework assets)
+    if matches_zero_access_paths(file_path, read_only_paths):
+        print(f"BLOCKED: {file_path} is deployed framework code", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("Write to the source instead:", file=sys.stderr)
+        print("  ~/.claude/rules/    -> Haunt/rules/", file=sys.stderr)
+        print("  ~/.claude/agents/   -> Haunt/agents/", file=sys.stderr)
+        print("  ~/.claude/skills/   -> Haunt/skills/", file=sys.stderr)
+        print("  ~/.claude/commands/ -> Haunt/commands/", file=sys.stderr)
+        print("  ~/.claude/hooks/    -> Haunt/hooks/", file=sys.stderr)
+        print("", file=sys.stderr)
+        print("Then deploy: bash Haunt/scripts/setup-haunt.sh", file=sys.stderr)
         sys.exit(2)
 
     # ALLOW: File is safe to write

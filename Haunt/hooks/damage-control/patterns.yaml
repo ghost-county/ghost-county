@@ -77,7 +77,13 @@ zeroAccessPaths:
 # If future requirements need read-only protection, add paths here.
 # ============================================================================
 
-readOnlyPaths: []  # Empty - allow editing everything
+readOnlyPaths:
+  # Deployed framework assets - edit Haunt/ source instead
+  - ~/.claude/rules/
+  - ~/.claude/agents/
+  - ~/.claude/skills/
+  - ~/.claude/commands/
+  - ~/.claude/hooks/
 
 # ============================================================================
 # NO DELETE PATHS (Read/Write/Edit Allowed, Delete Blocked)
