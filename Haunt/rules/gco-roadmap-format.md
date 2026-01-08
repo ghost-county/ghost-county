@@ -13,6 +13,7 @@
 **Tasks:**
 - [ ] Specific task 1
 - [ ] Specific task 2
+- [ ] Specific task 3 (2-4 tasks recommended)
 
 **Files:**
 - `path/to/file.ext` (create | modify)
@@ -67,14 +68,26 @@ Track pull request number and status:
 - Existing requirements do NOT need these fields added retroactively
 - Useful for tracking workflow state without leaving roadmap context
 
+## Task Limits
+
+**Recommended:** 2-4 tasks per requirement
+
+**Rationale:**
+- Forces atomic, completable units of work
+- Each task should be completable in one commit
+- Natural context boundaries prevent scope creep
+- Requirements with >4 tasks likely need decomposition
+
+**Validation:** haunt-roadmap.sh warns when >4 tasks detected
+
 ## Sizing (One Sitting Rule)
 
-| Size | Time | Files | Lines |
-|------|------|-------|-------|
-| XS | 30min-1hr | 1-2 | <50 |
-| S | 1-2hr | 2-4 | 50-150 |
-| M | 2-4hr | 4-8 | 150-300 |
-| SPLIT | >4hr | >8 | >300 (decompose) |
+| Size | Time | Files | Lines | Tasks |
+|------|------|-------|-------|-------|
+| XS | 30min-1hr | 1-2 | <50 | 2-3 |
+| S | 1-2hr | 2-4 | 50-150 | 2-4 |
+| M | 2-4hr | 4-8 | 150-300 | 3-4 |
+| SPLIT | >4hr | >8 | >300 (decompose) | >4 (decompose) |
 
 ## When to Invoke Full Skill
 
@@ -87,3 +100,4 @@ For batch organization, dependency management, Active Work section management, a
 - NEVER skip required fields
 - NEVER allow SPLIT-sized work (decompose first)
 - NEVER exceed 500 lines in roadmap.md (archive)
+- NEVER exceed 4 tasks per requirement (triggers SPLIT warning)
