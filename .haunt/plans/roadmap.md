@@ -6,15 +6,15 @@
 
 ## Current Focus
 
-**Batch:** Ralph Wiggum Dev Integration (4 requirements)
-**Status:** Complete
+**Batch:** Context Rot Improvements (4 requirements)
+**Status:** Not Started
 
 | REQ | Title | Effort | Blocked By |
 |-----|-------|--------|------------|
-| REQ-408 | Create /ralph-req command definition | XS | None |
-| REQ-409 | Create ralph-req.sh script | S | REQ-408 |
-| REQ-410 | Add Ralph loop awareness to dev agent | XS | None |
-| REQ-411 | Create gco-ralph-dev skill | S | REQ-410 |
+| REQ-412 | Add SESSION.md state tracking file | S | None |
+| REQ-413 | Enforce 2-4 task limit per requirement | S | None |
+| REQ-414 | Add decisions.md log | XS | None |
+| REQ-415 | Add continue-here.md auto-generation | XS | None |
 
 ---
 
@@ -27,6 +27,102 @@
 ## Haunt Framework
 
 *Haunt agent framework and SDLC tooling.*
+
+### Batch: Context Rot Improvements
+
+### 🟢 REQ-412: Add SESSION.md state tracking file
+
+**Type:** Enhancement
+**Reported:** 2026-01-08
+**Source:** GSD Comparison Research
+**Description:** Create a session-level state file to track current focus, resume points, and pending decisions. Solves the "where was I?" problem for session handoff.
+
+**Tasks:**
+- [x] Create `.haunt/state/` directory structure
+- [x] Create SESSION.md template with fields: current REQ, resume point, pending decisions, last updated
+- [x] Add session state auto-generation to haunt-roadmap.sh when status changes to 🟡
+
+**Files:**
+- `.haunt/state/SESSION.md` (create)
+- `Haunt/scripts/haunt-roadmap.sh` (modify)
+
+**Effort:** S
+**Complexity:** MODERATE
+**Agent:** gco-dev-infrastructure
+**Completion:** SESSION.md template exists and is auto-updated when requirement status changes to in-progress
+**Blocked by:** None
+
+---
+
+### 🟢 REQ-413: Enforce 2-4 task limit per requirement
+
+**Type:** Enhancement
+**Reported:** 2026-01-08
+**Source:** GSD Comparison Research
+**Description:** Add task count enforcement to prevent requirements from having too many tasks. Requirements with >4 tasks should trigger SPLIT warning.
+
+**Tasks:**
+- [x] Update gco-roadmap-format.md rule to document 2-4 task limit
+- [x] Add task count validation to haunt-roadmap.sh (warn if >4 tasks)
+- [x] Update roadmap format template to show 2-4 task guidance
+
+**Files:**
+- `Haunt/rules/gco-roadmap-format.md` (modify)
+- `Haunt/scripts/haunt-roadmap.sh` (modify)
+
+**Effort:** S
+**Complexity:** SIMPLE
+**Agent:** gco-dev-infrastructure
+**Completion:** haunt-roadmap.sh warns when a requirement has more than 4 tasks; rules document the 2-4 limit
+**Blocked by:** None
+
+---
+
+### 🟢 REQ-414: Add decisions.md log
+
+**Type:** Enhancement
+**Reported:** 2026-01-08
+**Source:** GSD Comparison Research
+**Description:** Create a simple append-only decision log to persist architectural and design decisions with rationale. Prevents re-litigating settled decisions.
+
+**Tasks:**
+- [x] Create `.haunt/docs/decisions.md` template with columns: Date, REQ, Decision, Rationale, Status
+- [x] Add documentation for when to log decisions (architecture, trade-offs, non-obvious choices)
+
+**Files:**
+- `.haunt/docs/decisions.md` (create)
+
+**Effort:** XS
+**Complexity:** SIMPLE
+**Agent:** gco-dev-infrastructure
+**Completion:** decisions.md file exists with table header and usage guidance at top
+**Blocked by:** None
+
+---
+
+### 🟢 REQ-415: Add continue-here.md auto-generation
+
+**Type:** Enhancement
+**Reported:** 2026-01-08
+**Source:** GSD Comparison Research
+**Description:** Generate an explicit handoff file when session ends with incomplete work. Contains requirement, last task, next step, modified files, and uncommitted changes.
+
+**Tasks:**
+- [x] Create `.haunt/state/continue-here.md` template
+- [x] Add auto-generation logic to session completion workflow
+- [x] Document continue-here.md in gco-session-startup rule for auto-read on startup
+
+**Files:**
+- `.haunt/state/continue-here.md` (created - comprehensive template with all recommended fields)
+- `Haunt/rules/gco-session-startup.md` (modified - added session handoff section with when to check/generate)
+
+**Effort:** XS
+**Complexity:** SIMPLE
+**Agent:** gco-dev-infrastructure
+**Completion:** continue-here.md template exists and session-startup rule documents checking it on session start
+**Blocked by:** None
+
+---
 
 ### Batch: Ralph Wiggum Dev Integration
 
@@ -152,10 +248,10 @@
 | Project | ⚪ | 🟡 | 🟢 |
 |---------|---|---|---|
 | Cross-Project | 0 | 0 | 0 |
-| Haunt | 4 | 0 | 0 |
+| Haunt | 0 | 0 | 8 |
 | TrueSight | 0 | 0 | 0 |
 | Familiar | 0 | 0 | 0 |
-| **Total** | 4 | 0 | 0 |
+| **Total** | 0 | 0 | 8 |
 
 **Archived:** 76 requirements → See `.haunt/completed/`
 

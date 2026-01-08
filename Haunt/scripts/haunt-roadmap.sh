@@ -164,6 +164,14 @@ parse_requirement() {
     agent=$(escape_json "$agent")
     completion=$(escape_json "$completion")
 
+    # Task count validation
+    local task_count=${#tasks[@]}
+    local task_warning=""
+    if [[ $task_count -gt 4 ]]; then
+        task_warning="WARNING: $req_id has $task_count tasks (recommended: 2-4). Consider SPLIT sizing."
+        echo "$task_warning" >&2
+    fi
+
     # Output JSON
     cat <<EOF
 {
@@ -175,6 +183,7 @@ parse_requirement() {
   "agent": "$agent",
   "blocked_by": $blocked_by,
   "tasks": [$tasks_json],
+  "task_count": $task_count,
   "completion": "$completion"
 }
 EOF
@@ -357,6 +366,193 @@ EOF
 }
 
 # ============================================================================
+# UPDATE-SESSION COMMAND
+# ============================================================================
+
+cmd_update_session() {
+    local roadmap_file
+    roadmap_file=$(find_roadmap)
+
+    if [[ $# -eq 0 ]]; then
+        error "Usage: $SCRIPT_NAME update-session REQ-XXX"
+    fi
+
+    local req_id="$1"
+
+    # Validate REQ-XXX format
+    if [[ ! "$req_id" =~ ^REQ-[0-9]+$ ]]; then
+        error "Invalid requirement ID format: $req_id (expected REQ-XXX)"
+    fi
+
+    # Parse requirement to get details
+    local req_json
+    req_json=$(parse_requirement "$roadmap_file" "$req_id")
+
+    if [[ $? -ne 0 ]]; then
+        error "Failed to parse requirement $req_id"
+    fi
+
+    # Extract fields from JSON
+    local title
+    title=$(echo "$req_json" | grep -o '"title": "[^"]*"' | cut -d'"' -f4)
+
+    local agent
+    agent=$(echo "$req_json" | grep -o '"agent": "[^"]*"' | cut -d'"' -f4)
+
+    # Find first unchecked task
+    local next_task=""
+    local last_completed=""
+    local task_num=0
+    local completed_num=0
+
+    # Re-parse requirement block to get task checkbox state
+    local start_line
+    start_line=$(grep -n "^### [⚪🟡🟢🔴] $req_id:" "$roadmap_file" | cut -d: -f1 | head -1)
+
+    if [[ -n "$start_line" ]]; then
+        local end_line
+        end_line=$(tail -n +$((start_line + 1)) "$roadmap_file" | grep -n "^###\|^---" | head -1 | cut -d: -f1)
+
+        if [[ -n "$end_line" ]]; then
+            end_line=$((start_line + end_line - 1))
+        else
+            end_line=$(wc -l < "$roadmap_file" | tr -d ' ')
+        fi
+
+        # Extract tasks with checkbox state
+        while IFS= read -r line; do
+            ((task_num++))
+            if [[ "$line" =~ ^\-\ \[x\]  ]]; then
+                ((completed_num++))
+                last_completed=$(echo "$line" | sed 's/^- \[x\] //')
+            elif [[ "$line" =~ ^\-\ \[\ \]  ]] && [[ -z "$next_task" ]]; then
+                next_task=$(echo "$line" | sed 's/^- \[ \] //')
+            fi
+        done < <(sed -n "${start_line},${end_line}p" "$roadmap_file" | grep "^- \[")
+    fi
+
+    # If no next task, all are complete
+    if [[ -z "$next_task" ]] && [[ $task_num -gt 0 ]]; then
+        next_task="All tasks complete - verify completion criteria"
+    fi
+
+    # Find files being modified from Files: section
+    local files=""
+    if [[ -n "$start_line" ]]; then
+        # Extract files between **Files:** and next **Field:**
+        local in_files=false
+        local file_list=()
+        while IFS= read -r line; do
+            if [[ "$line" =~ ^\*\*Files:\*\* ]]; then
+                in_files=true
+                continue
+            fi
+            if [[ "$in_files" == true ]]; then
+                if [[ "$line" =~ ^\*\*[A-Z] ]]; then
+                    break
+                fi
+                if [[ "$line" =~ ^-\  ]]; then
+                    # Extract file path, remove backticks and parenthetical
+                    local file_entry="${line#- }"
+                    file_entry="${file_entry//\`/}"
+                    file_entry="${file_entry%% (*}"
+                    file_list+=("$file_entry")
+                fi
+            fi
+        done < <(sed -n "${start_line},${end_line}p" "$roadmap_file")
+
+        if [[ ${#file_list[@]} -gt 0 ]]; then
+            # Join with ", " separator
+            local first=true
+            for file in "${file_list[@]}"; do
+                if [[ "$first" == true ]]; then
+                    files="$file"
+                    first=false
+                else
+                    files="$files, $file"
+                fi
+            done
+        fi
+    fi
+
+    if [[ -z "$files" ]]; then
+        files="None specified"
+    fi
+
+    # Check for uncommitted changes
+    local uncommitted="No"
+    if git diff --quiet 2>/dev/null; then
+        if git diff --cached --quiet 2>/dev/null; then
+            uncommitted="No"
+        else
+            uncommitted="Yes (staged)"
+        fi
+    else
+        uncommitted="Yes (unstaged)"
+    fi
+
+    # Get current timestamp
+    local timestamp
+    timestamp=$(date "+%Y-%m-%d %H:%M:%S")
+
+    # Determine project root (where roadmap file is)
+    local project_root
+    project_root=$(dirname "$roadmap_file")
+    project_root=$(dirname "$project_root")
+    project_root=$(dirname "$project_root")
+
+    # Write SESSION.md file
+    local session_file="$project_root/.haunt/state/SESSION.md"
+
+    cat > "$session_file" <<EOF
+# Session State
+
+**Last Updated:** $timestamp
+**Current Status:** Active work in progress
+
+---
+
+## Current Focus
+
+**Requirement:** $req_id
+**Agent:** $agent
+**Title:** $title
+
+---
+
+## Resume Point
+
+**Last Task Completed:** ${last_completed:-None}
+**Next Task:** ${next_task:-Start first task}
+**Files Being Modified:** $files
+**Uncommitted Changes:** $uncommitted
+
+---
+
+## Pending Decisions
+
+None
+
+---
+
+## Notes
+
+Session auto-generated on requirement status change to in-progress.
+Check roadmap for full task list and completion criteria.
+EOF
+
+    # Output success JSON
+    cat <<EOF
+{
+  "success": true,
+  "requirement": "$req_id",
+  "session_file": "$session_file",
+  "last_updated": "$timestamp"
+}
+EOF
+}
+
+# ============================================================================
 # HELP TEXT
 # ============================================================================
 
@@ -371,6 +567,7 @@ COMMANDS:
     get REQ-XXX                Get specific requirement as JSON
     list [filters]             List requirements with optional filters
     my-work                    Show requirements for caller (placeholder)
+    update-session REQ-XXX     Update SESSION.md state file for requirement
 
 LIST FILTERS:
     --status={⚪|🟡|🟢|🔴}     Filter by status icon
@@ -399,6 +596,9 @@ EXAMPLES:
 
     # List all requirements
     $SCRIPT_NAME list
+
+    # Update session state for in-progress requirement
+    $SCRIPT_NAME update-session REQ-412
 
 OUTPUT FORMAT:
     Single requirement (get):
@@ -448,6 +648,9 @@ main() {
             ;;
         my-work)
             cmd_my_work "$@"
+            ;;
+        update-session)
+            cmd_update_session "$@"
             ;;
         --help|-h|help)
             show_help
