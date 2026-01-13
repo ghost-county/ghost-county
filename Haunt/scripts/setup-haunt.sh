@@ -82,23 +82,48 @@ section() {
 }
 
 # Find best available Python 3.11+ binary
-# Checks versioned binaries first (brew installs python3.11), then generic python3
+# Checks versioned binaries and brew paths before falling back to generic python3
 find_python311() {
-    # Check versioned binaries first (brew-style)
+    # Check versioned binaries first (if in PATH)
     for py_cmd in python3.11 python3.12 python3.13; do
         if command -v "$py_cmd" &> /dev/null; then
             echo "$py_cmd"
             return 0
         fi
     done
-    # Check brew's common install locations directly
-    for brew_path in /opt/homebrew/opt/python@3.11/bin/python3.11 /usr/local/opt/python@3.11/bin/python3.11; do
+    # Check all common brew install locations (cellar and linked)
+    # Apple Silicon paths
+    for brew_path in \
+        /opt/homebrew/bin/python3.11 \
+        /opt/homebrew/bin/python3.12 \
+        /opt/homebrew/bin/python3.13 \
+        /opt/homebrew/opt/python@3.11/bin/python3.11 \
+        /opt/homebrew/opt/python@3.12/bin/python3.12 \
+        /opt/homebrew/opt/python@3.13/bin/python3.13 \
+        /usr/local/bin/python3.11 \
+        /usr/local/bin/python3.12 \
+        /usr/local/bin/python3.13 \
+        /usr/local/opt/python@3.11/bin/python3.11 \
+        /usr/local/opt/python@3.12/bin/python3.12 \
+        /usr/local/opt/python@3.13/bin/python3.13; do
         if [[ -x "$brew_path" ]]; then
             echo "$brew_path"
             return 0
         fi
     done
-    # Fall back to generic python3
+    # Check if brew's python3 is 3.11+ (linked version)
+    for brew_python3 in /opt/homebrew/bin/python3 /usr/local/bin/python3; do
+        if [[ -x "$brew_python3" ]]; then
+            local ver=$($brew_python3 --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+' | head -1)
+            local major=$(echo "$ver" | cut -d. -f1)
+            local minor=$(echo "$ver" | cut -d. -f2)
+            if [[ "$major" -ge 3 ]] && [[ "$minor" -ge 11 ]]; then
+                echo "$brew_python3"
+                return 0
+            fi
+        fi
+    done
+    # Last resort: generic python3 (might be system python)
     if command -v python3 &> /dev/null; then
         echo "python3"
         return 0
