@@ -2,10 +2,12 @@
 # Completion Gate Hook
 # Blocks:
 # 1. Marking requirements complete (🟢) without test verification
-# 2. Marking requirements complete (🟢) with unchecked task boxes (- [ ])
+# 2. Marking requirements complete (🟢) without visual verification (frontend only)
+# 3. Marking requirements complete (🟢) with unchecked task boxes (- [ ])
 #
 # This hook ensures requirements can only be marked complete when:
 # - Tests have been verified (via verify-tests.sh evidence file)
+# - Visual verification completed for frontend work (via verify-visual.sh evidence file)
 # - All task checkboxes are marked complete (- [x], not - [ ])
 
 set -euo pipefail
@@ -90,6 +92,55 @@ if [[ $VERIFY_AGE -gt 3600 ]]; then
     echo "" >&2
     echo "This ensures tests still pass before marking complete." >&2
     exit 2  # Blocking error
+fi
+
+# ============================================
+# Visual Verification Check (Frontend Only)
+# ============================================
+
+# Check if this is a frontend requirement by looking for frontend indicators
+# in the requirement content (styling, CSS, theme, component, UI, layout)
+FRONTEND_INDICATORS="style|css|theme|component|ui|layout|tailwind|styling|visual"
+IS_FRONTEND=$(echo "$NEW_STRING" | grep -iE "$FRONTEND_INDICATORS" || true)
+
+if [[ -n "$IS_FRONTEND" ]]; then
+    # Check for visual verification evidence file
+    VISUAL_VERIFY_FILE="$PROJECT_DIR/.haunt/progress/${REQ_MATCH}-visual-verified.txt"
+
+    if [[ ! -f "$VISUAL_VERIFY_FILE" ]]; then
+        echo "Completion gate: Frontend requirement $REQ_MATCH requires visual verification." >&2
+        echo "" >&2
+        echo "This requirement appears to include UI/styling work." >&2
+        echo "Visual verification is required to catch CSS bugs that code review misses." >&2
+        echo "" >&2
+        echo "To fix:" >&2
+        echo "1. Run: bash Haunt/scripts/verify-visual.sh $REQ_MATCH <url>" >&2
+        echo "2. Confirm the screenshot shows correct styling" >&2
+        echo "3. This creates: $VISUAL_VERIFY_FILE" >&2
+        echo "4. Then retry marking the requirement complete" >&2
+        echo "" >&2
+        echo "Why: CSS variables can be defined but not applied. Screenshots catch visual bugs." >&2
+        exit 2  # Blocking error
+    fi
+
+    # Check visual verification is recent (within last hour)
+    if [[ "$(uname)" == "Darwin" ]]; then
+        VISUAL_FILE_TIME=$(stat -f %m "$VISUAL_VERIFY_FILE" 2>/dev/null || echo "0")
+    else
+        VISUAL_FILE_TIME=$(stat -c %Y "$VISUAL_VERIFY_FILE" 2>/dev/null || echo "0")
+    fi
+
+    VISUAL_VERIFY_AGE=$((CURRENT_TIME - VISUAL_FILE_TIME))
+
+    if [[ $VISUAL_VERIFY_AGE -gt 3600 ]]; then
+        VISUAL_MINUTES_AGO=$((VISUAL_VERIFY_AGE / 60))
+        echo "Completion gate: Visual verification for $REQ_MATCH is stale." >&2
+        echo "" >&2
+        echo "Visual verification was $VISUAL_MINUTES_AGO minutes ago (max: 60 minutes)." >&2
+        echo "" >&2
+        echo "Re-run: bash Haunt/scripts/verify-visual.sh $REQ_MATCH <url>" >&2
+        exit 2  # Blocking error
+    fi
 fi
 
 # Check for unchecked task boxes in the requirement being marked complete

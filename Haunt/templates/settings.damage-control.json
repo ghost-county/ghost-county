@@ -18,6 +18,11 @@
             "type": "command",
             "command": "uv run \"$HOME/.claude/hooks/damage-control/edit-tool-damage-control.py\"",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/completion-gate.sh\"",
+            "timeout": 5
           }
         ]
       },
